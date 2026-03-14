@@ -1,0 +1,13 @@
+{
+  "outdir_samples": "/app/outputs",
+  "outdir_txt2img_samples": "/app/outputs/txt2img",
+  "outdir_img2img_samples": "/app/outputs/img2img",
+  "outdir_extras_samples": "/app/outputs/extras",
+  "save_to_dirs": true,
+  "samples_format": "png",
+  "show_progress_every_n_steps": 5,
+  "CLIP_stop_at_last_layers": 2,
+  "sd_model_checkpoint": "",
+  "sd_vae": "Automatic",
+  "enable_pnginfo": true
+}
