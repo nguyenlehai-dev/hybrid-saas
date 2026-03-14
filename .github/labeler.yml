@@ -1,0 +1,29 @@
+# Label config for auto-labeling PRs
+frontend:
+  - changed-files:
+      - any-glob-to-any-file: 'frontend/**'
+
+backend:
+  - changed-files:
+      - any-glob-to-any-file: 'api-gateway/**'
+
+infrastructure:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'nginx/**'
+          - 'docker-compose.yml'
+          - 'scripts/**'
+
+ai-engine:
+  - changed-files:
+      - any-glob-to-any-file: 'vm2-ai-engine/**'
+
+documentation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'docs/**'
+          - '*.md'
+
+ci-cd:
+  - changed-files:
+      - any-glob-to-any-file: '.github/**'

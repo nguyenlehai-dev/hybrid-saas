@@ -1,0 +1,46 @@
+name: Bug Report
+description: Báo cáo lỗi
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Mô tả lỗi
+      description: Mô tả chi tiết lỗi bạn gặp
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Các bước tái hiện
+      description: Liệt kê từng bước để tái hiện lỗi
+      placeholder: |
+        1. Vào trang '...'
+        2. Click vào '...'
+        3. Thấy lỗi '...'
+    validations:
+      required: true
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      options:
+        - Frontend
+        - Backend API
+        - AI Engine
+        - Database
+        - Nginx/Infra
+    validations:
+      required: true
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Mức độ nghiêm trọng
+      options:
+        - Low - Không ảnh hưởng nhiều
+        - Medium - Ảnh hưởng 1 tính năng
+        - High - Ảnh hưởng nhiều tính năng
+        - Critical - Hệ thống không hoạt động
+    validations:
+      required: true

@@ -1,0 +1,192 @@
+# ============================================
+# CD Pipeline - Deploy to Production
+# Trigger: Push/Merge to main branch
+# ============================================
+name: 🚀 Deploy Production
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      skip_ci:
+        description: 'Skip CI checks'
+        required: false
+        default: 'false'
+        type: boolean
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+env:
+  SERVER_HOST: ${{ secrets.SERVER_HOST }}
+  SERVER_USER: ${{ secrets.SERVER_USER }}
+  FRONTEND_PATH: ${{ secrets.FRONTEND_PATH }}
+  BACKEND_PATH: ${{ secrets.BACKEND_PATH }}
+
+jobs:
+  # ─────────────────────────────────────────
+  # 1. DETECT CHANGES
+  # ─────────────────────────────────────────
+  changes:
+    name: 🔎 Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      frontend: ${{ steps.filter.outputs.frontend }}
+      backend: ${{ steps.filter.outputs.backend }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            frontend:
+              - 'frontend/**'
+            backend:
+              - 'api-gateway/**'
+
+  # ─────────────────────────────────────────
+  # 2. DEPLOY FRONTEND
+  # ─────────────────────────────────────────
+  deploy-frontend:
+    name: 🎨 Deploy Frontend
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://vpspanel.io.vn
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: 📥 Install & Build
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+        env:
+          NEXT_PUBLIC_API_URL: https://api.vpspanel.io.vn
+
+      - name: 🔑 Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: 🔒 Add Known Hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ env.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: 🚀 Deploy Frontend
+        run: |
+          echo "📦 Syncing frontend files..."
+          rsync -avz --delete \
+            --exclude='node_modules' \
+            --exclude='.env.local' \
+            frontend/ ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}:${{ env.FRONTEND_PATH }}/
+
+          echo "📥 Installing dependencies on server..."
+          ssh ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} << 'EOF'
+            cd ${{ env.FRONTEND_PATH }}
+            source ~/.nvm/nvm.sh
+            npm ci --production
+            npm run build
+            sudo systemctl restart saas-frontend
+            echo "✅ Frontend deployed!"
+          EOF
+
+      - name: ❤️ Health Check
+        run: |
+          sleep 10
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://vpspanel.io.vn/)
+          if [ "$HTTP_STATUS" -eq 200 ]; then
+            echo "✅ Frontend is healthy (HTTP $HTTP_STATUS)"
+          else
+            echo "❌ Frontend health check failed (HTTP $HTTP_STATUS)"
+            exit 1
+          fi
+
+  # ─────────────────────────────────────────
+  # 3. DEPLOY BACKEND
+  # ─────────────────────────────────────────
+  deploy-backend:
+    name: ⚙️ Deploy Backend
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://api.vpspanel.io.vn
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 🔑 Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: 🔒 Add Known Hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ env.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: 🚀 Deploy Backend
+        run: |
+          echo "📦 Syncing backend files..."
+          rsync -avz --delete \
+            --exclude='venv' \
+            --exclude='.env' \
+            --exclude='__pycache__' \
+            api-gateway/ ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}:${{ env.BACKEND_PATH }}/
+
+          echo "📥 Installing dependencies on server..."
+          ssh ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} << 'EOF'
+            cd ${{ env.BACKEND_PATH }}
+            source venv/bin/activate
+            pip install -r requirements.txt --quiet
+            sudo systemctl restart saas-api
+            echo "✅ Backend deployed!"
+          EOF
+
+      - name: ❤️ Health Check
+        run: |
+          sleep 5
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://api.vpspanel.io.vn/docs)
+          if [ "$HTTP_STATUS" -eq 200 ]; then
+            echo "✅ Backend is healthy (HTTP $HTTP_STATUS)"
+          else
+            echo "❌ Backend health check failed (HTTP $HTTP_STATUS)"
+            exit 1
+          fi
+
+  # ─────────────────────────────────────────
+  # 4. NOTIFICATION
+  # ─────────────────────────────────────────
+  notify:
+    name: 📢 Notify Team
+    needs: [deploy-frontend, deploy-backend]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📊 Deploy Summary
+        run: |
+          echo "### 🚀 Deploy Production Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Frontend | ${{ needs.deploy-frontend.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Backend | ${{ needs.deploy-backend.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployed by:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY

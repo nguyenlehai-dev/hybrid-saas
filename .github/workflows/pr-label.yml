@@ -1,0 +1,22 @@
+# ============================================
+# PR Auto Label - Gán label tự động cho PR
+# ============================================
+name: 🏷️ PR Auto Label
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  label:
+    name: 🏷️ Auto Label
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/labeler@v5
+        with:
+          configuration-path: .github/labeler.yml

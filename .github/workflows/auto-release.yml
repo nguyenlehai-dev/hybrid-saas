@@ -1,0 +1,75 @@
+# ============================================
+# Auto Release - Tạo release tag khi merge PR
+# ============================================
+name: 📦 Auto Release
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+jobs:
+  release:
+    name: 📦 Create Release
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🏷️ Get version
+        id: version
+        run: |
+          # Auto increment version based on latest tag
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          MAJOR=$(echo $LATEST_TAG | cut -d. -f1 | tr -d 'v')
+          MINOR=$(echo $LATEST_TAG | cut -d. -f2)
+          PATCH=$(echo $LATEST_TAG | cut -d. -f3)
+          
+          # Check PR labels for version bump type
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          if echo "$PR_TITLE" | grep -qi "breaking\|major"; then
+            MAJOR=$((MAJOR + 1)); MINOR=0; PATCH=0
+          elif echo "$PR_TITLE" | grep -qi "feat\|feature\|minor"; then
+            MINOR=$((MINOR + 1)); PATCH=0
+          else
+            PATCH=$((PATCH + 1))
+          fi
+          
+          NEW_VERSION="v${MAJOR}.${MINOR}.${PATCH}"
+          echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "📦 New version: $NEW_VERSION"
+
+      - name: 📝 Generate Changelog
+        id: changelog
+        run: |
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -n "$LATEST_TAG" ]; then
+            CHANGES=$(git log ${LATEST_TAG}..HEAD --pretty=format:"- %s (%h)" --no-merges)
+          else
+            CHANGES=$(git log --pretty=format:"- %s (%h)" --no-merges -20)
+          fi
+          echo "changes<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: 🚀 Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          name: Release ${{ steps.version.outputs.version }}
+          body: |
+            ## 🚀 Release ${{ steps.version.outputs.version }}
+            
+            **PR:** #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}
+            **Author:** @${{ github.event.pull_request.user.login }}
+            **Date:** ${{ github.event.pull_request.merged_at }}
+            
+            ### 📝 Changes
+            ${{ steps.changelog.outputs.changes }}
+          draft: false
+          prerelease: false
