@@ -474,13 +474,13 @@ export default function HomePage() {
       )}
 
       {/* ══════ BANNER CAROUSEL SECTION — DIWE Style ══════ */}
-      <section style={{ padding: "0 0 50px", background: "#fff", position: "relative", marginTop: -80, zIndex: 10 }}>
+      <section style={{ background: "#fff", position: "relative", marginTop: "-8pc", zIndex: 10 }}>
         {/* Green swoosh curve from hero */}
         <svg viewBox="0 0 1440 80" style={{ display: "block", width: "100%", marginTop: -1 }} preserveAspectRatio="none">
           <path d="M0,0 L0,20 Q360,80 720,40 Q1080,0 1440,30 L1440,0 Z" fill="#ecfdf5" />
           <path d="M0,60 Q200,80 400,50 Q700,10 1000,40 Q1200,55 1440,30" fill="none" stroke="#16a34a" strokeWidth="2" opacity="0.3" />
         </svg>
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px", position: "relative" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px", position: "relative", top: -80 }}>
           {/* Carousel container */}
           <div style={{ position: "relative", overflow: "hidden", borderRadius: 16 }}>
             <div style={{
@@ -489,11 +489,11 @@ export default function HomePage() {
               transform: `translateX(-${bannerIndex * (100 / 3)}%)`,
             }}>
               {[
-                { img: "/images/banner-slide-1.png", alt: "Xây dựng ngôi nhà online" },
-                { img: "/images/banner-slide-2.png", alt: "Giải pháp bán hàng hiệu quả" },
-                { img: "/images/banner-slide-3.png", alt: "Portfolio dự án" },
-                { img: "/images/banner-slide-1.png", alt: "Xây dựng ngôi nhà online" },
-                { img: "/images/banner-slide-2.png", alt: "Giải pháp bán hàng hiệu quả" },
+                { img: "/images/gdrive-banner.png", alt: "VPS Panel AI Banner 1" },
+                { img: "/images/gdrive-banner.png", alt: "VPS Panel AI Banner 2" },
+                { img: "/images/gdrive-banner.png", alt: "VPS Panel AI Banner 3" },
+                { img: "/images/gdrive-banner.png", alt: "VPS Panel AI Banner 4" },
+                { img: "/images/gdrive-banner.png", alt: "VPS Panel AI Banner 5" },
               ].map((slide, i) => (
                 <div key={i} style={{
                   flex: "0 0 calc(100% / 3)",
@@ -824,12 +824,12 @@ export default function HomePage() {
                 cursor: "pointer", color: "#2563eb", fontSize: "1.1rem", fontWeight: 700,
                 transition: "all 0.2s",
               }}
-              onMouseEnter={e => { e.currentTarget.style.background = "#2563eb"; e.currentTarget.style.color = "#fff"; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#2563eb"; }}
-              onClick={() => {
-                const el = document.getElementById("case-carousel");
-                if (el) el.scrollBy({ left: -300, behavior: "smooth" });
-              }}
+                onMouseEnter={e => { e.currentTarget.style.background = "#2563eb"; e.currentTarget.style.color = "#fff"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#2563eb"; }}
+                onClick={() => {
+                  const el = document.getElementById("case-carousel");
+                  if (el) el.scrollBy({ left: -300, behavior: "smooth" });
+                }}
               >‹</div>
               <div style={{
                 width: 40, height: 40, borderRadius: "50%", background: "#2563eb",
@@ -837,10 +837,10 @@ export default function HomePage() {
                 cursor: "pointer", color: "#fff", fontSize: "1.1rem", fontWeight: 700,
                 transition: "all 0.2s",
               }}
-              onClick={() => {
-                const el = document.getElementById("case-carousel");
-                if (el) el.scrollBy({ left: 300, behavior: "smooth" });
-              }}
+                onClick={() => {
+                  const el = document.getElementById("case-carousel");
+                  if (el) el.scrollBy({ left: 300, behavior: "smooth" });
+                }}
               >›</div>
             </div>
           </div>
@@ -864,8 +864,8 @@ export default function HomePage() {
                 boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
                 minWidth: 270, flex: "0 0 calc(25% - 15px)",
               }}
-              onMouseEnter={e => e.currentTarget.style.transform = "translateY(-5px)"}
-              onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}
+                onMouseEnter={e => e.currentTarget.style.transform = "translateY(-5px)"}
+                onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}
               >
                 <div style={{
                   width: "100%", height: 280, overflow: "hidden",
@@ -875,8 +875,8 @@ export default function HomePage() {
                     width: "100%", height: "100%", objectFit: "cover",
                     transition: "transform 0.5s",
                   }}
-                  onMouseEnter={e => e.currentTarget.style.transform = "scale(1.05)"}
-                  onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
+                    onMouseEnter={e => e.currentTarget.style.transform = "scale(1.05)"}
+                    onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
                   />
                 </div>
                 <div style={{ padding: "20px 24px" }}>
