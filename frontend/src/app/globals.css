@@ -1492,6 +1492,18 @@ table th {
     max-width: 420px;
     margin: 0 auto;
   }
+  .solutions-grid-responsive-row2 {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+    max-width: 420px !important;
+    margin: 16px auto 0 !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  .solutions-grid-responsive-row2 {
+    max-width: 100% !important;
+  }
 }
 
 /* ══════ Banner Carousel — Responsive ══════ */

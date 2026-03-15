@@ -1,6 +1,6 @@
 "use client";
 import { useState, useRef } from "react";
-import { PiList, PiMagnifyingGlass, PiPhone, PiCaretDown, PiGlobe, PiPaintBrush, PiPalette, PiRocketLaunch, PiChartLineUp, PiUsers } from "react-icons/pi";
+import { PiList, PiMagnifyingGlass, PiPhone, PiCaretDown, PiGlobe, PiPalette, PiRocketLaunch, PiSparkle, PiPencilLine } from "react-icons/pi";
 
 interface NavbarProps {
   onOpenMobileMenu: () => void;
@@ -8,52 +8,44 @@ interface NavbarProps {
 
 const serviceItems = [
   {
-    icon: <PiGlobe />,
-    title: "Thiết kế website chuyên nghiệp",
-    desc: "Sở hữu một website chuẩn SEO, giao diện responsive với đầy đủ tính năng...",
+    icon: <PiRocketLaunch />,
+    title: "Thiết kế Landing Page bằng WP",
+    desc: "Landing page tối ưu chuyển đổi trên nền tảng WordPress, chuẩn SEO...",
     href: "/#services",
-    color: "#16a34a",
-    bg: "#f0fdf4",
+    color: "#f97316",
+    bg: "#fff7ed",
   },
   {
-    icon: <PiPaintBrush />,
-    title: "Thiết kế nhận diện thương hiệu",
-    desc: "Thiết kế logo, nhận diện văn phòng, ấn phẩm truyền thông, profile doanh...",
+    icon: <PiSparkle />,
+    title: "Thiết kế hình ảnh bằng Prompt",
+    desc: "Tạo hình ảnh chất lượng cao từ mô tả văn bản với công nghệ AI...",
     href: "/#services",
     color: "#a855f7",
     bg: "#faf5ff",
   },
   {
-    icon: <PiUsers />,
-    title: "Phòng marketing thuê ngoài",
-    desc: "Giúp tối ưu ngân sách, từ đó nâng mức chuyển đổi tối đa với các chiến...",
-    href: "/#services",
-    color: "#ef4444",
-    bg: "#fef2f2",
-  },
-  {
-    icon: <PiRocketLaunch />,
-    title: "Thiết kế landing page",
-    desc: "Là giải pháp tuyệt vời cho các chiến dịch bán hàng và truyền thông thươn...",
-    href: "/#services",
-    color: "#f59e0b",
-    bg: "#fffbeb",
-  },
-  {
-    icon: <PiPalette />,
-    title: "Quản trị và sáng tạo nội dung",
-    desc: "Xây dựng chiến lược và lên ý tưởng cho content theo từng giai đoạn, để...",
+    icon: <PiPencilLine />,
+    title: "Quản trị & sáng tạo nội dung",
+    desc: "Chiến lược content đa kênh Facebook, TikTok, Instagram, Website...",
     href: "/#services",
     color: "#06b6d4",
     bg: "#ecfeff",
   },
   {
-    icon: <PiChartLineUp />,
-    title: "Dịch vụ SEO tổng thể",
-    desc: "Chiến lược SEO bài bản, kế hoạch rõ ràng kết hợp với nội dung chuyên sâ...",
+    icon: <PiGlobe />,
+    title: "Thiết kế website chuyên nghiệp",
+    desc: "Website bán hàng, giới thiệu doanh nghiệp chuẩn SEO & responsive...",
     href: "/#services",
     color: "#16a34a",
     bg: "#f0fdf4",
+  },
+  {
+    icon: <PiPalette />,
+    title: "Kết nối nền tảng AI hình ảnh & video",
+    desc: "Tích hợp các nền tảng dựng hình ảnh, video bằng AI hàng đầu...",
+    href: "/#services",
+    color: "#ec4899",
+    bg: "#fdf2f8",
   },
 ];
 
