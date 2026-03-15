@@ -95,8 +95,8 @@ export default function SolutionsSection() {
             fontSize: "clamp(1.8rem, 3.5vw, 2.6rem)", fontWeight: 800,
             color: "#111827", lineHeight: 1.3,
           }}>
-            GIẢI PHÁP TOÀN DIỆN CHO<br />
-            <span style={{ color: "#16a34a" }}>DOANH NGHIỆP</span> THỜI ĐẠI SỐ
+            GIẢI PHÁP CHO DOANH NGHIỆP<br />
+            TRONG THỜI ĐẠI 4.0
           </h2>
           <p style={{
             color: "#6b7280", fontSize: "0.95rem", maxWidth: 560,
