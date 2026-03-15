@@ -1,6 +1,6 @@
 "use client";
 import { useState, useRef } from "react";
-import { PiList, PiMagnifyingGlass, PiPhone, PiCaretDown, PiGlobe, PiPalette, PiRocketLaunch, PiSparkle, PiPencilLine } from "react-icons/pi";
+import { PiList, PiMagnifyingGlass, PiPhone, PiCaretDown, PiGlobe, PiPalette, PiRocketLaunch, PiSparkle, PiPencilLine, PiChartLineUp } from "react-icons/pi";
 
 interface NavbarProps {
   onOpenMobileMenu: () => void;
@@ -46,6 +46,14 @@ const serviceItems = [
     href: "/#services",
     color: "#ec4899",
     bg: "#fdf2f8",
+  },
+  {
+    icon: <PiChartLineUp />,
+    title: "Dịch vụ SEO tổng thể",
+    desc: "Chiến lược SEO bài bản, kế hoạch rõ ràng, tối ưu công cụ tìm kiếm...",
+    href: "/#services",
+    color: "#16a34a",
+    bg: "#f0fdf4",
   },
 ];
 

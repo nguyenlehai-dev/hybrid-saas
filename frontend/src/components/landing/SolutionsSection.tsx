@@ -1,5 +1,5 @@
 "use client";
-import { PiGlobe, PiPalette, PiPencilLine, PiRocketLaunch, PiSparkle } from "react-icons/pi";
+import { PiGlobe, PiPalette, PiPencilLine, PiRocketLaunch, PiSparkle, PiChartLineUp } from "react-icons/pi";
 
 const solutions = [
   {
@@ -47,6 +47,15 @@ const solutions = [
     subtitle: "Tích hợp các nền tảng AI hàng đầu",
     desc: "Kết nối trực tiếp đến các nền tảng dựng hình ảnh, video bằng AI — tự động hóa quy trình sản xuất nội dung đa phương tiện cho doanh nghiệp.",
   },
+  {
+    img: "/images/solution-marketing.png",
+    icon: <PiChartLineUp />,
+    iconBg: "#f0fdf4",
+    iconColor: "#16a34a",
+    title: "DỊCH VỤ SEO TỔNG THỂ",
+    subtitle: "Giải pháp tối ưu hóa công cụ tìm kiếm cho website của bạn",
+    desc: "Chiến lược SEO bài bản, kế hoạch rõ ràng kết hợp với nội dung chuyên sâu giúp khách hàng tìm thấy bạn trên Google.",
+  },
 ];
 
 export default function SolutionsSection() {
@@ -72,23 +81,12 @@ export default function SolutionsSection() {
           </h2>
         </div>
 
-        {/* Row 1: 3 cards */}
+        {/* Solutions Grid — 3x2 */}
         <div className="solutions-grid-responsive" style={{
           display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 28,
-          marginBottom: 28,
         }}>
-          {solutions.slice(0, 3).map((item, i) => (
+          {solutions.map((item, i) => (
             <SolutionCard key={i} item={item} />
-          ))}
-        </div>
-
-        {/* Row 2: 2 cards — centered */}
-        <div className="solutions-grid-responsive-row2" style={{
-          display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 28,
-          maxWidth: 800, margin: "0 auto",
-        }}>
-          {solutions.slice(3, 5).map((item, i) => (
-            <SolutionCard key={i + 3} item={item} />
           ))}
         </div>
       </div>
