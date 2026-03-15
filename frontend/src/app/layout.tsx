@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 export const metadata: Metadata = {
   title: "VPS Panel AI - Nền tảng AI xử lý ảnh thông minh",
   description:
