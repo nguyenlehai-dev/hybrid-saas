@@ -309,11 +309,10 @@ export default function HomePage() {
               {/* Main image */}
               <div style={{ position: "relative" }}>
                 <img
-                  src="/images/hero-illustration.png"
+                  src="/images/hero-illustration.png?v=2"
                   alt="VPS Panel AI Hero"
                   style={{
                     width: "100%",
-                    maxWidth: 480,
                     borderRadius: 20,
                     position: "relative",
                     zIndex: 2,
