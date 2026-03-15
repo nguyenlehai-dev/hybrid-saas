@@ -28,6 +28,7 @@ export default function HomePage() {
   const [slideIndex, setSlideIndex] = useState(0);
   const [showVideo, setShowVideo] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [bannerIndex, setBannerIndex] = useState(0);
 
   /* ── Typing animation state ── */
   const typingPhrases = ["CONTENT MARKETING", "SEO WEBSITE", "QUẢNG CÁO GOOGLE", "THIẾT KẾ WEBSITE", "XỬ LÝ ẢNH AI"];
@@ -309,11 +310,10 @@ export default function HomePage() {
               {/* Main image */}
               <div style={{ position: "relative" }}>
                 <img
-                  src="/images/hero-illustration.png"
+                  src="/images/hero-illustration.png?v=2"
                   alt="VPS Panel AI Hero"
                   style={{
                     width: "100%",
-                    maxWidth: 480,
                     borderRadius: 20,
                     position: "relative",
                     zIndex: 2,
@@ -473,53 +473,94 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* ══════ ABOUT SECTION ══════ */}
-      <section style={{ padding: "80px 0", background: "#fff" }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
-          {/* Section Header */}
-          <div style={{ textAlign: "center", marginBottom: 60 }}>
-            <span style={{ color: "#6366f1", fontWeight: 700, fontSize: "0.85rem", textTransform: "uppercase", letterSpacing: 1 }}>Về VPS Panel AI</span>
-            <h2 style={{ fontSize: "2.4rem", fontWeight: 800, color: "#7c2d12", marginTop: 8, lineHeight: 1.3 }}>
-              Nền tảng AI<br />hàng đầu Việt Nam!
-            </h2>
+      {/* ══════ BANNER CAROUSEL SECTION — DIWE Style ══════ */}
+      <section style={{ padding: "50px 0 60px", background: "#fff" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px", position: "relative" }}>
+          {/* Carousel container */}
+          <div style={{ position: "relative", overflow: "hidden", borderRadius: 16 }}>
+            <div style={{
+              display: "flex",
+              transition: "transform 0.6s cubic-bezier(0.4,0,0.2,1)",
+              transform: `translateX(-${bannerIndex * (100 / 3)}%)`,
+            }}>
+              {[
+                { img: "/images/banner-slide-1.png", alt: "Xây dựng ngôi nhà online" },
+                { img: "/images/banner-slide-2.png", alt: "Giải pháp bán hàng hiệu quả" },
+                { img: "/images/banner-slide-3.png", alt: "Portfolio dự án" },
+                { img: "/images/banner-slide-1.png", alt: "Xây dựng ngôi nhà online" },
+                { img: "/images/banner-slide-2.png", alt: "Giải pháp bán hàng hiệu quả" },
+              ].map((slide, i) => (
+                <div key={i} style={{
+                  flex: "0 0 calc(100% / 3)",
+                  padding: "0 8px",
+                  boxSizing: "border-box" as const,
+                }}>
+                  <img
+                    src={slide.img}
+                    alt={slide.alt}
+                    style={{
+                      width: "100%",
+                      height: 280,
+                      objectFit: "cover",
+                      borderRadius: 12,
+                      display: "block",
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+
+            {/* Left Arrow */}
+            <button
+              onClick={() => setBannerIndex(prev => Math.max(0, prev - 1))}
+              style={{
+                position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)",
+                width: 44, height: 44, borderRadius: "50%",
+                background: "#16a34a", border: "none", cursor: "pointer",
+                color: "#fff", fontSize: "1.3rem", fontWeight: 700,
+                boxShadow: "0 4px 15px rgba(22,163,74,0.4)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                opacity: bannerIndex === 0 ? 0.4 : 1,
+                transition: "opacity 0.2s",
+                zIndex: 5,
+              }}
+              disabled={bannerIndex === 0}
+            >‹</button>
+
+            {/* Right Arrow */}
+            <button
+              onClick={() => setBannerIndex(prev => Math.min(2, prev + 1))}
+              style={{
+                position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)",
+                width: 44, height: 44, borderRadius: "50%",
+                background: "#16a34a", border: "none", cursor: "pointer",
+                color: "#fff", fontSize: "1.3rem", fontWeight: 700,
+                boxShadow: "0 4px 15px rgba(22,163,74,0.4)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                opacity: bannerIndex === 2 ? 0.4 : 1,
+                transition: "opacity 0.2s",
+                zIndex: 5,
+              }}
+              disabled={bannerIndex === 2}
+            >›</button>
           </div>
 
-          {/* Flip Cards Grid */}
-          <div className="about-cards-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 30 }}>
-            {[
-              {
-                img: "/images/about-icon.png",
-                title: "Xử Lý Ảnh AI",
-                desc: "Tạo ảnh sản phẩm chuyên nghiệp với AI. Phân tích và tối ưu hình ảnh cho eCommerce, tăng conversion rate đáng kể.",
-              },
-              {
-                img: "/images/about-icon.png",
-                title: "Quản Lý Nội Dung",
-                desc: "AI phân tích nội dung và tạo ảnh review sản phẩm tự động. Quản lý và tối ưu nội dung thương hiệu trên mọi nền tảng.",
-              },
-              {
-                img: "/images/about-icon.png",
-                title: "Auto Landing Page",
-                desc: "Tự động tạo và deploy landing page chuyên nghiệp. AI phân tích và tối ưu layout cho từng sản phẩm riêng biệt.",
-              },
-            ].map((card, i) => (
-              <div key={i} className={`flip-card ${i === 1 ? "flip-card-flipped" : ""}`}>
-                <div className="flip-card-inner">                  {/* Front */}
-                  <div className="flip-card-front">
-                    <img className="flip-icon" src={card.img} alt={card.title} />
-                    <h3>{card.title}</h3>
-                    <p>{card.desc}</p>
-                    <a href="/login" className="flip-btn">Tìm hiểu thêm</a>
-                  </div>
-                  {/* Back */}
-                  <div className="flip-card-back">
-                    <img className="flip-icon" src={card.img} alt={card.title} />
-                    <h3>{card.title}</h3>
-                    <p>{card.desc}</p>
-                    <a href="/login" className="flip-btn">Tìm hiểu thêm</a>
-                  </div>
-                </div>
-              </div>
+          {/* Dots */}
+          <div style={{ display: "flex", justifyContent: "center", gap: 8, marginTop: 20 }}>
+            {[0, 1, 2].map(i => (
+              <button
+                key={i}
+                onClick={() => setBannerIndex(i)}
+                style={{
+                  width: bannerIndex === i ? 28 : 10,
+                  height: 10,
+                  borderRadius: 5,
+                  background: bannerIndex === i ? "#16a34a" : "#d1d5db",
+                  border: "none",
+                  cursor: "pointer",
+                  transition: "all 0.3s",
+                }}
+              />
             ))}
           </div>
         </div>
