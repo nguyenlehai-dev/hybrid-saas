@@ -1,7 +1,9 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import { useLang } from "@/lib/i18n";
 
 export default function TestimonialsSection() {
+  const { lang } = useLang();
   const [testimonialVisible, setTestimonialVisible] = useState(false);
   const testimonialSectionRef = useRef<HTMLElement>(null);
 
@@ -47,7 +49,7 @@ export default function TestimonialsSection() {
               <span style={{
                 color: "#16a34a", fontSize: "0.8rem", fontWeight: 700,
                 letterSpacing: 1, textTransform: "uppercase" as const,
-              }}>LẮNG NGHE Ý KIẾN</span>
+              }}>{lang === "en" ? "LISTEN TO FEEDBACK" : "LẮNG NGHE Ý KIẾN"}</span>
             </div>
 
             {/* Heading */}
@@ -55,7 +57,7 @@ export default function TestimonialsSection() {
               fontSize: "clamp(1.6rem, 3vw, 2.4rem)", fontWeight: 800,
               color: "#111827", lineHeight: 1.3, marginBottom: 32,
             }}>
-              KHÁCH HÀNG NÓI GÌ VỀ<br />
+              {lang === "en" ? "WHAT CUSTOMERS SAY ABOUT" : "KHÁCH HÀNG NÓI GÌ VỀ"}<br />
               VPS PANEL AI
             </h2>
 
@@ -72,9 +74,9 @@ export default function TestimonialsSection() {
                 fontSize: "0.92rem", color: "#4b5563",
                 lineHeight: 1.8, fontStyle: "italic", margin: 0,
               }}>
-                &ldquo; Cảm ơn VPS Panel AI đã thực hiện các dự án tuyệt vời cho bên mình.
-                Chắc chắn với chất lượng dịch vụ và sản phẩm của VPS Panel AI,
-                các bạn sẽ còn tiến xa hơn. &rdquo;
+                {lang === "en"
+                  ? '\u201c Thank you VPS Panel AI for delivering amazing projects for us. With the quality of your services and products, you will surely go further. \u201d'
+                  : '\u201c C\u1ea3m \u01a1n VPS Panel AI \u0111\u00e3 th\u1ef1c hi\u1ec7n c\u00e1c d\u1ef1 \u00e1n tuy\u1ec7t v\u1eddi cho b\u00ean m\u00ecnh. Ch\u1eafc ch\u1eafn v\u1edbi ch\u1ea5t l\u01b0\u1ee3ng d\u1ecbch v\u1ee5 v\u00e0 s\u1ea3n ph\u1ea9m c\u1ee7a VPS Panel AI, c\u00e1c b\u1ea1n s\u1ebd c\u00f2n ti\u1ebfn xa h\u01a1n. \u201d'}
               </p>
             </div>
 

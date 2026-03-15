@@ -1,22 +1,30 @@
 "use client";
-
-const cases = [
-  { category: "Công cụ AI", title: "Tạo Ảnh AI Tự Động", bg: "#e8f4fd", img: "/images/case-ai-image.png" },
-  { category: "AI Marketing", title: "Viết Nội Dung SEO", bg: "#f3e8f9", img: "/images/case-seo-content.png" },
-  { category: "AI Doanh Nghiệp", title: "Trợ Lý Chatbot AI", bg: "#e8f0fd", img: "/images/case-chatbot.png" },
-  { category: "AI Sáng Tạo", title: "Tạo Video AI", bg: "#0a0e2a", img: "/images/case-video-ai.png" },
-  { category: "AI Phân Tích", title: "Phân Tích Dữ Liệu AI", bg: "#e8f4fd", img: "/images/case-data-insights.png" },
-];
+import { useLang } from "@/lib/i18n";
 
 export default function CaseStudiesSection() {
+  const { lang } = useLang();
+
+  const cases = lang === "en" ? [
+    { category: "AI Tools", title: "AI Image Generation", bg: "#e8f4fd", img: "/images/case-ai-image.png" },
+    { category: "AI Marketing", title: "SEO Content Writing", bg: "#f3e8f9", img: "/images/case-seo-content.png" },
+    { category: "AI Business", title: "AI Chatbot Assistant", bg: "#e8f0fd", img: "/images/case-chatbot.png" },
+    { category: "AI Creative", title: "AI Video Creation", bg: "#0a0e2a", img: "/images/case-video-ai.png" },
+    { category: "AI Analytics", title: "AI Data Analysis", bg: "#e8f4fd", img: "/images/case-data-insights.png" },
+  ] : [
+    { category: "Công cụ AI", title: "Tạo Ảnh AI Tự Động", bg: "#e8f4fd", img: "/images/case-ai-image.png" },
+    { category: "AI Marketing", title: "Viết Nội Dung SEO", bg: "#f3e8f9", img: "/images/case-seo-content.png" },
+    { category: "AI Doanh Nghiệp", title: "Trợ Lý Chatbot AI", bg: "#e8f0fd", img: "/images/case-chatbot.png" },
+    { category: "AI Sáng Tạo", title: "Tạo Video AI", bg: "#0a0e2a", img: "/images/case-video-ai.png" },
+    { category: "AI Phân Tích", title: "Phân Tích Dữ Liệu AI", bg: "#e8f4fd", img: "/images/case-data-insights.png" },
+  ];
   return (
     <section id="tools" style={{ padding: "80px 0", background: "#fff" }}>
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 50 }}>
           <div>
-            <span style={{ color: "#16a34a", fontWeight: 700, fontSize: "0.85rem", textTransform: "uppercase", letterSpacing: 1 }}>Dự Án Tiêu Biểu</span>
+            <span style={{ color: "#16a34a", fontWeight: 700, fontSize: "0.85rem", textTransform: "uppercase", letterSpacing: 1 }}>{lang === "en" ? "Featured Projects" : "Dự Án Tiêu Biểu"}</span>
             <h2 style={{ fontSize: "2.2rem", fontWeight: 800, color: "#111827", marginTop: 8, lineHeight: 1.3 }}>
-              Kết quả ấn tượng từ<br />các dự án thực tế
+              {lang === "en" ? <>Impressive results from<br />real projects</> : <>Kết quả ấn tượng từ<br />các dự án thực tế</>}
             </h2>
           </div>
           <div style={{ display: "flex", gap: 8 }}>

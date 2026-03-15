@@ -1,9 +1,13 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import { useLang } from "@/lib/i18n";
 
 export default function HeroSection() {
+  const { t, lang } = useLang();
   /* ── Typing animation state ── */
-  const typingPhrases = ["CONTENT MARKETING", "SEO WEBSITE", "QUẢNG CÁO GOOGLE", "THIẾT KẾ WEBSITE", "XỬ LÝ ẢNH AI"];
+  const typingPhrases = lang === "en"
+    ? ["CONTENT MARKETING", "SEO WEBSITE", "GOOGLE ADS", "WEBSITE DESIGN", "AI IMAGE PROCESSING"]
+    : ["CONTENT MARKETING", "SEO WEBSITE", "QUẢNG CÁO GOOGLE", "THIẾT KẾ WEBSITE", "XỬ LÝ ẢNH AI"];
   const [typingIndex, setTypingIndex] = useState(0);
   const [typingText, setTypingText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
@@ -59,7 +63,7 @@ export default function HeroSection() {
             <span style={{
               color: "#374151", fontSize: "0.85rem", fontWeight: 600,
               letterSpacing: "1px", textTransform: "uppercase" as const,
-            }}>BẠN ĐANG TÌM KIẾM</span>
+            }}>{t("hero.searching")}</span>
           </div>
 
           {/* Main Heading with Typing Effect */}
@@ -67,7 +71,7 @@ export default function HeroSection() {
             fontSize: "clamp(2rem, 4vw, 2.8rem)", fontWeight: 800,
             color: "#111827", lineHeight: 1.3, marginBottom: 20,
           }}>
-            GIẢI PHÁP CHO{" "}<br />
+            {t("hero.heading")}{" "}<br />
             <span style={{
               color: "#16a34a",
               borderRight: "3px solid #16a34a",
@@ -82,7 +86,7 @@ export default function HeroSection() {
             color: "#6b7280", fontSize: "0.95rem",
             maxWidth: 420, lineHeight: 1.8, marginBottom: 32,
           }}>
-            Với sự thấu hiểu và tận tâm, VPS Panel AI tự hào mang đến những giải pháp toàn diện cho khách hàng
+            {t("hero.desc2")}
           </p>
 
           {/* Buttons */}
@@ -95,7 +99,7 @@ export default function HeroSection() {
             }}
               onMouseEnter={e => e.currentTarget.style.transform = "translateY(-2px)"}
               onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}
-            >Về Chúng Tôi</a>
+            >{t("hero.btn1")}</a>
             <a href="#services" style={{
               padding: "12px 28px", borderRadius: 24,
               border: "2px solid #16a34a", color: "#16a34a",
@@ -104,7 +108,7 @@ export default function HeroSection() {
             }}
               onMouseEnter={e => { e.currentTarget.style.background = "#16a34a"; e.currentTarget.style.color = "#fff"; }}
               onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#16a34a"; }}
-            >Xem Profile</a>
+            >{t("hero.btn2")}</a>
           </div>
         </div>
 

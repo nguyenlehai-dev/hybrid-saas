@@ -1,8 +1,10 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { PiCheck } from "react-icons/pi";
+import { useLang } from "@/lib/i18n";
 
 export default function AboutSection() {
+  const { t, lang } = useLang();
   const [aboutVisible, setAboutVisible] = useState(false);
   const aboutSectionRef = useRef<HTMLElement>(null);
 
@@ -45,7 +47,7 @@ export default function AboutSection() {
               <span style={{
                 color: "#16a34a", fontSize: "0.85rem", fontWeight: 700,
                 letterSpacing: "1px", textTransform: "uppercase" as const,
-              }}>VỀ CHÚNG TÔI</span>
+              }}>{t("about.tag")}</span>
             </div>
 
             {/* Heading */}
@@ -53,8 +55,8 @@ export default function AboutSection() {
               fontSize: "clamp(1.8rem, 3.5vw, 2.6rem)", fontWeight: 800,
               color: "#111827", lineHeight: 1.25, marginBottom: 20,
             }}>
-              HỘI NHẬP XU HƯỚNG<br />
-              <span style={{ color: "#16a34a" }}>MARKETING</span> HIỆN ĐẠI
+              {lang === "en" ? "EMBRACING MODERN" : "HỘI NHẬP XU HƯỚNG"}<br />
+              <span style={{ color: "#16a34a" }}>MARKETING</span> {lang === "en" ? "TRENDS" : "HIỆN ĐẠI"}
             </h2>
 
             {/* Description */}
@@ -62,7 +64,7 @@ export default function AboutSection() {
               color: "#6b7280", fontSize: "0.9rem", lineHeight: 1.8,
               marginBottom: 28, maxWidth: 500,
             }}>
-              VPS Panel AI chuyên sâu về lĩnh vực Digital Marketing, với những giải pháp tối ưu, kiến thức chuyên sâu, kinh nghiệm lâu năm và sự nhiệt huyết. VPS Panel AI đã đáp ứng được những yêu cầu khắt khe nhất của khách hàng và được các doanh nghiệp lựa chọn làm đối tác chiến lược.
+              {t("about.desc")}
             </p>
 
             {/* CTA Button */}
@@ -75,16 +77,21 @@ export default function AboutSection() {
             }}
               onMouseEnter={e => e.currentTarget.style.transform = "translateY(-2px)"}
               onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}
-            >Liên Hệ Tư Vấn</a>
+            >{t("nav.cta")}</a>
 
             {/* Checklist */}
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              {[
+              {(lang === "en" ? [
+                "Build multi-platform, multi-channel strategies.",
+                "Increase brand awareness for your business.",
+                "Boost customer satisfaction on digital platforms.",
+                "Suitable for businesses developing services or products.",
+              ] : [
                 "Xây dựng chiến lược đa nền tảng, đa kênh.",
                 "Tăng mức độ nhận diện thương hiệu của doanh nghiệp.",
                 "Tăng độ hài lòng của khách hàng trên nền tảng số.",
                 "Phù hợp với doanh nghiệp phát triển dịch vụ hoặc sản phẩm.",
-              ].map((text, i) => (
+              ]).map((text, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
                   <div style={{
                     width: 22, height: 22, borderRadius: "50%",

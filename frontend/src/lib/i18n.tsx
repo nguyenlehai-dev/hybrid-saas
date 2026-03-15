@@ -171,6 +171,69 @@ const translations: Record<string, Record<Lang, string>> = {
   "mobile.contact": { vi: "LIÊN HỆ", en: "CONTACT" },
   "mobile.phone_label": { vi: "Hotline tư vấn:", en: "Support Hotline:" },
   "mobile.email_label": { vi: "Email:", en: "Email:" },
+
+  /* ── Hero extra ── */
+  "hero.searching": { vi: "BẠN ĐANG TÌM KIẾM", en: "YOU ARE LOOKING FOR" },
+  "hero.heading": { vi: "GIẢI PHÁP CHO", en: "SOLUTIONS FOR" },
+  "hero.desc2": {
+    vi: "Với sự thấu hiểu và tận tâm, VPS Panel AI tự hào mang đến những giải pháp toàn diện cho khách hàng",
+    en: "With deep understanding and dedication, VPS Panel AI proudly delivers comprehensive solutions for our clients",
+  },
+  "hero.btn1": { vi: "Về Chúng Tôi", en: "About Us" },
+  "hero.btn2": { vi: "Xem Profile", en: "View Profile" },
+
+  /* ── Banner ── */
+  "banner.desc": {
+    vi: "Khám phá sức mạnh AI trong việc xử lý ảnh chuyên nghiệp",
+    en: "Discover the power of AI in professional image processing",
+  },
+
+  /* ── Pricing plans ── */
+  "price.plan1": { vi: "Khởi Đầu", en: "Starter" },
+  "price.plan2": { vi: "Chuyên Nghiệp", en: "Professional" },
+  "price.plan3": { vi: "Doanh Nghiệp", en: "Enterprise" },
+  "price.plan4": { vi: "Cao Cấp", en: "Premium" },
+  "price.popular": { vi: "PHỔ BIẾN", en: "POPULAR" },
+  "price.f1.1": { vi: "20 ảnh/ngày", en: "20 images/day" },
+  "price.f1.2": { vi: "Tạo ảnh từ văn bản", en: "Text-to-image" },
+  "price.f1.3": { vi: "Nâng cấp độ nét", en: "Upscale quality" },
+  "price.f2.1": { vi: "100 ảnh/ngày", en: "100 images/day" },
+  "price.f2.2": { vi: "Tất cả công cụ", en: "All tools" },
+  "price.f2.3": { vi: "Chỉnh sửa + Làm đẹp", en: "Edit + Enhance" },
+  "price.f2.4": { vi: "Hỗ trợ ưu tiên", en: "Priority support" },
+  "price.f3.1": { vi: "Không giới hạn", en: "Unlimited" },
+  "price.f3.2": { vi: "Tất cả AI", en: "All AI models" },
+  "price.f3.3": { vi: "Xử lý ưu tiên", en: "Priority processing" },
+  "price.f3.4": { vi: "Truy cập API", en: "API access" },
+  "price.f4.1": { vi: "Server riêng", en: "Dedicated server" },
+  "price.f4.2": { vi: "Tạo Landing Page", en: "Landing page builder" },
+  "price.f4.3": { vi: "Video AI", en: "AI Video" },
+  "price.f4.4": { vi: "Hỗ trợ 24/7", en: "24/7 support" },
+
+  /* ── Testimonials extra ── */
+  "test.desc": {
+    vi: "Đánh giá từ khách hàng đã sử dụng dịch vụ của chúng tôi",
+    en: "Reviews from customers who have used our services",
+  },
+
+  /* ── Case Studies extra ── */
+  "case.desc": {
+    vi: "Những dự án tiêu biểu chúng tôi đã thực hiện",
+    en: "Featured projects we have successfully delivered",
+  },
+  "case.view": { vi: "Xem chi tiết", en: "View Details" },
+
+  /* ── Footer service links ── */
+  "footer.s1": { vi: "Thiết kế Website", en: "Website Design" },
+  "footer.s2": { vi: "Nhận diện thương hiệu", en: "Brand Identity" },
+  "footer.s3": { vi: "Content Marketing", en: "Content Marketing" },
+  "footer.s4": { vi: "Landing Page", en: "Landing Page" },
+  "footer.s5": { vi: "SEO tổng thể", en: "SEO Services" },
+  "footer.info": { vi: "Thông tin liên hệ", en: "Contact Info" },
+  "footer.made": { vi: "tại Việt Nam", en: "in Vietnam" },
+
+  /* ── CTA extra ── */
+  "cta.ready": { vi: "Sẵn sàng bắt đầu?", en: "Ready to Get Started?" },
 };
 
 /* ─── Provider ─── */

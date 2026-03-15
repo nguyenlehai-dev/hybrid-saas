@@ -1,5 +1,6 @@
 "use client";
 import { PiX, PiLightning, PiMapPin, PiPhone, PiEnvelopeSimple } from "react-icons/pi";
+import { useLang } from "@/lib/i18n";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -7,6 +8,8 @@ interface MobileMenuProps {
 }
 
 export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
+  const { t, lang } = useLang();
+  const supportHref = lang === "en" ? "/support" : "/ho-tro-khach-hang";
   return (
     <>
       <div className={`mobile-menu-overlay ${isOpen ? "active" : ""}`} onClick={onClose} />
@@ -35,19 +38,22 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         {/* About */}
         <div style={{ padding: "16px 24px", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
           <p style={{ color: "rgba(255,255,255,0.7)", fontSize: "0.85rem", lineHeight: 1.7 }}>
-            Nền tảng AI xử lý ảnh thông minh cho doanh nghiệp. Tạo ảnh sản phẩm, review, retouching tự động.
+            {t("footer.desc")}
           </p>
           <a href="/login" style={{
             display: "inline-block", marginTop: 12,
             padding: "10px 28px", borderRadius: 30,
             background: "#16a34a", color: "#fff",
             fontSize: "0.85rem", fontWeight: 600,
-          }}>Xem thêm</a>
+          }}>{t("sol.more")}</a>
         </div>
 
         {/* Navigation Links */}
         <div style={{ padding: "8px 0" }}>
-          {["Trang chủ", "Dịch vụ", "Công cụ AI", "Bảng giá", "Liên hệ"].map((item, i) => (
+          {(lang === "en"
+            ? ["Home", "Services", "AI Tools", "Pricing", "Contact"]
+            : ["Trang chủ", "Dịch vụ", "Công cụ AI", "Bảng giá", "Liên hệ"]
+          ).map((item, i) => (
             <a key={i} href={i === 0 ? "/" : `#${["", "services", "tools", "pricing", "contact"][i]}`}
               onClick={onClose}
               style={{

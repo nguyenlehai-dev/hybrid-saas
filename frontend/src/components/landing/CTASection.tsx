@@ -1,7 +1,9 @@
 "use client";
 import { PiRocketLaunch, PiEnvelopeSimple } from "react-icons/pi";
+import { useLang } from "@/lib/i18n";
 
 export default function CTASection() {
+  const { t } = useLang();
   return (
     <section id="contact" style={{
       padding: "80px 0",
@@ -16,10 +18,10 @@ export default function CTASection() {
         position: "relative", zIndex: 2,
       }}>
         <h2 style={{ fontSize: "2.2rem", fontWeight: 800, color: "#fff", marginBottom: 16 }}>
-          Tối Ưu Trang Web<br />&amp; Tăng Chuyển Đổi Ngay
+          {t("cta.title")}
         </h2>
         <p style={{ color: "rgba(255,255,255,0.7)", fontSize: "1rem", marginBottom: 36, lineHeight: 1.7 }}>
-          Bắt đầu sử dụng VPS Panel AI ngay hôm nay. Đăng ký miễn phí và nhận 10 điểm để trải nghiệm.
+          {t("cta.desc")}
         </p>
         <div className="cta-buttons-row" style={{ display: "flex", justifyContent: "center", gap: 16 }}>
           <a href="/login" style={{
@@ -27,12 +29,12 @@ export default function CTASection() {
             background: "linear-gradient(135deg, #f97316, #ef4444)", color: "#fff",
             fontWeight: 700, fontSize: "1rem",
             boxShadow: "0 6px 20px rgba(249,115,22,0.35)",
-          }}><PiRocketLaunch style={{ marginRight: 6 }} /> Bắt đầu miễn phí</a>
+          }}><PiRocketLaunch style={{ marginRight: 6 }} /> {t("cta.btn1")}</a>
           <a href="mailto:admin@vpspanel.io.vn" style={{
             padding: "14px 36px", borderRadius: 10,
             border: "2px solid rgba(255,255,255,0.3)", color: "#fff",
             fontWeight: 600, fontSize: "1rem",
-          }}><PiEnvelopeSimple style={{ marginRight: 6 }} /> Liên hệ tư vấn</a>
+          }}><PiEnvelopeSimple style={{ marginRight: 6 }} /> {t("cta.btn2")}</a>
         </div>
       </div>
     </section>
