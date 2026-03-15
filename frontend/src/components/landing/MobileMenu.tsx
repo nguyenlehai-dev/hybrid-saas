@@ -9,7 +9,7 @@ interface MobileMenuProps {
 
 export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const { t, lang } = useLang();
-  const supportHref = lang === "en" ? "/support" : "/ho-tro-khach-hang";
+  const supportHref = "/support";
   return (
     <>
       <div className={`mobile-menu-overlay ${isOpen ? "active" : ""}`} onClick={onClose} />
@@ -32,7 +32,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: "1.1rem", color: "#fff",
           }}><PiLightning /></span>
-          <span style={{ color: "#fff", fontWeight: 700, fontSize: "1.2rem" }}>VPS Panel AI</span>
+          <span style={{ color: "#fff", fontWeight: 700, fontSize: "1.2rem" }}>Nulith</span>
         </div>
 
         {/* About */}

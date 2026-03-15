@@ -59,7 +59,7 @@ export default function RegisterPage() {
               display: "flex", alignItems: "center", justifyContent: "center",
               fontSize: "1.3rem"
             }}>⚡</span>
-            VPS Panel AI
+            Nulith
           </a>
         </div>
 

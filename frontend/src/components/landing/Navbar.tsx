@@ -12,7 +12,7 @@ export default function Navbar({ onOpenMobileMenu }: NavbarProps) {
   const dropdownTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { lang, t } = useLang();
 
-  const supportHref = lang === "en" ? "/support" : "/ho-tro-khach-hang";
+  const supportHref = "/support";
 
   const serviceItems = [
     { icon: <PiRocketLaunch />, title: t("svc.landing.title"), desc: t("svc.landing.desc"), href: "/#services", color: "#f97316", bg: "#fff7ed" },
@@ -24,12 +24,11 @@ export default function Navbar({ onOpenMobileMenu }: NavbarProps) {
   ];
 
   const navItems = [
-    { label: t("nav.about"), href: "#about" },
-    { label: t("nav.services"), href: "#services", dropdown: true },
-    { label: t("nav.projects"), href: "#tools" },
+    { label: t("nav.about"), href: "/#about" },
+    { label: t("nav.services"), href: "/#services", dropdown: true, hot: true },
+    { label: t("nav.projects"), href: "/projects", hot: true },
     { label: t("nav.support"), href: supportHref },
-    { label: t("nav.careers"), href: "#", hot: true },
-    { label: t("nav.blog"), href: "#" },
+    { label: t("nav.blog"), href: "/blog" },
   ];
 
   const handleMouseEnter = () => {
@@ -60,7 +59,7 @@ export default function Navbar({ onOpenMobileMenu }: NavbarProps) {
               fontSize: "1.6rem", fontWeight: 800,
               color: "#16a34a", letterSpacing: "-0.5px",
             }}>
-              VPS<span style={{ color: "#15803d" }}>Panel</span>
+              Nulith
             </span>
           </a>
 

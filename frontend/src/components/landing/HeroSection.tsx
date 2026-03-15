@@ -118,7 +118,7 @@ export default function HeroSection() {
           <div style={{ position: "relative" }}>
             <img
               src="/images/hero-illustration.png?v=2"
-              alt="VPS Panel AI Hero"
+              alt="Nulith Hero"
               style={{
                 width: "100%",
                 borderRadius: 20,

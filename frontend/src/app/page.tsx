@@ -14,6 +14,7 @@ import {
   PricingSection,
   CTASection,
   Footer,
+  FloatingButtons,
 } from "@/components/landing";
 
 export default function HomePage() {
@@ -56,6 +57,9 @@ export default function HomePage() {
       <PricingSection />
       <CTASection />
       <Footer />
+
+      {/* ══════ FLOATING BUTTONS ══════ */}
+      <FloatingButtons />
     </div>
   );
 }

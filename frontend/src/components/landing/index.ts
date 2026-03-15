@@ -11,3 +11,4 @@ export { default as CaseStudiesSection } from "./CaseStudiesSection";
 export { default as PricingSection } from "./PricingSection";
 export { default as CTASection } from "./CTASection";
 export { default as Footer } from "./Footer";
+export { default as FloatingButtons } from "./FloatingButtons";

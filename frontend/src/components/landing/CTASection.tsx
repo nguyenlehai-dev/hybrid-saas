@@ -26,9 +26,9 @@ export default function CTASection() {
         <div className="cta-buttons-row" style={{ display: "flex", justifyContent: "center", gap: 16 }}>
           <a href="/login" style={{
             padding: "14px 36px", borderRadius: 10,
-            background: "linear-gradient(135deg, #f97316, #ef4444)", color: "#fff",
+            background: "linear-gradient(135deg, #16a34a, #15803d)", color: "#fff",
             fontWeight: 700, fontSize: "1rem",
-            boxShadow: "0 6px 20px rgba(249,115,22,0.35)",
+            boxShadow: "0 6px 20px rgba(22,163,74,0.35)",
           }}><PiRocketLaunch style={{ marginRight: 6 }} /> {t("cta.btn1")}</a>
           <a href="mailto:admin@vpspanel.io.vn" style={{
             padding: "14px 36px", borderRadius: 10,

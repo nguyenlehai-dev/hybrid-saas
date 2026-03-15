@@ -16,7 +16,7 @@ export default function Footer() {
                 display: "flex", alignItems: "center", justifyContent: "center",
                 fontSize: "1rem",
               }}><PiLightning style={{ color: "#fff" }} /></span>
-              <span style={{ color: "#fff", fontWeight: 700, fontSize: "1.15rem" }}>VPS Panel AI</span>
+              <span style={{ color: "#fff", fontWeight: 700, fontSize: "1.15rem" }}>Nulith</span>
             </div>
             <p style={{ fontSize: "0.9rem", lineHeight: 1.7, maxWidth: 280 }}>
               {t("footer.desc")}
