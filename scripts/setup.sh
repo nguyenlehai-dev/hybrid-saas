@@ -2,7 +2,7 @@
 # ============================================================
 # Hybrid SaaS - VM1 Control Hub Setup Script
 # Ubuntu Server 22.04 LTS + aaPanel + PostgreSQL + Redis
-# Domain: vpspanel.io.vn
+# Domain: nulith.io.vn
 # ============================================================
 
 set -euo pipefail
@@ -31,7 +31,7 @@ if ! grep -q "Ubuntu 22.04" /etc/os-release 2>/dev/null; then
     log_warn "This script is designed for Ubuntu 22.04 LTS. Proceeding anyway..."
 fi
 
-DOMAIN="vpspanel.io.vn"
+DOMAIN="nulith.io.vn"
 APP_USER="saasapp"
 APP_DIR="/opt/hybrid-saas"
 DB_NAME="hybrid_saas"

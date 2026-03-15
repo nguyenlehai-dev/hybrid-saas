@@ -1,13 +1,13 @@
 <div align="center">
 
-# VPS Panel AI
+# Nulith
 
 **Nền tảng AI xử lý ảnh thông minh cho doanh nghiệp**
 
 [![CI](https://github.com/nguyenlehai-dev/hybrid-saas/actions/workflows/ci.yml/badge.svg)](https://github.com/nguyenlehai-dev/hybrid-saas/actions/workflows/ci.yml)
 [![Deploy](https://github.com/nguyenlehai-dev/hybrid-saas/actions/workflows/deploy-production.yml/badge.svg)](https://github.com/nguyenlehai-dev/hybrid-saas/actions/workflows/deploy-production.yml)
 
-[Website](https://vpspanel.io.vn) · [API Docs](https://api.vpspanel.io.vn/docs) · [Report Bug](https://github.com/nguyenlehai-dev/hybrid-saas/issues/new?template=bug_report.yml) · [Request Feature](https://github.com/nguyenlehai-dev/hybrid-saas/issues/new?template=feature_request.yml)
+[Website](https://nulith.io.vn) · [API Docs](https://api.nulith.io.vn/docs) · [Report Bug](https://github.com/nguyenlehai-dev/hybrid-saas/issues/new?template=bug_report.yml) · [Request Feature](https://github.com/nguyenlehai-dev/hybrid-saas/issues/new?template=feature_request.yml)
 
 </div>
 
@@ -15,7 +15,7 @@
 
 ## Giới thiệu
 
-VPS Panel AI là nền tảng SaaS cung cấp các công cụ AI xử lý ảnh cho doanh nghiệp. Hệ thống sử dụng kiến trúc hybrid gồm 2 server: Main Server (Ubuntu) chạy web application và AI Server (Windows + GPU) chạy Stable Diffusion.
+Nulith là nền tảng SaaS cung cấp các công cụ AI xử lý ảnh cho doanh nghiệp. Hệ thống sử dụng kiến trúc hybrid gồm 2 server: Main Server (Ubuntu) chạy web application và AI Server (Windows + GPU) chạy Stable Diffusion.
 
 **Các tính năng chính:**
 
@@ -193,9 +193,9 @@ Chi tiết xem tại [vm2-ai-engine/README.md](vm2-ai-engine/README.md).
 **Backend** `.env`
 
 ```env
-DOMAIN=vpspanel.io.vn
-API_URL=https://api.vpspanel.io.vn
-FRONTEND_URL=https://vpspanel.io.vn
+DOMAIN=nulith.io.vn
+API_URL=https://api.nulith.io.vn
+FRONTEND_URL=https://nulith.io.vn
 DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/hybrid_saas
 REDIS_URL=redis://localhost:6379/0
 JWT_SECRET=your-secret-key
@@ -208,7 +208,7 @@ AI_ENGINE_TIMEOUT=120
 **Frontend** `.env.local`
 
 ```env
-NEXT_PUBLIC_API_URL=https://api.vpspanel.io.vn
+NEXT_PUBLIC_API_URL=https://api.nulith.io.vn
 ```
 
 > **Lưu ý:** Không commit file `.env` lên Git. Chỉ commit `.env.example`.
@@ -217,7 +217,7 @@ NEXT_PUBLIC_API_URL=https://api.vpspanel.io.vn
 
 ## API Endpoints
 
-Swagger UI: [api.vpspanel.io.vn/docs](https://api.vpspanel.io.vn/docs)
+Swagger UI: [api.nulith.io.vn/docs](https://api.nulith.io.vn/docs)
 
 | Method | Endpoint | Mô tả |
 |:-------|:---------|:-------|
@@ -457,6 +457,6 @@ Xem <a href="docs/server-setup.md">docs/server-setup.md</a>
 
 <div align="center">
 
-Made by [VPS Panel AI Team](https://vpspanel.io.vn)
+Made by [Nulith Team](https://nulith.io.vn)
 
 </div>

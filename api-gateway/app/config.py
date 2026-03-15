@@ -11,9 +11,9 @@ class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
     # Domain
-    DOMAIN: str = "vpspanel.io.vn"
-    API_URL: str = "https://api.vpspanel.io.vn"
-    FRONTEND_URL: str = "https://vpspanel.io.vn"
+    DOMAIN: str = "nulith.io.vn"
+    API_URL: str = "https://api.nulith.io.vn"
+    FRONTEND_URL: str = "https://nulith.io.vn"
 
     # Database
     DATABASE_URL: str = "postgresql+asyncpg://saas_admin:password@localhost:5432/hybrid_saas"

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.vpspanel.io.vn";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.nulith.io.vn";
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -89,7 +89,7 @@ export default function LoginPage() {
               display: "flex", alignItems: "center", justifyContent: "center",
               fontSize: "1.3rem"
             }}>⚡</span>
-            VPS Panel AI
+            Nulith
           </a>
         </div>
 

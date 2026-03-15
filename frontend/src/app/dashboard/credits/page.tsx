@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.vpspanel.io.vn";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.nulith.io.vn";
 
 interface Plan { id: string; name: string; slug: string; description: string | null; price_vnd: number; credits_amount: number; features: Record<string, any>; is_popular: boolean; }
 interface Order { id: string; order_code: string; plan_name: string; amount_vnd: number; credits_amount: number; status: string; transfer_content: string; qr_url: string; created_at: string; }

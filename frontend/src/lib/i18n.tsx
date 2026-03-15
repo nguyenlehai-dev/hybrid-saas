@@ -73,8 +73,8 @@ const translations: Record<string, Record<Lang, string>> = {
   "about.tag": { vi: "VỀ CHÚNG TÔI", en: "ABOUT US" },
   "about.title": { vi: "CHÚNG TÔI LÀ AI?", en: "WHO ARE WE?" },
   "about.desc": {
-    vi: "VPS Panel AI là nền tảng công nghệ AI tiên phong tại Việt Nam, chuyên cung cấp giải pháp xử lý ảnh thông minh và quản lý server tự động cho doanh nghiệp.",
-    en: "VPS Panel AI is a pioneering AI technology platform in Vietnam, specializing in smart image processing and automated server management solutions for businesses.",
+    vi: "Nulith là nền tảng công nghệ AI tiên phong tại Việt Nam, chuyên cung cấp giải pháp xử lý ảnh thông minh và quản lý server tự động cho doanh nghiệp.",
+    en: "Nulith is a pioneering AI technology platform in Vietnam, specializing in smart image processing and automated server management solutions for businesses.",
   },
   "about.card1.title": { vi: "Sứ mệnh", en: "Mission" },
   "about.card1.desc": {
@@ -93,7 +93,7 @@ const translations: Record<string, Record<Lang, string>> = {
   },
 
   /* ── Solutions ── */
-  "sol.tag": { vi: "DỊCH VỤ CỦA VPS PANEL AI", en: "VPS PANEL AI SERVICES" },
+  "sol.tag": { vi: "DỊCH VỤ CỦA NULITH", en: "NULITH SERVICES" },
   "sol.title1": { vi: "GIẢI PHÁP CHO DOANH NGHIỆP", en: "SOLUTIONS FOR BUSINESSES" },
   "sol.title2": { vi: "TRONG THỜI ĐẠI 4.0", en: "IN THE 4.0 ERA" },
   "sol.s1.title": { vi: "THIẾT KẾ LANDING PAGE BẰNG WP", en: "WORDPRESS LANDING PAGE DESIGN" },
@@ -154,8 +154,8 @@ const translations: Record<string, Record<Lang, string>> = {
   "footer.guide": { vi: "Hướng dẫn", en: "Guides" },
   "footer.pricing": { vi: "Bảng giá", en: "Pricing" },
   "footer.copyright": {
-    vi: "© 2026 VPS Panel AI. Bản quyền thuộc về VPS Panel AI.",
-    en: "© 2026 VPS Panel AI. All rights reserved.",
+    vi: "© 2026 Nulith. Bản quyền thuộc về Nulith.",
+    en: "© 2026 Nulith. All rights reserved.",
   },
 
   /* ── Support Page ── */
@@ -176,8 +176,8 @@ const translations: Record<string, Record<Lang, string>> = {
   "hero.searching": { vi: "BẠN ĐANG TÌM KIẾM", en: "YOU ARE LOOKING FOR" },
   "hero.heading": { vi: "GIẢI PHÁP CHO", en: "SOLUTIONS FOR" },
   "hero.desc2": {
-    vi: "Với sự thấu hiểu và tận tâm, VPS Panel AI tự hào mang đến những giải pháp toàn diện cho khách hàng",
-    en: "With deep understanding and dedication, VPS Panel AI proudly delivers comprehensive solutions for our clients",
+    vi: "Với sự thấu hiểu và tận tâm, Nulith tự hào mang đến những giải pháp toàn diện cho khách hàng",
+    en: "With deep understanding and dedication, Nulith proudly delivers comprehensive solutions for our clients",
   },
   "hero.btn1": { vi: "Về Chúng Tôi", en: "About Us" },
   "hero.btn2": { vi: "Xem Profile", en: "View Profile" },

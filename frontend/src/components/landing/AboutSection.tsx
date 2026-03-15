@@ -125,7 +125,7 @@ export default function AboutSection() {
             {/* Woman image */}
             <img
               src="/images/about-woman.png"
-              alt="VPS Panel AI Team"
+              alt="Nulith Team"
               style={{
                 width: "90%", maxWidth: 460,
                 position: "relative", zIndex: 2,

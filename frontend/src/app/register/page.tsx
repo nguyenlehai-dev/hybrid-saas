@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.vpspanel.io.vn";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.nulith.io.vn";
 
 export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
@@ -59,7 +59,7 @@ export default function RegisterPage() {
               display: "flex", alignItems: "center", justifyContent: "center",
               fontSize: "1.3rem"
             }}>⚡</span>
-            VPS Panel AI
+            Nulith
           </a>
         </div>
 

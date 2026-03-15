@@ -2,7 +2,7 @@
 const nextConfig = {
   output: 'standalone',
   images: {
-    domains: ['vpspanel.io.vn', 'api.vpspanel.io.vn'],
+    domains: ['nulith.io.vn', 'api.nulith.io.vn'],
   },
   async rewrites() {
     return [

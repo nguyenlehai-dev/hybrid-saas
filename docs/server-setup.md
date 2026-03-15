@@ -71,17 +71,17 @@ Script sẽ tự động:
 
 1. **Trỏ DNS** tại nhà cung cấp domain:
    ```
-   vpspanel.io.vn     → A Record → <IP_VM1>
-   api.vpspanel.io.vn → A Record → <IP_VM1>
+   nulith.io.vn     → A Record → <IP_VM1>
+   api.nulith.io.vn → A Record → <IP_VM1>
    ```
 
 2. **Cài SSL** (sau khi DNS đã propagate):
    ```bash
    docker compose run certbot certonly \
      --webroot -w /var/www/certbot \
-     -d vpspanel.io.vn \
-     -d api.vpspanel.io.vn \
-     --email admin@vpspanel.io.vn \
+     -d nulith.io.vn \
+     -d api.nulith.io.vn \
+     --email admin@nulith.io.vn \
      --agree-tos
    ```
 
@@ -111,17 +111,17 @@ bt default
 
 Truy cập aaPanel tại `http://<IP_VM1>:8888` và:
 1. Cài Nginx, PHP, MySQL (nếu cần thêm)
-2. Tạo website cho `vpspanel.io.vn`
+2. Tạo website cho `nulith.io.vn`
 3. Cấu hình SSL trong aaPanel
 
 ## Kiểm tra cuối cùng
 
 ```bash
 # Test API
-curl https://api.vpspanel.io.vn/health
+curl https://api.nulith.io.vn/health
 
 # Test đăng ký
-curl -X POST https://api.vpspanel.io.vn/auth/register \
+curl -X POST https://api.nulith.io.vn/auth/register \
   -H "Content-Type: application/json" \
   -d '{"email":"test@test.com","username":"testuser","password":"Test123!"}'
 

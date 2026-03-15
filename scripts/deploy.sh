@@ -1,5 +1,5 @@
 #!/bin/bash
-# Deploy script for vpspanel.io.vn
+# Deploy script for nulith.io.vn
 # Run with: echo "123456789" | sudo -S bash deploy.sh
 
 set -e
@@ -32,12 +32,12 @@ echo "Python deps installed."
 
 echo "=== Step 6: Create .env ==="
 cat > /opt/hybrid-saas/.env <<'ENVEOF'
-DOMAIN=vpspanel.io.vn
-API_URL=https://api.vpspanel.io.vn
-FRONTEND_URL=https://vpspanel.io.vn
+DOMAIN=nulith.io.vn
+API_URL=https://api.nulith.io.vn
+FRONTEND_URL=https://nulith.io.vn
 DATABASE_URL=postgresql+asyncpg://saas_admin:SaasAdmin2026!@localhost:5432/hybrid_saas
 REDIS_URL=redis://localhost:6379/0
-JWT_SECRET=VpsPanelAI2026SuperSecretKeyForJWTTokenGeneration48ch
+JWT_SECRET=NulithAI2026SuperSecretKeyForJWTTokenGeneration48chars
 JWT_ALGORITHM=HS256
 JWT_EXPIRATION_HOURS=24
 AI_ENGINE_URL=http://192.168.1.100:7860
@@ -45,7 +45,7 @@ AI_ENGINE_TIMEOUT=120
 UPLOAD_DIR=/opt/hybrid-saas/uploads
 LANDING_PAGES_DIR=/opt/hybrid-saas/landing-pages
 MAX_UPLOAD_SIZE_MB=50
-APP_NAME=VPS Panel AI
+APP_NAME=Nulith
 APP_ENV=production
 DEBUG=false
 LOG_LEVEL=info
@@ -64,10 +64,10 @@ echo "Frontend built."
 
 echo "=== Step 8: Configure Nginx ==="
 # API site
-cat > /etc/nginx/sites-available/api.vpspanel.io.vn <<'NGINX1'
+cat > /etc/nginx/sites-available/api.nulith.io.vn <<'NGINX1'
 server {
     listen 80;
-    server_name api.vpspanel.io.vn;
+    server_name api.nulith.io.vn;
 
     location / {
         proxy_pass http://127.0.0.1:8000;
@@ -89,10 +89,10 @@ server {
 NGINX1
 
 # Frontend site
-cat > /etc/nginx/sites-available/vpspanel.io.vn <<'NGINX2'
+cat > /etc/nginx/sites-available/nulith.io.vn <<'NGINX2'
 server {
     listen 80;
-    server_name vpspanel.io.vn www.vpspanel.io.vn;
+    server_name nulith.io.vn www.nulith.io.vn;
 
     location / {
         proxy_pass http://127.0.0.1:3000;
@@ -108,8 +108,8 @@ server {
 NGINX2
 
 # Enable sites
-ln -sf /etc/nginx/sites-available/api.vpspanel.io.vn /etc/nginx/sites-enabled/
-ln -sf /etc/nginx/sites-available/vpspanel.io.vn /etc/nginx/sites-enabled/
+ln -sf /etc/nginx/sites-available/api.nulith.io.vn /etc/nginx/sites-enabled/
+ln -sf /etc/nginx/sites-available/nulith.io.vn /etc/nginx/sites-enabled/
 # Remove default if exists
 rm -f /etc/nginx/sites-enabled/default
 
@@ -121,7 +121,7 @@ echo "=== Step 9: Create Systemd Services ==="
 # API Gateway service
 cat > /etc/systemd/system/saas-api.service <<'SVC1'
 [Unit]
-Description=VPS Panel AI - API Gateway
+Description=Nulith - API Gateway
 After=network.target postgresql.service redis.service
 
 [Service]
@@ -141,7 +141,7 @@ SVC1
 # Frontend service
 cat > /etc/systemd/system/saas-frontend.service <<'SVC2'
 [Unit]
-Description=VPS Panel AI - Frontend (Next.js)
+Description=Nulith - Frontend (Next.js)
 After=network.target
 
 [Service]
@@ -172,7 +172,7 @@ echo ""
 echo "============================================="
 echo "  ✅ DEPLOYMENT COMPLETE!"
 echo "============================================="
-echo "  API:      http://api.vpspanel.io.vn"
-echo "  Frontend: http://vpspanel.io.vn"  
+echo "  API:      http://api.nulith.io.vn"
+echo "  Frontend: http://nulith.io.vn"  
 echo "  Health:   curl http://localhost:8000/health"
 echo "============================================="

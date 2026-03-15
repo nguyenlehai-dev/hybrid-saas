@@ -49,7 +49,7 @@ const faqData: Record<string, { intro: string; questions: { q: string; a: string
     intro: "Dịch vụ quản trị và sáng tạo nội dung trên các kênh truyền thông, giúp doanh nghiệp tiếp cận hàng triệu khách hàng tiềm năng.",
     questions: [
       { q: "Content Marketing là gì?", a: "Content Marketing là chiến lược tạo và chia sẻ nội dung có giá trị, phù hợp và nhất quán để thu hút và giữ chân khách hàng mục tiêu, từ đó thúc đẩy hành động mua hàng." },
-      { q: "Các loại nội dung mà VPS Panel AI cung cấp?", a: "Chúng tôi cung cấp: Bài viết SEO, content mạng xã hội (Facebook, Instagram, TikTok), email marketing, video script, infographic, ebook và whitepaper." },
+      { q: "Các loại nội dung mà Nulith cung cấp?", a: "Chúng tôi cung cấp: Bài viết SEO, content mạng xã hội (Facebook, Instagram, TikTok), email marketing, video script, infographic, ebook và whitepaper." },
       { q: "Quy trình sản xuất nội dung như thế nào?", a: "Bước 1: Nghiên cứu thị trường và đối thủ.\nBước 2: Xây dựng chiến lược content.\nBước 3: Lên kế hoạch nội dung (content calendar).\nBước 4: Sản xuất nội dung.\nBước 5: Đăng tải và quản lý.\nBước 6: Đo lường và tối ưu." },
       { q: "Bao lâu thì thấy hiệu quả?", a: "Content Marketing thường cần 3-6 tháng để thấy kết quả rõ rệt. Tuy nhiên, với chiến lược đúng đắn và nội dung chất lượng, bạn có thể thấy sự cải thiện về traffic và tương tác sau 1-2 tháng." },
     ],
@@ -69,7 +69,7 @@ const faqData: Record<string, { intro: string; questions: { q: string; a: string
       { q: "SEO là gì?", a: "SEO (Search Engine Optimization) là quá trình tối ưu hóa website để cải thiện thứ hạng trên các công cụ tìm kiếm như Google, Bing, giúp tăng lượng truy cập tự nhiên (organic traffic)." },
       { q: "SEO mất bao lâu để thấy kết quả?", a: "Thông thường SEO cần 3-6 tháng để thấy kết quả rõ rệt. Thời gian cụ thể phụ thuộc vào mức độ cạnh tranh của từ khóa, chất lượng website hiện tại và chiến lược SEO được áp dụng." },
       { q: "Dịch vụ SEO bao gồm những gì?", a: "Bao gồm: Nghiên cứu từ khóa, tối ưu On-page (nội dung, thẻ meta, URL, hình ảnh), xây dựng liên kết (backlink), tối ưu tốc độ website, SEO kỹ thuật và báo cáo hàng tháng." },
-      { q: "Tại sao nên chọn VPS Panel AI cho SEO?", a: "Chúng tôi có đội ngũ chuyên gia SEO với hơn 5 năm kinh nghiệm, chiến lược SEO bài bản, cam kết KPI rõ ràng và báo cáo minh bạch. Đã hỗ trợ hơn 500+ doanh nghiệp cải thiện thứ hạng Google." },
+      { q: "Tại sao nên chọn Nulith cho SEO?", a: "Chúng tôi có đội ngũ chuyên gia SEO với hơn 5 năm kinh nghiệm, chiến lược SEO bài bản, cam kết KPI rõ ràng và báo cáo minh bạch. Đã hỗ trợ hơn 500+ doanh nghiệp cải thiện thứ hạng Google." },
     ],
   },
   marketing: {

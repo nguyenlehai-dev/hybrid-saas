@@ -32,7 +32,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: "1.1rem", color: "#fff",
           }}><PiLightning /></span>
-          <span style={{ color: "#fff", fontWeight: 700, fontSize: "1.2rem" }}>VPS Panel AI</span>
+          <span style={{ color: "#fff", fontWeight: 700, fontSize: "1.2rem" }}>Nulith</span>
         </div>
 
         {/* About */}
@@ -76,7 +76,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             <PiPhone style={{ color: "#16a34a" }} /> 0765.168.xxx
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <PiEnvelopeSimple style={{ color: "#16a34a" }} /> admin@vpspanel.io.vn
+            <PiEnvelopeSimple style={{ color: "#16a34a" }} /> admin@nulith.io.vn
           </div>
         </div>
       </div>

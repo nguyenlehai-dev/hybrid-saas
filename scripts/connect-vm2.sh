@@ -41,7 +41,7 @@ fi
 # 2. Update Nginx config
 echo ""
 echo "[2/4] Updating Nginx config..."
-NGINX_CONF="/etc/nginx/sites-available/vpspanel.io.vn"
+NGINX_CONF="/etc/nginx/sites-available/nulith.io.vn"
 
 # Backup current config
 cp "$NGINX_CONF" "${NGINX_CONF}.bak.$(date +%s)"
@@ -49,7 +49,7 @@ cp "$NGINX_CONF" "${NGINX_CONF}.bak.$(date +%s)"
 cat > "$NGINX_CONF" << 'NGINX_EOF'
 server {
     listen 80;
-    server_name vpspanel.io.vn www.vpspanel.io.vn;
+    server_name nulith.io.vn www.nulith.io.vn;
 
     client_max_body_size 50M;
 
@@ -155,12 +155,12 @@ echo "============================================================"
 echo " ✅ VM1 connected to VM2 ($VM2_IP)!"
 echo ""
 echo " Architecture:"
-echo "   vpspanel.io.vn"
+echo "   nulith.io.vn"
 echo "     ├── /           → Frontend (VM1:3000)"
 echo "     ├── /api/        → API Gateway (VM1:8000)"
 echo "     ├── /ai-engine/  → SD WebUI (VM2:7860)"
 echo "     ├── /ai-tasks/   → Task API (VM2:7862)"
 echo "     └── /ai-outputs/ → AI Images (VM2:7862)"
 echo ""
-echo " Test: curl http://vpspanel.io.vn/ai-engine/sdapi/v1/sd-models"
+echo " Test: curl http://nulith.io.vn/ai-engine/sdapi/v1/sd-models"
 echo "============================================================"

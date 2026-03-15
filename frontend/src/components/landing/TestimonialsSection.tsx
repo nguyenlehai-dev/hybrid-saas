@@ -58,7 +58,7 @@ export default function TestimonialsSection() {
               color: "#111827", lineHeight: 1.3, marginBottom: 32,
             }}>
               {lang === "en" ? "WHAT CUSTOMERS SAY ABOUT" : "KHÁCH HÀNG NÓI GÌ VỀ"}<br />
-              VPS PANEL AI
+              NULITH
             </h2>
 
             {/* Testimonial Quote Card */}
@@ -75,8 +75,8 @@ export default function TestimonialsSection() {
                 lineHeight: 1.8, fontStyle: "italic", margin: 0,
               }}>
                 {lang === "en"
-                  ? '\u201c Thank you VPS Panel AI for delivering amazing projects for us. With the quality of your services and products, you will surely go further. \u201d'
-                  : '\u201c C\u1ea3m \u01a1n VPS Panel AI \u0111\u00e3 th\u1ef1c hi\u1ec7n c\u00e1c d\u1ef1 \u00e1n tuy\u1ec7t v\u1eddi cho b\u00ean m\u00ecnh. Ch\u1eafc ch\u1eafn v\u1edbi ch\u1ea5t l\u01b0\u1ee3ng d\u1ecbch v\u1ee5 v\u00e0 s\u1ea3n ph\u1ea9m c\u1ee7a VPS Panel AI, c\u00e1c b\u1ea1n s\u1ebd c\u00f2n ti\u1ebfn xa h\u01a1n. \u201d'}
+                  ? '\u201c Thank you Nulith for delivering amazing projects for us. With the quality of your services and products, you will surely go further. \u201d'
+                  : '\u201c C\u1ea3m \u01a1n Nulith \u0111\u00e3 th\u1ef1c hi\u1ec7n c\u00e1c d\u1ef1 \u00e1n tuy\u1ec7t v\u1eddi cho b\u00ean m\u00ecnh. Ch\u1eafc ch\u1eafn v\u1edbi ch\u1ea5t l\u01b0\u1ee3ng d\u1ecbch v\u1ee5 v\u00e0 s\u1ea3n ph\u1ea9m c\u1ee7a Nulith, c\u00e1c b\u1ea1n s\u1ebd c\u00f2n ti\u1ebfn xa h\u01a1n. \u201d'}
               </p>
             </div>
 
@@ -93,7 +93,7 @@ export default function TestimonialsSection() {
               />
               <div>
                 <div style={{ fontWeight: 700, fontSize: "0.95rem", color: "#16a34a" }}>Nguyễn Lê Hải</div>
-                <div style={{ fontSize: "0.8rem", color: "#6b7280" }}>CEO VPS Panel AI</div>
+                <div style={{ fontSize: "0.8rem", color: "#6b7280" }}>CEO Nulith</div>
               </div>
             </div>
           </div>

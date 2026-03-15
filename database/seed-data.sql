@@ -36,7 +36,7 @@ ON CONFLICT (task_type) DO NOTHING;
 
 -- Admin User (password: admin123 - CHANGE THIS!)
 INSERT INTO users (email, username, password_hash, full_name, role, is_active, is_verified, credits_balance) VALUES
-('admin@vpspanel.io.vn', 'admin', 
+('admin@nulith.io.vn', 'admin', 
  crypt('admin123', gen_salt('bf', 10)),
  'System Admin', 'admin', true, true, 99999.00)
 ON CONFLICT (email) DO NOTHING;

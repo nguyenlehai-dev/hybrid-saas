@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.vpspanel.io.vn";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.nulith.io.vn";
 
 interface User {
   id: string;
@@ -88,7 +88,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             >
               ⚡
             </span>
-            <span style={{ fontSize: "1.1rem", fontWeight: 700 }}>VPS Panel</span>
+            <span style={{ fontSize: "1.1rem", fontWeight: 700 }}>Nulith</span>
           </a>
         </div>
 

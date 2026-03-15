@@ -5,11 +5,11 @@ export default function BannerCarousel() {
   const [bannerIndex, setBannerIndex] = useState(0);
 
   const slides = [
-    { img: "/images/gdrive-banner.png", alt: "VPS Panel AI Banner 1" },
-    { img: "/images/gdrive-banner.png", alt: "VPS Panel AI Banner 2" },
-    { img: "/images/gdrive-banner.png", alt: "VPS Panel AI Banner 3" },
-    { img: "/images/gdrive-banner.png", alt: "VPS Panel AI Banner 4" },
-    { img: "/images/gdrive-banner.png", alt: "VPS Panel AI Banner 5" },
+    { img: "/images/gdrive-banner.png", alt: "Nulith Banner 1" },
+    { img: "/images/gdrive-banner.png", alt: "Nulith Banner 2" },
+    { img: "/images/gdrive-banner.png", alt: "Nulith Banner 3" },
+    { img: "/images/gdrive-banner.png", alt: "Nulith Banner 4" },
+    { img: "/images/gdrive-banner.png", alt: "Nulith Banner 5" },
   ];
 
   return (

@@ -102,9 +102,9 @@ sudo apt install -y certbot
 
 # Lấy certificate
 sudo certbot certonly --standalone \
-  -d vpspanel.io.vn \
-  -d api.vpspanel.io.vn \
-  --email admin@vpspanel.io.vn \
+  -d nulith.io.vn \
+  -d api.nulith.io.vn \
+  --email admin@nulith.io.vn \
   --agree-tos
 
 # Auto-renew (cron)
