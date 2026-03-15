@@ -1,0 +1,154 @@
+"use client";
+import { useState, useEffect, useRef } from "react";
+
+export default function TestimonialsSection() {
+  const [testimonialVisible, setTestimonialVisible] = useState(false);
+  const testimonialSectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const section = testimonialSectionRef.current;
+    if (!section) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setTestimonialVisible(true);
+            observer.disconnect();
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <section ref={testimonialSectionRef} style={{
+      padding: "80px 0",
+      background: "#f9fafb",
+      position: "relative",
+      overflow: "hidden",
+    }}>
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 60, flexWrap: "wrap" }}>
+          {/* Left Column — Text — slides in from left */}
+          <div style={{
+            flex: "1 1 480px", minWidth: 320,
+            opacity: testimonialVisible ? 1 : 0,
+            transform: testimonialVisible ? "translateX(0) scale(1)" : "translateX(-120px) scale(0.95)",
+            transition: "opacity 1s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+          }}>
+            {/* Badge */}
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+              <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#16a34a" }} />
+              <span style={{
+                color: "#16a34a", fontSize: "0.8rem", fontWeight: 700,
+                letterSpacing: 1, textTransform: "uppercase" as const,
+              }}>LẮNG NGHE Ý KIẾN</span>
+            </div>
+
+            {/* Heading */}
+            <h2 style={{
+              fontSize: "clamp(1.6rem, 3vw, 2.4rem)", fontWeight: 800,
+              color: "#111827", lineHeight: 1.3, marginBottom: 32,
+            }}>
+              KHÁCH HÀNG NÓI GÌ VỀ<br />
+              VPS PANEL AI
+            </h2>
+
+            {/* Testimonial Quote Card */}
+            <div style={{
+              background: "#fff",
+              borderRadius: 16,
+              padding: "28px 32px",
+              boxShadow: "0 2px 20px rgba(0,0,0,0.06)",
+              borderLeft: "4px solid #16a34a",
+              marginBottom: 24,
+            }}>
+              <p style={{
+                fontSize: "0.92rem", color: "#4b5563",
+                lineHeight: 1.8, fontStyle: "italic", margin: 0,
+              }}>
+                &ldquo; Cảm ơn VPS Panel AI đã thực hiện các dự án tuyệt vời cho bên mình.
+                Chắc chắn với chất lượng dịch vụ và sản phẩm của VPS Panel AI,
+                các bạn sẽ còn tiến xa hơn. &rdquo;
+              </p>
+            </div>
+
+            {/* Author */}
+            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+              <img
+                src="/ceo-photo.jpg"
+                alt="Nguyễn Lê Hải"
+                style={{
+                  width: 50, height: 50, borderRadius: "50%",
+                  objectFit: "cover",
+                  border: "3px solid #e5e7eb",
+                }}
+              />
+              <div>
+                <div style={{ fontWeight: 700, fontSize: "0.95rem", color: "#16a34a" }}>Nguyễn Lê Hải</div>
+                <div style={{ fontSize: "0.8rem", color: "#6b7280" }}>CEO VPS Panel AI</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column — Phone Image — slides in from right */}
+          <div style={{
+            flex: "1 1 400px", minWidth: 320,
+            display: "flex", justifyContent: "center", alignItems: "center",
+            position: "relative",
+            opacity: testimonialVisible ? 1 : 0,
+            transform: testimonialVisible ? "translateX(0) scale(1)" : "translateX(120px) scale(0.95)",
+            transition: "opacity 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s, transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s",
+          }}>
+            {/* Green circle background */}
+            <div style={{
+              position: "absolute",
+              width: "85%", aspectRatio: "1",
+              borderRadius: "50%",
+              background: "linear-gradient(135deg, #16a34a, #15803d)",
+              zIndex: 0,
+            }} />
+
+            {/* Phone Image */}
+            <img
+              src="/images/testimonial-phone.png"
+              alt="Social media engagement"
+              style={{
+                width: "90%", maxWidth: 420,
+                position: "relative", zIndex: 1,
+                filter: "drop-shadow(0 20px 40px rgba(0,0,0,0.15))",
+              }}
+            />
+
+            {/* Floating emojis */}
+            <div style={{
+              position: "absolute", top: "8%", left: "15%", zIndex: 2,
+              fontSize: "2rem",
+              animation: "floatCard 3s ease-in-out infinite",
+            }}>🤗</div>
+            <div style={{
+              position: "absolute", top: "5%", right: "20%", zIndex: 2,
+              fontSize: "2rem",
+              animation: "floatCard 3.5s ease-in-out infinite 0.5s",
+            }}>😍</div>
+            <div style={{
+              position: "absolute", bottom: "15%", left: "10%", zIndex: 2,
+              fontSize: "2.2rem",
+              animation: "floatCard 4s ease-in-out infinite 1s",
+            }}>😘</div>
+            <div style={{
+              position: "absolute", bottom: "10%", right: "10%", zIndex: 2,
+              fontSize: "2.2rem",
+              animation: "floatCard 3.2s ease-in-out infinite 0.3s",
+            }}>❤️</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

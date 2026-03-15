@@ -1,0 +1,79 @@
+"use client";
+import { PiX, PiLightning, PiMapPin, PiPhone, PiEnvelopeSimple } from "react-icons/pi";
+
+interface MobileMenuProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
+  return (
+    <>
+      <div className={`mobile-menu-overlay ${isOpen ? "active" : ""}`} onClick={onClose} />
+      <div className={`mobile-menu-panel ${isOpen ? "active" : ""}`}>
+        {/* Close button */}
+        <div style={{ display: "flex", justifyContent: "flex-end", padding: "20px 20px 0" }}>
+          <button onClick={onClose} style={{
+            width: 36, height: 36, borderRadius: "50%",
+            background: "rgba(255,255,255,0.1)", border: "none",
+            color: "#fff", fontSize: "1.2rem", cursor: "pointer",
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}><PiX /></button>
+        </div>
+
+        {/* Logo */}
+        <div style={{ padding: "16px 24px 8px", display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{
+            width: 42, height: 42, borderRadius: 10,
+            background: "linear-gradient(135deg, #16a34a, #15803d)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: "1.1rem", color: "#fff",
+          }}><PiLightning /></span>
+          <span style={{ color: "#fff", fontWeight: 700, fontSize: "1.2rem" }}>VPS Panel AI</span>
+        </div>
+
+        {/* About */}
+        <div style={{ padding: "16px 24px", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
+          <p style={{ color: "rgba(255,255,255,0.7)", fontSize: "0.85rem", lineHeight: 1.7 }}>
+            Nền tảng AI xử lý ảnh thông minh cho doanh nghiệp. Tạo ảnh sản phẩm, review, retouching tự động.
+          </p>
+          <a href="/login" style={{
+            display: "inline-block", marginTop: 12,
+            padding: "10px 28px", borderRadius: 30,
+            background: "#16a34a", color: "#fff",
+            fontSize: "0.85rem", fontWeight: 600,
+          }}>Xem thêm</a>
+        </div>
+
+        {/* Navigation Links */}
+        <div style={{ padding: "8px 0" }}>
+          {["Trang chủ", "Dịch vụ", "Công cụ AI", "Bảng giá", "Liên hệ"].map((item, i) => (
+            <a key={i} href={i === 0 ? "/" : `#${["", "services", "tools", "pricing", "contact"][i]}`}
+              onClick={onClose}
+              style={{
+                display: "block", padding: "14px 24px",
+                color: "#fff", fontSize: "0.95rem", fontWeight: 600,
+                textTransform: "uppercase" as const, letterSpacing: "0.5px",
+                borderBottom: "1px solid rgba(255,255,255,0.08)",
+                transition: "background 0.2s",
+              }}
+            >{item}</a>
+          ))}
+        </div>
+
+        {/* Contact Info */}
+        <div style={{ padding: "20px 24px", color: "rgba(255,255,255,0.7)", fontSize: "0.82rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+            <PiMapPin style={{ color: "#16a34a" }} /> Ho Chi Minh City, Vietnam
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+            <PiPhone style={{ color: "#16a34a" }} /> 0765.168.xxx
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <PiEnvelopeSimple style={{ color: "#16a34a" }} /> admin@vpspanel.io.vn
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
