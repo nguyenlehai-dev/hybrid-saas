@@ -505,7 +505,6 @@ export default function HomePage() {
                     alt={slide.alt}
                     style={{
                       width: "100%",
-                      height: 280,
                       objectFit: "cover",
                       borderRadius: 12,
                       display: "block",
