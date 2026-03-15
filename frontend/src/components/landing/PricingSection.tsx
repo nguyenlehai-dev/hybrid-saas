@@ -23,6 +23,7 @@ export default function PricingSection() {
             <div key={i} style={{
               background: "#fff", borderRadius: 16, padding: "36px 24px",
               textAlign: "center", position: "relative",
+              display: "flex", flexDirection: "column" as const,
               border: plan.popular ? "2px solid #16a34a" : "1px solid #f1f5f9",
               boxShadow: plan.popular ? "0 12px 40px rgba(22,163,74,0.12)" : "0 2px 12px rgba(0,0,0,0.04)",
               transform: plan.popular ? "scale(1.02)" : "none",
@@ -45,7 +46,7 @@ export default function PricingSection() {
                 background: "rgba(22,163,74,0.08)", color: "#16a34a",
                 fontSize: "0.85rem", fontWeight: 600, marginBottom: 24,
               }}><PiCoin style={{ marginRight: 4 }} /> {plan.credits} Điểm</div>
-              <ul style={{ listStyle: "none", textAlign: "left", marginBottom: 24 }}>
+              <ul style={{ listStyle: "none", textAlign: "left", marginBottom: 24, flex: 1 }}>
                 {plan.features.map((f, fi) => (
                   <li key={fi} style={{
                     padding: "8px 0", fontSize: "0.88rem", color: "#475569",
@@ -56,6 +57,7 @@ export default function PricingSection() {
                 ))}
               </ul>
               <a href="/login" style={{
+                marginTop: "auto",
                 display: "block", padding: "12px", borderRadius: 8,
                 background: plan.popular ? "linear-gradient(135deg, #16a34a, #15803d)" : "#f8fafc",
                 color: plan.popular ? "#fff" : "#111827", fontWeight: 600, fontSize: "0.92rem",
