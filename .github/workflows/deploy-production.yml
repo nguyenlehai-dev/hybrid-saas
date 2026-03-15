@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: production
-      url: https://nulith.io.vn
+      url: https://vpspanel.io.vn
 
     steps:
       - uses: actions/checkout@v4
@@ -77,7 +77,7 @@ jobs:
             # Build frontend
             cd ${{ env.FRONTEND_PATH }}
             npm ci --production=false
-            NEXT_PUBLIC_API_URL=https://api.nulith.io.vn npm run build
+            NEXT_PUBLIC_API_URL=https://vpspanel.io.vn/api npm run build
 
             # Restart service
             echo '123456789' | sudo -S systemctl restart saas-frontend
@@ -130,7 +130,7 @@ jobs:
         run: |
           sleep 5
           echo "🔍 Checking frontend..."
-          FRONTEND_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 https://nulith.io.vn/ || echo "000")
+          FRONTEND_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 https://vpspanel.io.vn/ || echo "000")
           echo "Frontend: HTTP $FRONTEND_STATUS"
 
           if [ "$FRONTEND_STATUS" -eq 200 ]; then

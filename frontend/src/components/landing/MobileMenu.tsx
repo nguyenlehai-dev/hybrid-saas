@@ -79,7 +79,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             <PiPhone style={{ color: "#16a34a" }} /> 0765.168.xxx
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <PiEnvelopeSimple style={{ color: "#16a34a" }} /> admin@nulith.io.vn
+            <PiEnvelopeSimple style={{ color: "#16a34a" }} /> admin@vpspanel.io.vn
           </div>
         </div>
       </div>

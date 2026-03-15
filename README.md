@@ -7,7 +7,7 @@
 [![CI](https://github.com/nguyenlehai-dev/hybrid-saas/actions/workflows/ci.yml/badge.svg)](https://github.com/nguyenlehai-dev/hybrid-saas/actions/workflows/ci.yml)
 [![Deploy](https://github.com/nguyenlehai-dev/hybrid-saas/actions/workflows/deploy-production.yml/badge.svg)](https://github.com/nguyenlehai-dev/hybrid-saas/actions/workflows/deploy-production.yml)
 
-[Website](https://nulith.io.vn) · [API Docs](https://api.nulith.io.vn/docs) · [Report Bug](https://github.com/nguyenlehai-dev/hybrid-saas/issues/new?template=bug_report.yml) · [Request Feature](https://github.com/nguyenlehai-dev/hybrid-saas/issues/new?template=feature_request.yml)
+[Website](https://vpspanel.io.vn) · [API Docs](https://vpspanel.io.vn/api/docs) · [Report Bug](https://github.com/nguyenlehai-dev/hybrid-saas/issues/new?template=bug_report.yml) · [Request Feature](https://github.com/nguyenlehai-dev/hybrid-saas/issues/new?template=feature_request.yml)
 
 </div>
 
@@ -193,9 +193,9 @@ Chi tiết xem tại [vm2-ai-engine/README.md](vm2-ai-engine/README.md).
 **Backend** `.env`
 
 ```env
-DOMAIN=nulith.io.vn
-API_URL=https://api.nulith.io.vn
-FRONTEND_URL=https://nulith.io.vn
+DOMAIN=vpspanel.io.vn
+API_URL=https://vpspanel.io.vn/api
+FRONTEND_URL=https://vpspanel.io.vn
 DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/hybrid_saas
 REDIS_URL=redis://localhost:6379/0
 JWT_SECRET=your-secret-key
@@ -208,7 +208,7 @@ AI_ENGINE_TIMEOUT=120
 **Frontend** `.env.local`
 
 ```env
-NEXT_PUBLIC_API_URL=https://api.nulith.io.vn
+NEXT_PUBLIC_API_URL=https://vpspanel.io.vn/api
 ```
 
 > **Lưu ý:** Không commit file `.env` lên Git. Chỉ commit `.env.example`.
@@ -217,7 +217,7 @@ NEXT_PUBLIC_API_URL=https://api.nulith.io.vn
 
 ## API Endpoints
 
-Swagger UI: [api.nulith.io.vn/docs](https://api.nulith.io.vn/docs)
+Swagger UI: [vpspanel.io.vn/api/docs](https://vpspanel.io.vn/api/docs)
 
 | Method | Endpoint | Mô tả |
 |:-------|:---------|:-------|
@@ -457,6 +457,6 @@ Xem <a href="docs/server-setup.md">docs/server-setup.md</a>
 
 <div align="center">
 
-Made by [Nulith Team](https://nulith.io.vn)
+Made by [Nulith Team](https://vpspanel.io.vn)
 
 </div>

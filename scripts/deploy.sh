@@ -1,5 +1,5 @@
 #!/bin/bash
-# Deploy script for nulith.io.vn
+# Deploy script for vpspanel.io.vn
 # Run with: echo "123456789" | sudo -S bash deploy.sh
 
 set -e
@@ -32,9 +32,9 @@ echo "Python deps installed."
 
 echo "=== Step 6: Create .env ==="
 cat > /opt/hybrid-saas/.env <<'ENVEOF'
-DOMAIN=nulith.io.vn
-API_URL=https://api.nulith.io.vn
-FRONTEND_URL=https://nulith.io.vn
+DOMAIN=vpspanel.io.vn
+API_URL=https://vpspanel.io.vn/api
+FRONTEND_URL=https://vpspanel.io.vn
 DATABASE_URL=postgresql+asyncpg://saas_admin:SaasAdmin2026!@localhost:5432/hybrid_saas
 REDIS_URL=redis://localhost:6379/0
 JWT_SECRET=NulithAI2026SuperSecretKeyForJWTTokenGeneration48chars
@@ -64,10 +64,10 @@ echo "Frontend built."
 
 echo "=== Step 8: Configure Nginx ==="
 # API site
-cat > /etc/nginx/sites-available/api.nulith.io.vn <<'NGINX1'
+cat > /etc/nginx/sites-available/vpspanel.io.vn <<'NGINX1'
 server {
     listen 80;
-    server_name api.nulith.io.vn;
+    server_name vpspanel.io.vn;
 
     location / {
         proxy_pass http://127.0.0.1:8000;
@@ -88,11 +88,12 @@ server {
 }
 NGINX1
 
-# Frontend site
-cat > /etc/nginx/sites-available/nulith.io.vn <<'NGINX2'
+# Frontend site (same domain, served by unified config)
+cat >> /etc/nginx/sites-available/vpspanel.io.vn <<'NGINX2'
+# Frontend is served under the same domain
 server {
     listen 80;
-    server_name nulith.io.vn www.nulith.io.vn;
+    server_name vpspanel.io.vn www.vpspanel.io.vn;
 
     location / {
         proxy_pass http://127.0.0.1:3000;
@@ -108,8 +109,7 @@ server {
 NGINX2
 
 # Enable sites
-ln -sf /etc/nginx/sites-available/api.nulith.io.vn /etc/nginx/sites-enabled/
-ln -sf /etc/nginx/sites-available/nulith.io.vn /etc/nginx/sites-enabled/
+ln -sf /etc/nginx/sites-available/vpspanel.io.vn /etc/nginx/sites-enabled/
 # Remove default if exists
 rm -f /etc/nginx/sites-enabled/default
 
@@ -172,7 +172,7 @@ echo ""
 echo "============================================="
 echo "  ✅ DEPLOYMENT COMPLETE!"
 echo "============================================="
-echo "  API:      http://api.nulith.io.vn"
-echo "  Frontend: http://nulith.io.vn"  
+echo "  API:      https://vpspanel.io.vn/api"
+echo "  Frontend: https://vpspanel.io.vn"  
 echo "  Health:   curl http://localhost:8000/health"
 echo "============================================="

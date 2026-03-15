@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Nulith",
     description: "Nền tảng AI xử lý ảnh và quản lý server thông minh",
-    url: "https://nulith.io.vn",
+    url: "https://vpspanel.io.vn",
     siteName: "Nulith",
     type: "website",
   },

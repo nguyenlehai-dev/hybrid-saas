@@ -2,13 +2,13 @@
 const nextConfig = {
   output: 'standalone',
   images: {
-    domains: ['nulith.io.vn', 'api.nulith.io.vn'],
+    domains: ['vpspanel.io.vn'],
   },
   async rewrites() {
     return [
       {
         source: '/api/:path*',
-        destination: (process.env.NEXT_PUBLIC_API_URL || 'https://api.vpspanel.io.vn') + '/:path*',
+        destination: (process.env.NEXT_PUBLIC_API_URL || 'https://vpspanel.io.vn/api') + '/:path*',
       },
     ];
   },

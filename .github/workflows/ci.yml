@@ -70,7 +70,7 @@ jobs:
       - name: 🔨 Build Check
         run: npm run build
         env:
-          NEXT_PUBLIC_API_URL: https://api.nulith.io.vn
+          NEXT_PUBLIC_API_URL: https://vpspanel.io.vn/api
 
       - name: 📊 Build Size Report
         run: |
