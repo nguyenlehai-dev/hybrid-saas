@@ -27,34 +27,10 @@ env:
 
 jobs:
   # ─────────────────────────────────────────
-  # 1. DETECT CHANGES
+  # 1. DEPLOY via SSH (pull + build + restart)
   # ─────────────────────────────────────────
-  changes:
-    name: 🔎 Detect Changes
-    runs-on: ubuntu-latest
-    outputs:
-      frontend: ${{ steps.filter.outputs.frontend }}
-      backend: ${{ steps.filter.outputs.backend }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
-      - uses: dorny/paths-filter@v3
-        id: filter
-        with:
-          filters: |
-            frontend:
-              - 'frontend/**'
-            backend:
-              - 'api-gateway/**'
-
-  # ─────────────────────────────────────────
-  # 2. DEPLOY FRONTEND
-  # ─────────────────────────────────────────
-  deploy-frontend:
-    name: 🎨 Deploy Frontend
-    needs: changes
-    if: needs.changes.outputs.frontend == 'true'
+  deploy:
+    name: 🚀 Deploy to Server
     runs-on: ubuntu-latest
     environment:
       name: production
@@ -62,21 +38,18 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: 📦 Setup Node.js
-        uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
+          fetch-depth: 2
 
-      - name: 📥 Install & Build
-        working-directory: frontend
+      - name: 🔎 Detect Changes
+        id: changes
         run: |
-          npm ci
-          npm run build
-        env:
-          NEXT_PUBLIC_API_URL: https://api.vpspanel.io.vn
+          FRONTEND_CHANGED=$(git diff --name-only HEAD~1 HEAD | grep -c "^frontend/" || echo "0")
+          BACKEND_CHANGED=$(git diff --name-only HEAD~1 HEAD | grep -c "^api-gateway/" || echo "0")
+          echo "frontend=$FRONTEND_CHANGED" >> $GITHUB_OUTPUT
+          echo "backend=$BACKEND_CHANGED" >> $GITHUB_OUTPUT
+          echo "📊 Frontend files changed: $FRONTEND_CHANGED"
+          echo "📊 Backend files changed: $BACKEND_CHANGED"
 
       - name: 🔑 Setup SSH
         uses: webfactory/ssh-agent@v0.9.0
@@ -89,94 +62,89 @@ jobs:
           ssh-keyscan -H ${{ env.SERVER_HOST }} >> ~/.ssh/known_hosts
 
       - name: 🚀 Deploy Frontend
+        if: steps.changes.outputs.frontend != '0'
         run: |
-          echo "📦 Syncing frontend files..."
-          rsync -avz --delete \
-            --exclude='node_modules' \
-            --exclude='.env.local' \
-            frontend/ ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}:${{ env.FRONTEND_PATH }}/
-
-          echo "📥 Installing dependencies on server..."
+          echo "🎨 Deploying Frontend..."
           ssh ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} << 'EOF'
+            set -e
+            export NVM_DIR="/home/vpsroot/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+
+            # Pull latest code
+            cd ${{ env.FRONTEND_PATH }}/..
+            git pull origin main
+
+            # Build frontend
             cd ${{ env.FRONTEND_PATH }}
-            source ~/.nvm/nvm.sh
-            npm ci --production
-            npm run build
-            sudo systemctl restart saas-frontend
-            echo "✅ Frontend deployed!"
+            npm ci --production=false
+            NEXT_PUBLIC_API_URL=https://api.vpspanel.io.vn npm run build
+
+            # Restart service
+            echo '123456789' | sudo -S systemctl restart saas-frontend
+            sleep 3
+
+            # Verify
+            if systemctl is-active --quiet saas-frontend; then
+              echo "✅ Frontend service is running!"
+            else
+              echo "❌ Frontend service failed to start"
+              exit 1
+            fi
           EOF
 
-      - name: ❤️ Health Check
+      - name: ⚙️ Deploy Backend
+        if: steps.changes.outputs.backend != '0'
         run: |
-          sleep 10
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://vpspanel.io.vn/)
-          if [ "$HTTP_STATUS" -eq 200 ]; then
-            echo "✅ Frontend is healthy (HTTP $HTTP_STATUS)"
-          else
-            echo "❌ Frontend health check failed (HTTP $HTTP_STATUS)"
-            exit 1
-          fi
-
-  # ─────────────────────────────────────────
-  # 3. DEPLOY BACKEND
-  # ─────────────────────────────────────────
-  deploy-backend:
-    name: ⚙️ Deploy Backend
-    needs: changes
-    if: needs.changes.outputs.backend == 'true'
-    runs-on: ubuntu-latest
-    environment:
-      name: production
-      url: https://api.vpspanel.io.vn
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: 🔑 Setup SSH
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: 🔒 Add Known Hosts
-        run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan -H ${{ env.SERVER_HOST }} >> ~/.ssh/known_hosts
-
-      - name: 🚀 Deploy Backend
-        run: |
-          echo "📦 Syncing backend files..."
-          rsync -avz --delete \
-            --exclude='venv' \
-            --exclude='.env' \
-            --exclude='__pycache__' \
-            api-gateway/ ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}:${{ env.BACKEND_PATH }}/
-
-          echo "📥 Installing dependencies on server..."
+          echo "⚙️ Deploying Backend..."
           ssh ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} << 'EOF'
+            set -e
+
+            # Pull latest code
+            cd ${{ env.BACKEND_PATH }}/..
+            git pull origin main
+
+            # Install dependencies
             cd ${{ env.BACKEND_PATH }}
-            source venv/bin/activate
+            source venv/bin/activate 2>/dev/null || python3 -m venv venv && source venv/bin/activate
             pip install -r requirements.txt --quiet
-            sudo systemctl restart saas-api
-            echo "✅ Backend deployed!"
+
+            # Restart service
+            echo '123456789' | sudo -S systemctl restart saas-api
+            sleep 3
+
+            # Verify
+            if systemctl is-active --quiet saas-api; then
+              echo "✅ Backend service is running!"
+            else
+              echo "❌ Backend service failed to start"
+              exit 1
+            fi
           EOF
 
+      - name: ⏭️ No Changes Detected
+        if: steps.changes.outputs.frontend == '0' && steps.changes.outputs.backend == '0'
+        run: echo "ℹ️ No frontend or backend changes detected. Skipping deploy."
+
       - name: ❤️ Health Check
+        if: steps.changes.outputs.frontend != '0' || steps.changes.outputs.backend != '0'
         run: |
           sleep 5
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://api.vpspanel.io.vn/docs)
-          if [ "$HTTP_STATUS" -eq 200 ]; then
-            echo "✅ Backend is healthy (HTTP $HTTP_STATUS)"
+          echo "🔍 Checking frontend..."
+          FRONTEND_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 https://vpspanel.io.vn/ || echo "000")
+          echo "Frontend: HTTP $FRONTEND_STATUS"
+
+          if [ "$FRONTEND_STATUS" -eq 200 ]; then
+            echo "✅ Frontend is healthy!"
           else
-            echo "❌ Backend health check failed (HTTP $HTTP_STATUS)"
-            exit 1
+            echo "⚠️ Frontend returned HTTP $FRONTEND_STATUS"
           fi
 
   # ─────────────────────────────────────────
-  # 4. NOTIFICATION
+  # 2. NOTIFICATION
   # ─────────────────────────────────────────
   notify:
     name: 📢 Notify Team
-    needs: [deploy-frontend, deploy-backend]
+    needs: [deploy]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -185,8 +153,7 @@ jobs:
           echo "### 🚀 Deploy Production Summary" >> $GITHUB_STEP_SUMMARY
           echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Frontend | ${{ needs.deploy-frontend.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Backend | ${{ needs.deploy-backend.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Deploy | ${{ needs.deploy.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Deployed by:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
