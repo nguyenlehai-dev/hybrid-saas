@@ -320,72 +320,23 @@ export default function HomePage() {
                   }}
                 />
 
-                {/* Floating Card — Subscribers */}
-                <div className="float-card-1" style={{
-                  position: "absolute", top: "5%", left: "-10%", zIndex: 3,
-                  background: "#fff", borderRadius: 12, padding: "10px 16px",
-                  boxShadow: "0 8px 30px rgba(0,0,0,0.12)",
-                  display: "flex", alignItems: "center", gap: 10,
+                {/* Floating Card 1 */}
+                <img className="float-card-1" src="/images/float-card-1.png" alt="" style={{
+                  position: "absolute", top: "5%", left: "-5%", zIndex: 3,
+                  width: 160,
                   animation: "floatCard 3s ease-in-out infinite",
-                }}>
-                  <div style={{
-                    width: 36, height: 36, borderRadius: 8,
-                    background: "linear-gradient(135deg, #818cf8, #6366f1)",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    color: "#fff", fontSize: "0.9rem",
-                  }}><PiUsers /></div>
-                  <div>
-                    <div style={{ fontSize: "0.95rem", fontWeight: 800, color: "#111" }}>+25.000</div>
-                    <div style={{ fontSize: "0.65rem", color: "#6b7280" }}>Subscribers</div>
-                  </div>
-                </div>
+                  filter: "drop-shadow(0 8px 20px rgba(0,0,0,0.1))",
+                }} />
 
-                {/* Floating Card — Stats Dashboard */}
-                <div className="float-card-2" style={{
-                  position: "absolute", top: "10%", right: "-15%", zIndex: 3,
-                  background: "#fff", borderRadius: 14, padding: "14px 18px",
-                  boxShadow: "0 8px 30px rgba(0,0,0,0.12)",
+                {/* Floating Card 2 */}
+                <img className="float-card-2" src="/images/float-card-2.png" alt="" style={{
+                  position: "absolute", top: "5%", right: "-10%", zIndex: 3,
+                  width: 200,
                   animation: "floatCard 3s ease-in-out infinite 0.5s",
-                  minWidth: 180,
-                }}>
-                  {/* Mini donut charts */}
-                  <div style={{ display: "flex", gap: 12, marginBottom: 10, justifyContent: "center" }}>
-                    <div style={{ textAlign: "center" }}>
-                      <div style={{
-                        width: 40, height: 40, borderRadius: "50%",
-                        border: "3px solid #16a34a", borderTopColor: "#e5e7eb",
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        fontSize: "0.6rem", fontWeight: 700, color: "#16a34a",
-                      }}>35%</div>
-                    </div>
-                    <div style={{ textAlign: "center" }}>
-                      <div style={{
-                        width: 40, height: 40, borderRadius: "50%",
-                        border: "3px solid #f59e0b", borderTopColor: "#e5e7eb",
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        fontSize: "0.6rem", fontWeight: 700, color: "#f59e0b",
-                      }}>40%</div>
-                    </div>
-                  </div>
-                  <div style={{
-                    fontSize: "0.85rem", fontWeight: 700, color: "#16a34a",
-                    textAlign: "center", letterSpacing: "0.5px",
-                  }}>VPS Panel</div>
-                  <div style={{
-                    display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 10,
-                  }}>
-                    <div style={{ textAlign: "center" }}>
-                      <div style={{ fontSize: "0.9rem", fontWeight: 800, color: "#111" }}>1000+</div>
-                      <div style={{ fontSize: "0.55rem", color: "#9ca3af" }}>Client Projects</div>
-                    </div>
-                    <div style={{ textAlign: "center" }}>
-                      <div style={{ fontSize: "0.9rem", fontWeight: 800, color: "#111" }}>1500+</div>
-                      <div style={{ fontSize: "0.55rem", color: "#9ca3af" }}>Marketing days</div>
-                    </div>
-                  </div>
-                </div>
+                  filter: "drop-shadow(0 8px 20px rgba(0,0,0,0.1))",
+                }} />
 
-                {/* Floating Card — Chart */}
+                {/* Floating Card 3 — Chart (keep as is) */}
                 <div className="float-card-3" style={{
                   position: "absolute", top: "-5%", left: "35%", zIndex: 3,
                   background: "#fff", borderRadius: 10, padding: "8px 12px",
@@ -401,54 +352,21 @@ export default function HomePage() {
                   ))}
                 </div>
 
-                {/* Floating Card — Review Badge */}
-                <div className="float-card-4" style={{
-                  position: "absolute", bottom: "5%", right: "-10%", zIndex: 3,
-                  background: "#fff", borderRadius: 12, padding: "10px 16px",
-                  boxShadow: "0 8px 30px rgba(0,0,0,0.12)",
+                {/* Floating Card 4 */}
+                <img className="float-card-4" src="/images/float-card-4.png" alt="" style={{
+                  position: "absolute", bottom: "5%", right: "-8%", zIndex: 3,
+                  width: 180,
                   animation: "floatCard 3s ease-in-out infinite 1.5s",
-                  display: "flex", alignItems: "center", gap: 10,
-                }}>
-                  <div style={{
-                    width: 32, height: 32, borderRadius: "50%",
-                    background: "#ef4444", display: "flex",
-                    alignItems: "center", justifyContent: "center",
-                    color: "#fff", fontSize: "0.8rem",
-                  }}><PiHeart /></div>
-                  <div>
-                    <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "#111" }}>+500 <span style={{ fontSize: "0.7rem", color: "#16a34a" }}>Review</span></div>
-                    <div style={{ display: "flex", gap: 2 }}>
-                      {[1,2,3,4,5].map(s => (
-                        <PiStar key={s} style={{ fontSize: "0.6rem", color: "#f59e0b" }} />
-                      ))}
-                      <span style={{ fontSize: "0.55rem", color: "#9ca3af", marginLeft: 4 }}>(4.8/5)</span>
-                    </div>
-                  </div>
-                </div>
+                  filter: "drop-shadow(0 8px 20px rgba(0,0,0,0.1))",
+                }} />
 
-                {/* User avatars bubble */}
-                <div className="float-card-5" style={{
-                  position: "absolute", bottom: "8%", left: "5%", zIndex: 3,
-                  display: "flex", alignItems: "center", gap: -4,
+                {/* Floating Card 5 */}
+                <img className="float-card-5" src="/images/float-card-5.png" alt="" style={{
+                  position: "absolute", bottom: "8%", left: "0%", zIndex: 3,
+                  width: 200,
                   animation: "floatCard 3s ease-in-out infinite 2s",
-                }}>
-                  {["#f97316", "#3b82f6", "#8b5cf6", "#10b981"].map((c, i) => (
-                    <div key={i} style={{
-                      width: 32, height: 32, borderRadius: "50%",
-                      background: c, border: "2px solid #fff",
-                      marginLeft: i > 0 ? -8 : 0,
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      color: "#fff", fontSize: "0.65rem", fontWeight: 700,
-                    }}>{["N", "T", "H", "M"][i]}</div>
-                  ))}
-                  <div style={{
-                    width: 32, height: 32, borderRadius: "50%",
-                    background: "#16a34a", border: "2px solid #fff",
-                    marginLeft: -8,
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    color: "#fff", fontSize: "0.55rem", fontWeight: 700,
-                  }}>20+</div>
-                </div>
+                  filter: "drop-shadow(0 8px 20px rgba(0,0,0,0.1))",
+                }} />
               </div>
             </div>
           </div>
