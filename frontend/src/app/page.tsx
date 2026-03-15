@@ -322,16 +322,16 @@ export default function HomePage() {
 
                 {/* Floating Card 1 */}
                 <img className="float-card-1" src="/images/float-card-1.png" alt="" style={{
-                  position: "absolute", top: "5%", left: "-5%", zIndex: 3,
-                  width: 160,
+                  position: "absolute", top: "2%", left: "-12%", zIndex: 3,
+                  width: 280,
                   animation: "floatCard 3s ease-in-out infinite",
                   filter: "drop-shadow(0 8px 20px rgba(0,0,0,0.1))",
                 }} />
 
                 {/* Floating Card 2 */}
                 <img className="float-card-2" src="/images/float-card-2.png" alt="" style={{
-                  position: "absolute", top: "5%", right: "-10%", zIndex: 3,
-                  width: 200,
+                  position: "absolute", top: "0%", right: "-18%", zIndex: 3,
+                  width: 340,
                   animation: "floatCard 3s ease-in-out infinite 0.5s",
                   filter: "drop-shadow(0 8px 20px rgba(0,0,0,0.1))",
                 }} />
@@ -354,16 +354,16 @@ export default function HomePage() {
 
                 {/* Floating Card 4 */}
                 <img className="float-card-4" src="/images/float-card-4.png" alt="" style={{
-                  position: "absolute", bottom: "5%", right: "-8%", zIndex: 3,
-                  width: 180,
+                  position: "absolute", bottom: "2%", right: "-15%", zIndex: 3,
+                  width: 300,
                   animation: "floatCard 3s ease-in-out infinite 1.5s",
                   filter: "drop-shadow(0 8px 20px rgba(0,0,0,0.1))",
                 }} />
 
                 {/* Floating Card 5 */}
                 <img className="float-card-5" src="/images/float-card-5.png" alt="" style={{
-                  position: "absolute", bottom: "8%", left: "0%", zIndex: 3,
-                  width: 200,
+                  position: "absolute", bottom: "5%", left: "-8%", zIndex: 3,
+                  width: 320,
                   animation: "floatCard 3s ease-in-out infinite 2s",
                   filter: "drop-shadow(0 8px 20px rgba(0,0,0,0.1))",
                 }} />
