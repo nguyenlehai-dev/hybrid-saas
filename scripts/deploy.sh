@@ -1,5 +1,5 @@
 #!/bin/bash
-# Deploy script for nulith.io.vn
+# Deploy script for vpspanel.io.vn
 # Run with: echo "123456789" | sudo -S bash deploy.sh
 
 set -e
@@ -32,12 +32,12 @@ echo "Python deps installed."
 
 echo "=== Step 6: Create .env ==="
 cat > /opt/hybrid-saas/.env <<'ENVEOF'
-DOMAIN=nulith.io.vn
-API_URL=https://api.nulith.io.vn
-FRONTEND_URL=https://nulith.io.vn
+DOMAIN=vpspanel.io.vn
+API_URL=https://vpspanel.io.vn/api
+FRONTEND_URL=https://vpspanel.io.vn
 DATABASE_URL=postgresql+asyncpg://saas_admin:SaasAdmin2026!@localhost:5432/hybrid_saas
 REDIS_URL=redis://localhost:6379/0
-JWT_SECRET=NulithAI2026SuperSecretKeyForJWTTokenGeneration48chars
+JWT_SECRET=VpsPanelAI2026SuperSecretKeyForJWTTokenGeneration48ch
 JWT_ALGORITHM=HS256
 JWT_EXPIRATION_HOURS=24
 AI_ENGINE_URL=http://192.168.1.100:7860
@@ -45,7 +45,7 @@ AI_ENGINE_TIMEOUT=120
 UPLOAD_DIR=/opt/hybrid-saas/uploads
 LANDING_PAGES_DIR=/opt/hybrid-saas/landing-pages
 MAX_UPLOAD_SIZE_MB=50
-APP_NAME=Nulith
+APP_NAME=VPS Panel AI
 APP_ENV=production
 DEBUG=false
 LOG_LEVEL=info
@@ -62,14 +62,18 @@ mkdir -p /opt/hybrid-saas/frontend
 cp -r .next/standalone/* /opt/hybrid-saas/frontend/ 2>/dev/null || cp -r out/* /opt/hybrid-saas/frontend/ 2>/dev/null || cp -r .next /opt/hybrid-saas/frontend/
 echo "Frontend built."
 
-echo "=== Step 8: Configure Nginx ==="
-# API site
-cat > /etc/nginx/sites-available/api.nulith.io.vn <<'NGINX1'
+echo "=== Step 8: Configure Nginx (Unified Domain) ==="
+# Unified site - vpspanel.io.vn handles both frontend and API
+cat > /etc/nginx/sites-available/vpspanel.io.vn <<'NGINX1'
 server {
     listen 80;
-    server_name api.nulith.io.vn;
+    server_name vpspanel.io.vn www.vpspanel.io.vn;
 
-    location / {
+    client_max_body_size 50M;
+
+    # API proxy - route /api/ requests to FastAPI backend
+    location /api/ {
+        rewrite ^/api/(.*) /$1 break;
         proxy_pass http://127.0.0.1:8000;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
@@ -80,20 +84,14 @@ server {
         proxy_send_timeout 60s;
     }
 
+    # Upload files
     location /uploads/ {
         alias /opt/hybrid-saas/uploads/;
         expires 30d;
         add_header Cache-Control "public, immutable";
     }
-}
-NGINX1
 
-# Frontend site
-cat > /etc/nginx/sites-available/nulith.io.vn <<'NGINX2'
-server {
-    listen 80;
-    server_name nulith.io.vn www.nulith.io.vn;
-
+    # Frontend - Next.js
     location / {
         proxy_pass http://127.0.0.1:3000;
         proxy_http_version 1.1;
@@ -105,23 +103,23 @@ server {
         proxy_set_header Connection "upgrade";
     }
 }
-NGINX2
+NGINX1
 
-# Enable sites
-ln -sf /etc/nginx/sites-available/api.nulith.io.vn /etc/nginx/sites-enabled/
-ln -sf /etc/nginx/sites-available/nulith.io.vn /etc/nginx/sites-enabled/
-# Remove default if exists
+# Enable site
+ln -sf /etc/nginx/sites-available/vpspanel.io.vn /etc/nginx/sites-enabled/
+# Remove old api subdomain config and default
+rm -f /etc/nginx/sites-enabled/api.vpspanel.io.vn
 rm -f /etc/nginx/sites-enabled/default
 
 # Test and reload
 nginx -t && systemctl reload nginx
-echo "Nginx configured."
+echo "Nginx configured (unified domain)."
 
 echo "=== Step 9: Create Systemd Services ==="
 # API Gateway service
 cat > /etc/systemd/system/saas-api.service <<'SVC1'
 [Unit]
-Description=Nulith - API Gateway
+Description=VPS Panel AI - API Gateway
 After=network.target postgresql.service redis.service
 
 [Service]
@@ -141,7 +139,7 @@ SVC1
 # Frontend service
 cat > /etc/systemd/system/saas-frontend.service <<'SVC2'
 [Unit]
-Description=Nulith - Frontend (Next.js)
+Description=VPS Panel AI - Frontend (Next.js)
 After=network.target
 
 [Service]
@@ -172,7 +170,7 @@ echo ""
 echo "============================================="
 echo "  ✅ DEPLOYMENT COMPLETE!"
 echo "============================================="
-echo "  API:      http://api.nulith.io.vn"
-echo "  Frontend: http://nulith.io.vn"  
+echo "  Website:  http://vpspanel.io.vn"
+echo "  API:      http://vpspanel.io.vn/api"  
 echo "  Health:   curl http://localhost:8000/health"
 echo "============================================="
