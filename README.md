@@ -265,48 +265,112 @@ Hệ thống sử dụng GitHub Actions với 4 workflows:
 
 ## Git Workflow
 
-### Branching
+### Branches
 
 ```
-main ← production, luôn stable
-  └── develop ← tổng hợp features
-        ├── feature/xxx ← tính năng mới
-        ├── bugfix/xxx  ← sửa bug
-        └── hotfix/xxx  ← sửa khẩn cấp
+                          PRODUCTION
+                              |
+  v1.0.0    v1.1.0    v2.0.0  |
+     *---------*---------*    |
+     |                   |    |
+ ----*-------------------*---------  main         (production, auto deploy)
+     |         |         |
+ ----*---------*---------*---------  staging       (pre-production, testing)
+     |    |    |    |    |
+ ----*----*----*----*----*---------  develop       (development, default)
+          |         |
+          |         *--*--*         feature/xxx   (tính năng mới)
+          |
+          *--*                      bugfix/xxx    (sửa bug)
 ```
 
-### Quy trình
+### Vai trò từng nhánh
+
+| Nhánh | Vai trò | Protected | Merge từ | Deploy tới |
+|:------|:--------|:----------|:---------|:-----------|
+| `main` | Code production, luôn stable | Co - cần 1 approval | staging | Production (auto) |
+| `staging` | Test trước khi release | Co - cần 1 approval | develop | Staging server |
+| `develop` | Tổng hợp features | Co - cần 1 approval | feature/*, bugfix/* | Dev server |
+| `feature/*` | Phát triển tính năng mới | Khong | Developer tạo từ develop | - |
+| `bugfix/*` | Sửa bug thường | Khong | Developer tạo từ develop | - |
+| `hotfix/*` | Sửa bug khẩn cấp | Khong | Developer tạo từ main | - |
+
+### Quy trình chi tiết
+
+**Bước 1** — Tạo feature branch từ develop
 
 ```bash
-# Cập nhật develop
 git checkout develop
 git pull origin develop
-
-# Tạo feature branch
 git checkout -b feature/ten-tinh-nang
+```
 
-# Code và commit
+**Bước 2** — Code và commit theo convention
+
+```bash
+git add .
 git commit -m "feat: thêm trang dashboard"
+```
 
-# Push và tạo PR
+**Bước 3** — Push và tạo Pull Request
+
+```bash
 git push origin feature/ten-tinh-nang
 ```
 
-Trên GitHub: tạo Pull Request vào `develop` → CI chạy → review → merge.
+Vào GitHub tạo PR vào `develop`. CI tự động chạy lint, test, build.
 
-Khi `develop` stable: tạo PR từ `develop` vào `main` → merge → auto deploy.
+**Bước 4** — Code review
+
+Ít nhất 1 thành viên review và approve. Nếu CI fail, sửa và push lại.
+
+**Bước 5** — Merge vào develop
+
+Sau khi CI pass + approved, merge PR vào develop.
+
+**Bước 6** — Test trên staging
+
+Tạo PR từ `develop` vào `staging`. Test kỹ trên staging server.
+
+**Bước 7** — Release lên production
+
+Tạo PR từ `staging` vào `main`. Merge xong, CI/CD tự động deploy + tạo release tag.
+
+### Quy trình tóm tắt
+
+```
+feature/xxx ──PR──> develop ──PR──> staging ──PR──> main ──> Auto Deploy
+                        |              |              |
+                     CI chạy        QA test      Deploy + Tag
+                     Review         Staging       Production
+```
 
 ### Commit Convention
 
-| Prefix | Mô tả |
-|:-------|:-------|
-| `feat:` | Tính năng mới |
-| `fix:` | Sửa bug |
-| `docs:` | Documentation |
-| `style:` | UI/CSS |
-| `refactor:` | Tái cấu trúc code |
-| `test:` | Tests |
-| `chore:` | Dependencies, config |
+| Prefix | Mô tả | Ví dụ |
+|:-------|:-------|:------|
+| `feat:` | Tính năng mới | `feat: thêm trang quản trị` |
+| `fix:` | Sửa bug | `fix: lỗi upload file lớn` |
+| `docs:` | Tài liệu | `docs: cập nhật API docs` |
+| `style:` | Giao diện | `style: chỉnh CSS trang login` |
+| `refactor:` | Tái cấu trúc | `refactor: tách auth middleware` |
+| `test:` | Test | `test: thêm test credit service` |
+| `chore:` | Config, deps | `chore: cập nhật dependencies` |
+
+### Hotfix (sửa khẩn cấp)
+
+Khi production có bug nghiêm trọng:
+
+```bash
+git checkout main
+git pull origin main
+git checkout -b hotfix/ten-loi
+# Sửa lỗi
+git commit -m "fix: sửa lỗi nghiêm trọng xxx"
+git push origin hotfix/ten-loi
+```
+
+Tạo PR vào `main` (bỏ qua staging). Sau khi merge, tạo thêm PR vào `develop` để đồng bộ.
 
 ---
 
