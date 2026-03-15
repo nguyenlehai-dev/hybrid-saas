@@ -1,4 +1,4 @@
-<![CDATA[<div align="center">
+<div align="center">
 
 # VPS Panel AI
 
@@ -32,26 +32,26 @@ VPS Panel AI là nền tảng SaaS cung cấp các công cụ AI xử lý ảnh 
 ## Kiến trúc hệ thống
 
 ```
-                         Cloudflare (CDN + Tunnel)
-                                  |
-                  ────────────────┼────────────────
-                  |                                |
-          VM1 - Main Server                VM2 - AI Server
-            (Ubuntu Linux)              (Windows + RTX 3060)
-                  |                                |
-     ┌────────────┼────────────┐        ┌──────────┼──────────┐
-     |            |            |        |                     |
-   Nginx      Frontend     Backend    Stable Diffusion    Task API
-   :80        Next.js      FastAPI     WebUI :7860       Node.js :7862
-              :3000        :8000
-                |            |
-          ┌─────┼─────┐      |
-          |           |      |
-      PostgreSQL    Redis    |
-        :5432       :6379    |
-                             |
-                    Internal Network
-                   (192.168.100.x)
+                      Cloudflare (CDN + Tunnel)
+                               |
+               ────────────────┼────────────────
+               |                                |
+       VM1 - Main Server                VM2 - AI Server
+         (Ubuntu Linux)              (Windows + RTX 3060)
+               |                                |
+  ┌────────────┼────────────┐       ┌───────────┼───────────┐
+  |            |            |       |                       |
+Nginx      Frontend     Backend   Stable Diffusion      Task API
+ :80       Next.js      FastAPI    WebUI :7860         Node.js :7862
+           :3000        :8000
+             |            |
+       ┌─────┼─────┐      |
+       |           |      |
+   PostgreSQL    Redis    |
+     :5432       :6379    |
+                          |
+                 Internal Network
+                (192.168.100.x)
 ```
 
 ---
@@ -59,7 +59,7 @@ VPS Panel AI là nền tảng SaaS cung cấp các công cụ AI xử lý ảnh 
 ## Tech Stack
 
 | Layer | Công nghệ |
-|-------|-----------|
+|:------|:-----------|
 | Frontend | Next.js 14, React 18, TypeScript, React Icons |
 | Backend | FastAPI, SQLAlchemy (Async), AsyncPG, Redis, JWT |
 | AI Engine | Stable Diffusion WebUI, Real-ESRGAN, NVIDIA RTX 3060 |
@@ -74,57 +74,58 @@ VPS Panel AI là nền tảng SaaS cung cấp các công cụ AI xử lý ảnh 
 
 ```
 hybrid-saas/
-├── frontend/                     # Next.js Frontend
+│
+├── frontend/                      # Next.js Frontend
 │   ├── src/app/
-│   │   ├── page.tsx              # Landing page
-│   │   ├── layout.tsx            # Root layout
-│   │   ├── globals.css           # Styles
-│   │   ├── login/page.tsx        # Đăng nhập
-│   │   ├── register/page.tsx     # Đăng ký
+│   │   ├── page.tsx               # Landing page
+│   │   ├── layout.tsx             # Root layout
+│   │   ├── globals.css            # Styles
+│   │   ├── login/page.tsx         # Đăng nhập
+│   │   ├── register/page.tsx      # Đăng ký
 │   │   └── dashboard/
-│   │       ├── page.tsx          # Dashboard
-│   │       ├── generate/page.tsx # Tạo ảnh AI
-│   │       ├── gallery/page.tsx  # Thư viện ảnh
-│   │       ├── credits/page.tsx  # Nạp credits
-│   │       └── admin/page.tsx    # Quản trị
-│   ├── public/                   # Static assets
+│   │       ├── page.tsx           # Dashboard
+│   │       ├── generate/page.tsx  # Tạo ảnh AI
+│   │       ├── gallery/page.tsx   # Thư viện ảnh
+│   │       ├── credits/page.tsx   # Nạp credits
+│   │       └── admin/page.tsx     # Quản trị
+│   ├── public/                    # Static assets
 │   ├── package.json
 │   └── next.config.js
 │
-├── api-gateway/                  # FastAPI Backend
+├── api-gateway/                   # FastAPI Backend
 │   ├── app/
-│   │   ├── main.py               # Entry point
-│   │   ├── config.py             # Configuration
-│   │   ├── database.py           # Database connection
-│   │   ├── models.py             # SQLAlchemy models
+│   │   ├── main.py                # Entry point
+│   │   ├── config.py              # Configuration
+│   │   ├── database.py            # Database connection
+│   │   ├── models.py              # SQLAlchemy models
 │   │   ├── routers/
-│   │   │   ├── auth.py           # Authentication
-│   │   │   ├── admin.py          # Admin endpoints
-│   │   │   ├── ai_tasks.py       # AI task management
-│   │   │   ├── credits.py        # Credit management
-│   │   │   ├── sepay_pg.py       # Payment gateway
-│   │   │   ├── webhook.py        # Webhooks
-│   │   │   └── landing_pages.py  # Landing pages
+│   │   │   ├── auth.py            # Authentication
+│   │   │   ├── admin.py           # Admin endpoints
+│   │   │   ├── ai_tasks.py        # AI task management
+│   │   │   ├── credits.py         # Credit management
+│   │   │   ├── sepay_pg.py        # Payment gateway
+│   │   │   ├── webhook.py         # Webhooks
+│   │   │   └── landing_pages.py   # Landing pages
 │   │   └── services/
-│   │       ├── ai_dispatcher.py  # AI Engine dispatcher
+│   │       ├── ai_dispatcher.py   # AI Engine dispatcher
 │   │       └── credits_service.py
 │   ├── requirements.txt
 │   └── Dockerfile
 │
-├── vm2-ai-engine/                # AI Engine (Windows VM)
-│   ├── sd-webui/                 # Stable Diffusion
-│   ├── task-api/server.js        # Task queue API
-│   └── data/models/              # AI Models
+├── vm2-ai-engine/                 # AI Engine (Windows VM)
+│   ├── sd-webui/                  # Stable Diffusion
+│   ├── task-api/server.js         # Task queue API
+│   └── data/models/               # AI Models
 │
 ├── database/
-│   ├── init-db.sql               # Schema
-│   └── seed-data.sql             # Seed data
+│   ├── init-db.sql                # Schema
+│   └── seed-data.sql              # Seed data
 │
-├── nginx/                        # Nginx configs
-├── scripts/                      # Deploy & setup scripts
-├── docs/                         # Documentation
-├── .github/workflows/            # CI/CD pipelines
-├── .env.example                  # Environment template
+├── nginx/                         # Nginx configs
+├── scripts/                       # Deploy & setup scripts
+├── docs/                          # Documentation
+├── .github/workflows/             # CI/CD pipelines
+├── .env.example                   # Environment template
 └── docker-compose.yml
 ```
 
@@ -145,25 +146,36 @@ hybrid-saas/
 ```bash
 cd frontend
 npm install
-cp .env.example .env.local        # Sửa giá trị phù hợp
-npm run dev                        # http://localhost:3000
+cp .env.example .env.local
+npm run dev
 ```
+
+Truy cập `http://localhost:3000`
 
 ### Backend
 
 ```bash
 cd api-gateway
 python -m venv venv
-source venv/bin/activate           # Linux/Mac
+source venv/bin/activate
 pip install -r requirements.txt
-cp ../.env.example .env            # Sửa giá trị phù hợp
+cp ../.env.example .env
+```
 
-# Khởi tạo database
+Khởi tạo database:
+
+```bash
 psql -U postgres -f ../database/init-db.sql
 psql -U postgres -d hybrid_saas -f ../database/seed-data.sql
-
-uvicorn app.main:app --reload --port 8000   # http://localhost:8000
 ```
+
+Chạy server:
+
+```bash
+uvicorn app.main:app --reload --port 8000
+```
+
+Truy cập `http://localhost:8000/docs` để xem API documentation.
 
 ### AI Engine (VM2)
 
@@ -178,7 +190,7 @@ Chi tiết xem tại [vm2-ai-engine/README.md](vm2-ai-engine/README.md).
 
 ## Biến môi trường
 
-### Backend `.env`
+**Backend** `.env`
 
 ```env
 DOMAIN=vpspanel.io.vn
@@ -193,22 +205,22 @@ AI_ENGINE_URL=http://192.168.100.107:7860
 AI_ENGINE_TIMEOUT=120
 ```
 
-### Frontend `.env.local`
+**Frontend** `.env.local`
 
 ```env
 NEXT_PUBLIC_API_URL=https://api.vpspanel.io.vn
 ```
 
-> **Lưu ý:** Không commit file `.env` lên Git. Chỉ commit `.env.example` với giá trị placeholder.
+> **Lưu ý:** Không commit file `.env` lên Git. Chỉ commit `.env.example`.
 
 ---
 
 ## API Endpoints
 
-Swagger UI: [https://api.vpspanel.io.vn/docs](https://api.vpspanel.io.vn/docs)
+Swagger UI: [api.vpspanel.io.vn/docs](https://api.vpspanel.io.vn/docs)
 
 | Method | Endpoint | Mô tả |
-|--------|----------|--------|
+|:-------|:---------|:-------|
 | POST | `/auth/register` | Đăng ký tài khoản |
 | POST | `/auth/login` | Đăng nhập |
 | GET | `/auth/me` | Thông tin user hiện tại |
@@ -226,23 +238,27 @@ Swagger UI: [https://api.vpspanel.io.vn/docs](https://api.vpspanel.io.vn/docs)
 
 Hệ thống sử dụng GitHub Actions với 4 workflows:
 
-**CI Pipeline** — chạy mỗi khi push/PR vào `main` hoặc `develop`
+**CI Pipeline** — chạy khi push/PR vào `main` hoặc `develop`
+
 - Phát hiện thay đổi, chỉ kiểm tra phần bị ảnh hưởng
 - Frontend: lint, build
 - Backend: lint (ruff), test (pytest), import check
 - Quét bảo mật với TruffleHog
 
 **Deploy Production** — chạy khi merge vào `main`
+
 - Sync code qua rsync + SSH
 - Cài dependencies, build, restart service
 - Health check tự động sau deploy
 
 **Auto Release** — chạy khi PR merged vào `main`
+
 - Tự động tăng version (semver)
 - Tạo changelog từ commit history
 - Publish GitHub Release
 
 **PR Auto Label** — chạy khi PR được tạo
+
 - Tự động gán label dựa trên file thay đổi
 
 ---
@@ -269,10 +285,8 @@ git pull origin develop
 # Tạo feature branch
 git checkout -b feature/ten-tinh-nang
 
-# Code, commit theo convention
+# Code và commit
 git commit -m "feat: thêm trang dashboard"
-git commit -m "fix: sửa lỗi upload file"
-git commit -m "docs: cập nhật API docs"
 
 # Push và tạo PR
 git push origin feature/ten-tinh-nang
@@ -280,12 +294,12 @@ git push origin feature/ten-tinh-nang
 
 Trên GitHub: tạo Pull Request vào `develop` → CI chạy → review → merge.
 
-Khi `develop` đã stable: tạo PR từ `develop` vào `main` → merge → auto deploy.
+Khi `develop` stable: tạo PR từ `develop` vào `main` → merge → auto deploy.
 
 ### Commit Convention
 
 | Prefix | Mô tả |
-|--------|--------|
+|:-------|:-------|
 | `feat:` | Tính năng mới |
 | `fix:` | Sửa bug |
 | `docs:` | Documentation |
@@ -327,7 +341,7 @@ sudo nginx -s reload
 ```bash
 sudo systemctl status saas-frontend
 sudo systemctl status saas-api
-journalctl -u saas-api -f      # Xem logs
+journalctl -u saas-api -f
 ```
 
 ---
@@ -335,44 +349,44 @@ journalctl -u saas-api -f      # Xem logs
 ## Hướng dẫn cho thành viên mới
 
 1. Clone repo và cài đặt theo hướng dẫn ở trên
-2. Luôn tạo branch từ `develop`, không code trực tiếp trên `main` hay `develop`
+2. Tạo branch từ `develop`, không code trên `main` hay `develop`
 3. Mỗi PR chỉ làm 1 việc, viết mô tả rõ ràng
-4. Chờ CI pass và ít nhất 1 người review trước khi merge
+4. Chờ CI pass và ít nhất 1 review trước khi merge
 5. Không commit `.env`, `node_modules/`, `venv/`, `__pycache__/`
 6. Dùng TypeScript (Frontend) và type hints (Backend)
-7. Dùng [Issue Template](https://github.com/nguyenlehai-dev/hybrid-saas/issues/new/choose) để báo bug hoặc đề xuất feature
 
 ---
 
 ## FAQ
 
 <details>
-<summary>Làm sao để thêm thành viên mới?</summary>
-
+<summary>Làm sao thêm thành viên mới?</summary>
+<br>
 Vào repo → Settings → Collaborators → Add people → nhập GitHub username.
 </details>
 
 <details>
 <summary>CI failed thì làm gì?</summary>
-
-Vào tab Actions trên GitHub, click workflow failed để xem log. Sửa lỗi, push lại, CI chạy lại tự động.
+<br>
+Vào tab Actions trên GitHub, click workflow failed để xem log. Sửa lỗi, push lại.
 </details>
 
 <details>
 <summary>Làm sao rollback khi deploy lỗi?</summary>
+<br>
 
 ```bash
 git log --oneline -5
 git revert <commit-hash>
 git push origin main
 ```
-CI/CD sẽ tự động deploy phiên bản đã revert.
+
 </details>
 
 <details>
 <summary>Server setup từ đầu?</summary>
-
-Xem [docs/server-setup.md](docs/server-setup.md).
+<br>
+Xem <a href="docs/server-setup.md">docs/server-setup.md</a>
 </details>
 
 ---
@@ -382,4 +396,3 @@ Xem [docs/server-setup.md](docs/server-setup.md).
 Made by [VPS Panel AI Team](https://vpspanel.io.vn)
 
 </div>
-]]>
