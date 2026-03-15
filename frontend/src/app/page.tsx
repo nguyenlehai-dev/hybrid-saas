@@ -474,7 +474,7 @@ export default function HomePage() {
       )}
 
       {/* ══════ BANNER CAROUSEL SECTION — DIWE Style ══════ */}
-      <section style={{ padding: "0 0 50px", background: "#fff", position: "relative" }}>
+      <section style={{ padding: "0 0 50px", background: "#fff", position: "relative", marginTop: -80, zIndex: 10 }}>
         {/* Green swoosh curve from hero */}
         <svg viewBox="0 0 1440 80" style={{ display: "block", width: "100%", marginTop: -1 }} preserveAspectRatio="none">
           <path d="M0,0 L0,20 Q360,80 720,40 Q1080,0 1440,30 L1440,0 Z" fill="#ecfdf5" />
