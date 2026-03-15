@@ -1,6 +1,6 @@
 "use client";
-import { PiSparkle, PiCamera, PiSmileyWink, PiMagnifyingGlassPlus, PiPaintBrush, PiArrowsClockwise, PiImages, PiScissors, PiVideoCamera, PiMapPin, PiEnvelopeSimple, PiPhone, PiFacebookLogo, PiInstagramLogo, PiTwitterLogo, PiList, PiLightning, PiMagnifyingGlass, PiPlay, PiPalette, PiX, PiChatCircle, PiYoutubeLogo, PiRocketLaunch, PiCoin, PiCheck, PiHeart, PiLinkedinLogo } from "react-icons/pi";
-import { useState, useEffect } from "react";
+import { PiSparkle, PiCamera, PiSmileyWink, PiMagnifyingGlassPlus, PiPaintBrush, PiArrowsClockwise, PiImages, PiScissors, PiVideoCamera, PiMapPin, PiEnvelopeSimple, PiPhone, PiFacebookLogo, PiInstagramLogo, PiTwitterLogo, PiList, PiLightning, PiMagnifyingGlass, PiPlay, PiPalette, PiX, PiChatCircle, PiYoutubeLogo, PiRocketLaunch, PiCoin, PiCheck, PiHeart, PiLinkedinLogo, PiCaretDown, PiStar, PiUsers, PiChartLineUp, PiGlobe } from "react-icons/pi";
+import { useState, useEffect, useRef } from "react";
 
 export default function HomePage() {
   const [mounted, setMounted] = useState(false);
@@ -29,6 +29,13 @@ export default function HomePage() {
   const [showVideo, setShowVideo] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  /* ── Typing animation state ── */
+  const typingPhrases = ["CONTENT MARKETING", "SEO WEBSITE", "QUẢNG CÁO GOOGLE", "THIẾT KẾ WEBSITE", "XỬ LÝ ẢNH AI"];
+  const [typingIndex, setTypingIndex] = useState(0);
+  const [typingText, setTypingText] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const typingRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -40,6 +47,30 @@ export default function HomePage() {
     return () => clearInterval(timer);
   }, [totalPages]);
 
+  /* ── Typing effect ── */
+  useEffect(() => {
+    const currentPhrase = typingPhrases[typingIndex];
+    const speed = isDeleting ? 40 : 80;
+
+    typingRef.current = setTimeout(() => {
+      if (!isDeleting) {
+        setTypingText(currentPhrase.substring(0, typingText.length + 1));
+        if (typingText.length + 1 === currentPhrase.length) {
+          setTimeout(() => setIsDeleting(true), 1800);
+        }
+      } else {
+        setTypingText(currentPhrase.substring(0, typingText.length - 1));
+        if (typingText.length === 0) {
+          setIsDeleting(false);
+          setTypingIndex((prev) => (prev + 1) % typingPhrases.length);
+        }
+      }
+    }, speed);
+
+    return () => {
+      if (typingRef.current) clearTimeout(typingRef.current);
+    };
+  }, [typingText, isDeleting, typingIndex]);
 
 
   const tools = [
@@ -67,212 +98,360 @@ export default function HomePage() {
 
   return (
     <div style={{ overflow: "hidden" }}>
-      {/* ══════ FULL HEADER WRAPPER (TopBar + Nav + Hero share one BG) ══════ */}
+      {/* ══════ FULL HEADER WRAPPER ══════ */}
       <div style={{
-        backgroundImage: "url('/images/banner-bg.png')",
-        backgroundSize: "cover",
-        backgroundPosition: "center top",
-        backgroundRepeat: "no-repeat",
+        background: "#fafbfc",
         position: "relative",
-        minHeight: "100vh",
         display: "flex",
         flexDirection: "column" as const,
       }}>
-        {/* ══════ TOP BAR (transparent, hidden on mobile) ══════ */}
+
+        {/* ══════ TOP BAR — Green Announcement Bar ══════ */}
         <div className="topbar-desktop" style={{
-          background: "transparent",
-          padding: "10px 0",
+          background: "linear-gradient(135deg, #16a34a 0%, #15803d 100%)",
+          padding: "8px 0",
           fontSize: "0.82rem",
-          color: "rgba(255,255,255,0.8)",
+          color: "#fff",
         }}>
           <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div style={{ display: "flex", gap: 28, alignItems: "center" }}>
-              <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <PiMapPin style={{ color: "#f97316" }} /> Ho Chi Minh City, Vietnam
-              </span>
-              <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <PiEnvelopeSimple style={{ color: "#f97316" }} /> admin@vpspanel.io.vn
-              </span>
-              <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <PiPhone style={{ color: "#f97316" }} /> 0765.168.xxx
-              </span>
+            {/* Language Switcher */}
+            <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+              <button style={{
+                padding: "3px 10px", borderRadius: 4, border: "none",
+                background: "rgba(255,255,255,0.2)", color: "#fff",
+                fontSize: "0.75rem", fontWeight: 600, cursor: "pointer",
+              }}>EN</button>
+              <button style={{
+                padding: "3px 10px", borderRadius: 4, border: "none",
+                background: "#fff", color: "#16a34a",
+                fontSize: "0.75rem", fontWeight: 700, cursor: "pointer",
+              }}>VI</button>
             </div>
-            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-              {[
-                { icon: <PiFacebookLogo />, bg: "#1877f2", label: "Facebook" },
-                { icon: <PiInstagramLogo />, bg: "#e4405f", label: "Instagram" },
-                { icon: <PiTwitterLogo />, bg: "#1da1f2", label: "Twitter" },
-                { icon: <PiEnvelopeSimple />, bg: "#555", label: "Email" },
-              ].map((s, i) => (
-                <a key={i} href="#" aria-label={s.label} style={{
-                  width: 30, height: 30, borderRadius: "50%",
-                  background: "rgba(255,255,255,0.15)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  color: "#fff", fontSize: "0.75rem", fontWeight: 700,
-                  transition: "background 0.2s",
-                }}
-                  onMouseEnter={e => e.currentTarget.style.background = s.bg}
-                  onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.15)"}
-                >{s.icon}</a>
-              ))}
+
+            {/* Center Promo Text */}
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <span>Hỗ trợ giá các gói dịch vụ</span>
+              <span style={{ color: "#fde047", fontWeight: 700, textDecoration: "underline" }}>lên tới 50%</span>
+              <span>trong mùa dịch</span>
             </div>
+
+            {/* Search Icon */}
+            <button style={{
+              background: "none", border: "none", color: "#fff",
+              fontSize: "1.1rem", cursor: "pointer", display: "flex",
+              alignItems: "center", opacity: 0.8,
+            }}
+              onMouseEnter={e => e.currentTarget.style.opacity = "1"}
+              onMouseLeave={e => e.currentTarget.style.opacity = "0.8"}
+            ><PiMagnifyingGlass /></button>
           </div>
         </div>
 
-        {/* ══════ NAVBAR (White Floating Style) ══════ */}
-        <div style={{ padding: "0 24px", position: "relative", zIndex: 100 }}>
-          <nav style={{
-            background: "#fff",
-            borderRadius: "0 0 16px 16px",
-            maxWidth: 1200,
-            margin: "0 auto",
-            boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-            position: "relative",
-          }}>
-            <div style={{ padding: "0 24px", display: "flex", alignItems: "center", justifyContent: "space-between", height: 72 }}>
+        {/* ══════ NAVBAR — Clean White Style ══════ */}
+        <div style={{ position: "relative", zIndex: 100, background: "#fff", boxShadow: "0 2px 20px rgba(0,0,0,0.06)" }}>
+          <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
+            <nav style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 72 }}>
+
               {/* Hamburger (mobile only) */}
               <button className="hamburger-btn" onClick={() => setMobileMenuOpen(true)} style={{
                 width: 42, height: 42, borderRadius: "50%",
-                background: "#6366f1", border: "none", cursor: "pointer",
+                background: "#16a34a", border: "none", cursor: "pointer",
                 alignItems: "center", justifyContent: "center",
                 color: "#fff", fontSize: "1.2rem",
               }}><PiList /></button>
 
-              <a href="/" style={{ display: "flex", alignItems: "center", gap: 10, color: "#7c2d12", fontWeight: 700, fontSize: "1.3rem" }}>
+              {/* Logo */}
+              <a href="/" style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <span style={{
-                  width: 42, height: 42, borderRadius: 10,
-                  background: "linear-gradient(135deg, #f97316, #ea580c)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: "1.1rem", boxShadow: "0 4px 12px rgba(249,115,22,0.4)",
-                  color: "#fff",
-                }}><PiLightning /></span>
-                VPS Panel AI
+                  fontSize: "1.6rem", fontWeight: 800,
+                  color: "#16a34a", letterSpacing: "-0.5px",
+                }}>
+                  VPS<span style={{ color: "#15803d" }}>Panel</span>
+                </span>
               </a>
-              <div className="nav-links-desktop" style={{ alignItems: "center", gap: 28 }}>
-                {["Trang chủ", "Dịch vụ", "Công cụ AI", "Bảng giá", "Liên hệ"].map((item, i) => (
-                  <a key={i} href={i === 0 ? "/" : `#${["", "services", "tools", "pricing", "contact"][i]}`}
-                    style={{ color: i === 0 ? "#7c2d12" : "#475569", fontSize: "0.92rem", fontWeight: 600, transition: "color 0.2s", position: "relative" }}
-                    onMouseEnter={e => e.currentTarget.style.color = "#6366f1"}
-                    onMouseLeave={e => { e.currentTarget.style.color = i === 0 ? "#7c2d12" : "#475569"; }}
-                  >{item}</a>
+
+              {/* Nav Links */}
+              <div className="nav-links-desktop" style={{ alignItems: "center", gap: 32 }}>
+                {[
+                  { label: "VỀ CHÚNG TÔI", href: "#about" },
+                  { label: "DỊCH VỤ", href: "#services", dropdown: true },
+                  { label: "DỰ ÁN", href: "#tools" },
+                  { label: "HỖ TRỢ KHÁCH HÀNG", href: "#testimonials" },
+                  { label: "TUYỂN DỤNG", href: "#", hot: true },
+                  { label: "BLOG", href: "#" },
+                ].map((item, i) => (
+                  <a key={i} href={item.href}
+                    style={{
+                      color: "#374151", fontSize: "0.82rem", fontWeight: 600,
+                      transition: "color 0.2s", position: "relative",
+                      display: "flex", alignItems: "center", gap: 4,
+                      letterSpacing: "0.3px",
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.color = "#16a34a"}
+                    onMouseLeave={e => e.currentTarget.style.color = "#374151"}
+                  >
+                    {item.label}
+                    {item.dropdown && <PiCaretDown style={{ fontSize: "0.7rem" }} />}
+                    {item.hot && (
+                      <span style={{
+                        position: "absolute", top: -8, right: -22,
+                        background: "#ef4444", color: "#fff",
+                        fontSize: "0.55rem", fontWeight: 700, padding: "1px 5px",
+                        borderRadius: 4, lineHeight: 1.3,
+                      }}>HOT</span>
+                    )}
+                  </a>
                 ))}
               </div>
+
+              {/* CTA Button */}
               <div className="nav-actions-desktop" style={{ alignItems: "center", gap: 16 }}>
-                <a href="/login" style={{ color: "#475569", fontSize: "0.9rem", fontWeight: 600, transition: "color 0.2s" }}
-                  onMouseEnter={e => e.currentTarget.style.color = "#6366f1"}
-                  onMouseLeave={e => e.currentTarget.style.color = "#475569"}
-                >Đăng nhập</a>
                 <a href="/login" style={{
-                  padding: "10px 24px", borderRadius: 8, background: "linear-gradient(135deg, #f97316, #ef4444)",
-                  color: "#fff", fontSize: "0.9rem", fontWeight: 600,
-                  boxShadow: "0 4px 12px rgba(249,115,22,0.3)", transition: "all 0.2s",
+                  padding: "10px 24px", borderRadius: 24,
+                  background: "linear-gradient(135deg, #16a34a, #15803d)",
+                  color: "#fff", fontSize: "0.85rem", fontWeight: 600,
+                  boxShadow: "0 4px 12px rgba(22,163,74,0.3)", transition: "all 0.2s",
+                  display: "flex", alignItems: "center", gap: 6,
                 }}
-                  onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 6px 20px rgba(249,115,22,0.4)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 12px rgba(249,115,22,0.3)"; }}
-                >Dùng thử miễn phí</a>
+                  onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 6px 20px rgba(22,163,74,0.4)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 12px rgba(22,163,74,0.3)"; }}
+                ><PiPhone style={{ fontSize: "1rem" }} /> LIÊN HỆ TƯ VẤN</a>
               </div>
+
               {/* Search icon (mobile only) */}
               <button className="hamburger-btn" style={{
                 width: 42, height: 42, borderRadius: "50%",
-                background: "#6366f1", border: "none", cursor: "pointer",
+                background: "#16a34a", border: "none", cursor: "pointer",
                 alignItems: "center", justifyContent: "center",
                 color: "#fff", fontSize: "1.1rem",
               }}><PiMagnifyingGlass /></button>
-            </div>
-          </nav>
+            </nav>
+          </div>
         </div>
 
-        {/* ══════ HERO SECTION ══════ */}
+        {/* ══════ HERO SECTION — DIWE Style ══════ */}
         <section style={{
-          flex: 1,
-          display: "flex",
-          alignItems: "center",
-          padding: "40px 0",
+          padding: "60px 0 80px",
+          background: "linear-gradient(180deg, #ffffff 0%, #f0fdf4 40%, #ecfdf5 100%)",
+          position: "relative",
+          overflow: "hidden",
         }}>
-
+          {/* Subtle background decoration */}
+          <div style={{
+            position: "absolute", right: 0, top: 0, width: "55%", height: "100%",
+            background: "radial-gradient(circle at 70% 50%, rgba(22,163,74,0.04) 0%, transparent 70%)",
+            pointerEvents: "none",
+          }} />
 
           <div className="hero-grid-responsive" style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px", position: "relative", zIndex: 2 }}>
             {/* Left: Text content */}
-            <div>
-              {/* Play Button */}
-              <div style={{ marginBottom: 28 }}>
-                <button onClick={() => setShowVideo(true)} style={{
-                  width: 70, height: 70, borderRadius: "50%",
-                  background: "rgba(255,255,255,0.15)",
-                  border: "3px solid rgba(255,255,255,0.5)",
-                  cursor: "pointer",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  position: "relative",
-                  transition: "all 0.3s",
-                }}
-                  onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.25)"}
-                  onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.15)"}
-                >
-                  {/* Pulse ring 1 */}
-                  <span style={{
-                    position: "absolute", inset: -6, borderRadius: "50%",
-                    border: "2px solid rgba(255,255,255,0.4)",
-                    animation: "playPulse 2s ease-out infinite",
-                  }} />
-                  {/* Pulse ring 2 */}
-                  <span style={{
-                    position: "absolute", inset: -6, borderRadius: "50%",
-                    border: "2px solid rgba(255,255,255,0.3)",
-                    animation: "playPulse 2s ease-out infinite 0.6s",
-                  }} />
-                  {/* Play icon */}
-                  <PiPlay style={{ fontSize: "1.4rem", color: "#fff", marginLeft: 4 }} />
-                </button>
+            <div style={{ paddingTop: 20 }}>
+              {/* Subtitle dot */}
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+                <span style={{
+                  width: 8, height: 8, borderRadius: "50%",
+                  background: "#16a34a", display: "inline-block",
+                }} />
+                <span style={{
+                  color: "#374151", fontSize: "0.85rem", fontWeight: 600,
+                  letterSpacing: "1px", textTransform: "uppercase" as const,
+                }}>BẠN ĐANG TÌM KIẾM</span>
               </div>
 
+              {/* Main Heading with Typing Effect */}
               <h1 style={{
-                fontSize: "clamp(2.2rem, 4.5vw, 3.2rem)", fontWeight: 800, color: "#fff",
-                lineHeight: 1.2, marginBottom: 20,
+                fontSize: "clamp(2rem, 4vw, 2.8rem)", fontWeight: 800,
+                color: "#111827", lineHeight: 1.3, marginBottom: 20,
               }}>
-                Tạo Ảnh AI{" "}
-                <span style={{ background: "linear-gradient(135deg, #fb923c, #fb923c)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                  Chuyên Nghiệp
-                </span>{" "}Trong Giây Lát
+                GIẢI PHÁP CHO{" "}<br />
+                <span style={{
+                  color: "#16a34a",
+                  borderRight: "3px solid #16a34a",
+                  paddingRight: 4,
+                  animation: "blinkCursor 0.8s step-end infinite",
+                }}>
+                  {typingText}
+                </span>
               </h1>
-              <p style={{ color: "rgba(255,255,255,0.75)", fontSize: "1.05rem", maxWidth: 500, lineHeight: 1.8, marginBottom: 36 }}>
-                Nền tảng AI xử lý ảnh thông minh cho doanh nghiệp. Tạo ảnh sản phẩm, review, retouching và deploy landing page tự động.
+
+              <p style={{
+                color: "#6b7280", fontSize: "0.95rem",
+                maxWidth: 420, lineHeight: 1.8, marginBottom: 32,
+              }}>
+                Với sự thấu hiểu và tận tâm, VPS Panel AI tự hào mang đến những giải pháp toàn diện cho khách hàng
               </p>
-              <div className="hero-buttons-row" style={{ display: "flex", gap: 16 }}>
-                <a href="/login" style={{
-                  padding: "14px 36px", borderRadius: 10,
-                  background: "linear-gradient(135deg, #f97316, #ef4444)", color: "#fff",
-                  fontSize: "1rem", fontWeight: 700,
-                  boxShadow: "0 6px 20px rgba(249,115,22,0.35)", transition: "all 0.2s",
+
+              {/* Buttons */}
+              <div className="hero-buttons-row" style={{ display: "flex", gap: 14, alignItems: "center" }}>
+                <a href="#about" style={{
+                  padding: "12px 28px", borderRadius: 24,
+                  background: "linear-gradient(135deg, #16a34a, #15803d)",
+                  color: "#fff", fontSize: "0.9rem", fontWeight: 600,
+                  boxShadow: "0 4px 15px rgba(22,163,74,0.3)", transition: "all 0.2s",
                 }}
-                  onMouseEnter={e => e.currentTarget.style.transform = "translateY(-3px)"}
+                  onMouseEnter={e => e.currentTarget.style.transform = "translateY(-2px)"}
                   onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}
-                ><PiPalette style={{ marginRight: 8 }} />Bắt đầu tạo ảnh ngay</a>
-                <a href="#tools" style={{
-                  padding: "14px 36px", borderRadius: 10,
-                  border: "2px solid rgba(255,255,255,0.3)", color: "#fff",
-                  fontSize: "1rem", fontWeight: 600, transition: "all 0.2s",
+                >Về Chúng Tôi</a>
+                <a href="#services" style={{
+                  padding: "12px 28px", borderRadius: 24,
+                  border: "2px solid #16a34a", color: "#16a34a",
+                  fontSize: "0.9rem", fontWeight: 600, transition: "all 0.2s",
+                  background: "transparent",
                 }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = "#fff"; e.currentTarget.style.background = "rgba(255,255,255,0.08)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.3)"; e.currentTarget.style.background = "transparent"; }}
-                >Xem công cụ AI →</a>
+                  onMouseEnter={e => { e.currentTarget.style.background = "#16a34a"; e.currentTarget.style.color = "#fff"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#16a34a"; }}
+                >Xem Profile</a>
               </div>
             </div>
 
-            {/* Right: Illustration with floating animation */}
-            <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-              <img
-                src="/images/hero-illustration.png"
-                alt="AI Platform Illustration"
-                style={{
-                  width: "100%",
-                  maxWidth: 550,
-                  animation: "heroFloat 3s ease-in-out infinite",
-                }}
-              />
+            {/* Right: Image with floating cards */}
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", position: "relative" }}>
+              {/* Main image */}
+              <div style={{ position: "relative" }}>
+                <img
+                  src="/images/hero-illustration.png"
+                  alt="VPS Panel AI Hero"
+                  style={{
+                    width: "100%",
+                    maxWidth: 480,
+                    borderRadius: 20,
+                    position: "relative",
+                    zIndex: 2,
+                  }}
+                />
+
+                {/* Floating Card — Subscribers */}
+                <div className="float-card-1" style={{
+                  position: "absolute", top: "5%", left: "-10%", zIndex: 3,
+                  background: "#fff", borderRadius: 12, padding: "10px 16px",
+                  boxShadow: "0 8px 30px rgba(0,0,0,0.12)",
+                  display: "flex", alignItems: "center", gap: 10,
+                  animation: "floatCard 3s ease-in-out infinite",
+                }}>
+                  <div style={{
+                    width: 36, height: 36, borderRadius: 8,
+                    background: "linear-gradient(135deg, #818cf8, #6366f1)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    color: "#fff", fontSize: "0.9rem",
+                  }}><PiUsers /></div>
+                  <div>
+                    <div style={{ fontSize: "0.95rem", fontWeight: 800, color: "#111" }}>+25.000</div>
+                    <div style={{ fontSize: "0.65rem", color: "#6b7280" }}>Subscribers</div>
+                  </div>
+                </div>
+
+                {/* Floating Card — Stats Dashboard */}
+                <div className="float-card-2" style={{
+                  position: "absolute", top: "10%", right: "-15%", zIndex: 3,
+                  background: "#fff", borderRadius: 14, padding: "14px 18px",
+                  boxShadow: "0 8px 30px rgba(0,0,0,0.12)",
+                  animation: "floatCard 3s ease-in-out infinite 0.5s",
+                  minWidth: 180,
+                }}>
+                  {/* Mini donut charts */}
+                  <div style={{ display: "flex", gap: 12, marginBottom: 10, justifyContent: "center" }}>
+                    <div style={{ textAlign: "center" }}>
+                      <div style={{
+                        width: 40, height: 40, borderRadius: "50%",
+                        border: "3px solid #16a34a", borderTopColor: "#e5e7eb",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        fontSize: "0.6rem", fontWeight: 700, color: "#16a34a",
+                      }}>35%</div>
+                    </div>
+                    <div style={{ textAlign: "center" }}>
+                      <div style={{
+                        width: 40, height: 40, borderRadius: "50%",
+                        border: "3px solid #f59e0b", borderTopColor: "#e5e7eb",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        fontSize: "0.6rem", fontWeight: 700, color: "#f59e0b",
+                      }}>40%</div>
+                    </div>
+                  </div>
+                  <div style={{
+                    fontSize: "0.85rem", fontWeight: 700, color: "#16a34a",
+                    textAlign: "center", letterSpacing: "0.5px",
+                  }}>VPS Panel</div>
+                  <div style={{
+                    display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 10,
+                  }}>
+                    <div style={{ textAlign: "center" }}>
+                      <div style={{ fontSize: "0.9rem", fontWeight: 800, color: "#111" }}>1000+</div>
+                      <div style={{ fontSize: "0.55rem", color: "#9ca3af" }}>Client Projects</div>
+                    </div>
+                    <div style={{ textAlign: "center" }}>
+                      <div style={{ fontSize: "0.9rem", fontWeight: 800, color: "#111" }}>1500+</div>
+                      <div style={{ fontSize: "0.55rem", color: "#9ca3af" }}>Marketing days</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Floating Card — Chart */}
+                <div className="float-card-3" style={{
+                  position: "absolute", top: "-5%", left: "35%", zIndex: 3,
+                  background: "#fff", borderRadius: 10, padding: "8px 12px",
+                  boxShadow: "0 6px 25px rgba(0,0,0,0.1)",
+                  animation: "floatCard 3s ease-in-out infinite 1s",
+                  display: "flex", gap: 3, alignItems: "flex-end",
+                }}>
+                  {[24, 36, 20, 44, 30, 50, 38].map((h, i) => (
+                    <div key={i} style={{
+                      width: 6, height: h * 0.6, borderRadius: 3,
+                      background: i === 5 ? "#16a34a" : i % 2 === 0 ? "#818cf8" : "#fbbf24",
+                    }} />
+                  ))}
+                </div>
+
+                {/* Floating Card — Review Badge */}
+                <div className="float-card-4" style={{
+                  position: "absolute", bottom: "5%", right: "-10%", zIndex: 3,
+                  background: "#fff", borderRadius: 12, padding: "10px 16px",
+                  boxShadow: "0 8px 30px rgba(0,0,0,0.12)",
+                  animation: "floatCard 3s ease-in-out infinite 1.5s",
+                  display: "flex", alignItems: "center", gap: 10,
+                }}>
+                  <div style={{
+                    width: 32, height: 32, borderRadius: "50%",
+                    background: "#ef4444", display: "flex",
+                    alignItems: "center", justifyContent: "center",
+                    color: "#fff", fontSize: "0.8rem",
+                  }}><PiHeart /></div>
+                  <div>
+                    <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "#111" }}>+500 <span style={{ fontSize: "0.7rem", color: "#16a34a" }}>Review</span></div>
+                    <div style={{ display: "flex", gap: 2 }}>
+                      {[1,2,3,4,5].map(s => (
+                        <PiStar key={s} style={{ fontSize: "0.6rem", color: "#f59e0b" }} />
+                      ))}
+                      <span style={{ fontSize: "0.55rem", color: "#9ca3af", marginLeft: 4 }}>(4.8/5)</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* User avatars bubble */}
+                <div className="float-card-5" style={{
+                  position: "absolute", bottom: "8%", left: "5%", zIndex: 3,
+                  display: "flex", alignItems: "center", gap: -4,
+                  animation: "floatCard 3s ease-in-out infinite 2s",
+                }}>
+                  {["#f97316", "#3b82f6", "#8b5cf6", "#10b981"].map((c, i) => (
+                    <div key={i} style={{
+                      width: 32, height: 32, borderRadius: "50%",
+                      background: c, border: "2px solid #fff",
+                      marginLeft: i > 0 ? -8 : 0,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      color: "#fff", fontSize: "0.65rem", fontWeight: 700,
+                    }}>{["N", "T", "H", "M"][i]}</div>
+                  ))}
+                  <div style={{
+                    width: 32, height: 32, borderRadius: "50%",
+                    background: "#16a34a", border: "2px solid #fff",
+                    marginLeft: -8,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    color: "#fff", fontSize: "0.55rem", fontWeight: 700,
+                  }}>20+</div>
+                </div>
+              </div>
             </div>
           </div>
-
-
         </section>
       </div>{/* END HEADER WRAPPER */}
 
