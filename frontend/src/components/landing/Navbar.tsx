@@ -1,11 +1,75 @@
 "use client";
-import { PiList, PiMagnifyingGlass, PiPhone, PiCaretDown } from "react-icons/pi";
+import { useState, useRef } from "react";
+import { PiList, PiMagnifyingGlass, PiPhone, PiCaretDown, PiGlobe, PiPaintBrush, PiPalette, PiRocketLaunch, PiChartLineUp, PiUsers } from "react-icons/pi";
 
 interface NavbarProps {
   onOpenMobileMenu: () => void;
 }
 
+const serviceItems = [
+  {
+    icon: <PiGlobe />,
+    title: "Thiết kế website chuyên nghiệp",
+    desc: "Sở hữu một website chuẩn SEO, giao diện responsive với đầy đủ tính năng...",
+    href: "/#services",
+    color: "#16a34a",
+    bg: "#f0fdf4",
+  },
+  {
+    icon: <PiPaintBrush />,
+    title: "Thiết kế nhận diện thương hiệu",
+    desc: "Thiết kế logo, nhận diện văn phòng, ấn phẩm truyền thông, profile doanh...",
+    href: "/#services",
+    color: "#a855f7",
+    bg: "#faf5ff",
+  },
+  {
+    icon: <PiUsers />,
+    title: "Phòng marketing thuê ngoài",
+    desc: "Giúp tối ưu ngân sách, từ đó nâng mức chuyển đổi tối đa với các chiến...",
+    href: "/#services",
+    color: "#ef4444",
+    bg: "#fef2f2",
+  },
+  {
+    icon: <PiRocketLaunch />,
+    title: "Thiết kế landing page",
+    desc: "Là giải pháp tuyệt vời cho các chiến dịch bán hàng và truyền thông thươn...",
+    href: "/#services",
+    color: "#f59e0b",
+    bg: "#fffbeb",
+  },
+  {
+    icon: <PiPalette />,
+    title: "Quản trị và sáng tạo nội dung",
+    desc: "Xây dựng chiến lược và lên ý tưởng cho content theo từng giai đoạn, để...",
+    href: "/#services",
+    color: "#06b6d4",
+    bg: "#ecfeff",
+  },
+  {
+    icon: <PiChartLineUp />,
+    title: "Dịch vụ SEO tổng thể",
+    desc: "Chiến lược SEO bài bản, kế hoạch rõ ràng kết hợp với nội dung chuyên sâ...",
+    href: "/#services",
+    color: "#16a34a",
+    bg: "#f0fdf4",
+  },
+];
+
 export default function Navbar({ onOpenMobileMenu }: NavbarProps) {
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleMouseEnter = () => {
+    if (dropdownTimeout.current) clearTimeout(dropdownTimeout.current);
+    setShowDropdown(true);
+  };
+
+  const handleMouseLeave = () => {
+    dropdownTimeout.current = setTimeout(() => setShowDropdown(false), 200);
+  };
+
   return (
     <div style={{ position: "relative", zIndex: 100, background: "#fff", boxShadow: "0 2px 20px rgba(0,0,0,0.06)" }}>
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
@@ -39,27 +103,111 @@ export default function Navbar({ onOpenMobileMenu }: NavbarProps) {
               { label: "TUYỂN DỤNG", href: "#", hot: true },
               { label: "BLOG", href: "#" },
             ].map((item, i) => (
-              <a key={i} href={item.href}
-                style={{
-                  color: "#374151", fontSize: "0.82rem", fontWeight: 600,
-                  transition: "color 0.2s", position: "relative",
-                  display: "flex", alignItems: "center", gap: 4,
-                  letterSpacing: "0.3px",
-                }}
-                onMouseEnter={e => e.currentTarget.style.color = "#16a34a"}
-                onMouseLeave={e => e.currentTarget.style.color = "#374151"}
+              <div
+                key={i}
+                style={{ position: "relative" }}
+                onMouseEnter={item.dropdown ? handleMouseEnter : undefined}
+                onMouseLeave={item.dropdown ? handleMouseLeave : undefined}
               >
-                {item.label}
-                {item.dropdown && <PiCaretDown style={{ fontSize: "0.7rem" }} />}
-                {item.hot && (
-                  <span style={{
-                    position: "absolute", top: -8, right: -22,
-                    background: "#ef4444", color: "#fff",
-                    fontSize: "0.55rem", fontWeight: 700, padding: "1px 5px",
-                    borderRadius: 4, lineHeight: 1.3,
-                  }}>HOT</span>
+                <a href={item.href}
+                  style={{
+                    color: (item.dropdown && showDropdown) ? "#16a34a" : "#374151",
+                    fontSize: "0.82rem", fontWeight: 600,
+                    transition: "color 0.2s", position: "relative",
+                    display: "flex", alignItems: "center", gap: 4,
+                    letterSpacing: "0.3px",
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.color = "#16a34a"}
+                  onMouseLeave={e => {
+                    if (!(item.dropdown && showDropdown)) {
+                      e.currentTarget.style.color = "#374151";
+                    }
+                  }}
+                >
+                  {item.label}
+                  {item.dropdown && <PiCaretDown style={{
+                    fontSize: "0.7rem",
+                    transition: "transform 0.2s",
+                    transform: showDropdown ? "rotate(180deg)" : "rotate(0)",
+                  }} />}
+                  {item.hot && (
+                    <span style={{
+                      position: "absolute", top: -8, right: -22,
+                      background: "#ef4444", color: "#fff",
+                      fontSize: "0.55rem", fontWeight: 700, padding: "1px 5px",
+                      borderRadius: 4, lineHeight: 1.3,
+                    }}>HOT</span>
+                  )}
+                </a>
+
+                {/* ── MEGA DROPDOWN ── */}
+                {item.dropdown && (
+                  <div style={{
+                    position: "absolute",
+                    top: "100%",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    paddingTop: 16,
+                    opacity: showDropdown ? 1 : 0,
+                    visibility: showDropdown ? "visible" : "hidden",
+                    transition: "opacity 0.25s ease, visibility 0.25s ease",
+                    pointerEvents: showDropdown ? "auto" : "none",
+                  }}>
+                    {/* Arrow */}
+                    <div style={{
+                      position: "absolute", top: 8, left: "50%",
+                      transform: "translateX(-50%) rotate(45deg)",
+                      width: 12, height: 12, background: "#fff",
+                      boxShadow: "-2px -2px 4px rgba(0,0,0,0.04)",
+                      zIndex: 1,
+                    }} />
+
+                    <div style={{
+                      width: 680,
+                      background: "#fff",
+                      borderRadius: 16,
+                      boxShadow: "0 20px 60px rgba(0,0,0,0.12), 0 4px 20px rgba(0,0,0,0.06)",
+                      padding: "24px 28px",
+                      display: "grid",
+                      gridTemplateColumns: "1fr 1fr",
+                      gap: 8,
+                    }}>
+                      {serviceItems.map((service, si) => (
+                        <a key={si} href={service.href} style={{
+                          display: "flex", alignItems: "flex-start", gap: 14,
+                          padding: "14px 16px",
+                          borderRadius: 12,
+                          transition: "background 0.2s",
+                          textDecoration: "none",
+                        }}
+                          onMouseEnter={e => e.currentTarget.style.background = "#f9fafb"}
+                          onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                        >
+                          {/* Icon */}
+                          <div style={{
+                            width: 44, height: 44, borderRadius: 10, flexShrink: 0,
+                            background: service.bg,
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            fontSize: "1.3rem", color: service.color,
+                          }}>
+                            {service.icon}
+                          </div>
+                          {/* Text */}
+                          <div>
+                            <div style={{
+                              fontSize: "0.85rem", fontWeight: 700, color: "#111827",
+                              marginBottom: 4, lineHeight: 1.3,
+                            }}>{service.title}</div>
+                            <div style={{
+                              fontSize: "0.75rem", color: "#9ca3af", lineHeight: 1.5,
+                            }}>{service.desc}</div>
+                          </div>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
                 )}
-              </a>
+              </div>
             ))}
           </div>
 

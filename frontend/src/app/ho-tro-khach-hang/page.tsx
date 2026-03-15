@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
-import { PiCaretDown, PiCaretUp, PiLightning, PiMapPin, PiPhone, PiEnvelopeSimple, PiFacebookLogo, PiTwitterLogo, PiLinkedinLogo, PiHeart, PiList, PiX, PiMagnifyingGlass, PiCaretRight } from "react-icons/pi";
+import { PiCaretDown, PiCaretUp, PiCaretRight } from "react-icons/pi";
+import { TopBar, Navbar, MobileMenu, Footer } from "@/components/landing";
 
 /* ── FAQ Data per service ── */
 const faqData: Record<string, { intro: string; questions: { q: string; a: string }[] }> = {
@@ -99,53 +100,10 @@ export default function SupportPage() {
 
   return (
     <div style={{ overflow: "hidden" }}>
-      {/* ══════ NAVBAR ══════ */}
-      <div style={{ background: "#fff", boxShadow: "0 2px 20px rgba(0,0,0,0.06)", position: "sticky", top: 0, zIndex: 100 }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
-          <nav style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 72 }}>
-            <a href="/" style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{ fontSize: "1.6rem", fontWeight: 800, color: "#16a34a", letterSpacing: "-0.5px" }}>
-                VPS<span style={{ color: "#15803d" }}>Panel</span>
-              </span>
-            </a>
-            <div className="nav-links-desktop" style={{ alignItems: "center", gap: 32 }}>
-              {[
-                { label: "TRANG CHỦ", href: "/" },
-                { label: "DỊCH VỤ", href: "/#services" },
-                { label: "DỰ ÁN", href: "/#tools" },
-                { label: "HỖ TRỢ KHÁCH HÀNG", href: "/ho-tro-khach-hang", active: true },
-                { label: "BLOG", href: "#" },
-              ].map((item, i) => (
-                <a key={i} href={item.href}
-                  style={{
-                    color: item.active ? "#16a34a" : "#374151",
-                    fontSize: "0.82rem", fontWeight: 600,
-                    letterSpacing: "0.3px",
-                    transition: "color 0.2s",
-                  }}
-                  onMouseEnter={e => e.currentTarget.style.color = "#16a34a"}
-                  onMouseLeave={e => { if (!item.active) e.currentTarget.style.color = "#374151"; }}
-                >{item.label}</a>
-              ))}
-            </div>
-            <div className="nav-actions-desktop" style={{ alignItems: "center", gap: 16 }}>
-              <a href="/login" style={{
-                padding: "10px 24px", borderRadius: 24,
-                background: "linear-gradient(135deg, #16a34a, #15803d)",
-                color: "#fff", fontSize: "0.85rem", fontWeight: 600,
-                boxShadow: "0 4px 12px rgba(22,163,74,0.3)",
-                display: "flex", alignItems: "center", gap: 6,
-              }}><PiPhone style={{ fontSize: "1rem" }} /> LIÊN HỆ TƯ VẤN</a>
-            </div>
-            <button className="hamburger-btn" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} style={{
-              width: 42, height: 42, borderRadius: "50%",
-              background: "#16a34a", border: "none", cursor: "pointer",
-              alignItems: "center", justifyContent: "center",
-              color: "#fff", fontSize: "1.2rem",
-            }}>{mobileMenuOpen ? <PiX /> : <PiList />}</button>
-          </nav>
-        </div>
-      </div>
+      {/* ══════ SHARED HEADER ══════ */}
+      <TopBar />
+      <Navbar onOpenMobileMenu={() => setMobileMenuOpen(true)} />
+      <MobileMenu isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
 
       {/* ══════ HERO BREADCRUMB ══════ */}
       <section style={{
@@ -259,7 +217,7 @@ export default function SupportPage() {
               {/* FAQ Accordion */}
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 {currentData.questions.map((item, i) => (
-                  <div key={i} style={{
+                  <div key={`${activeTab}-${i}`} style={{
                     background: "#fff", borderRadius: 12,
                     boxShadow: openFaq === i ? "0 4px 20px rgba(22,163,74,0.1)" : "0 1px 8px rgba(0,0,0,0.04)",
                     border: openFaq === i ? "1px solid rgba(22,163,74,0.2)" : "1px solid #f1f5f9",
@@ -327,68 +285,8 @@ export default function SupportPage() {
         </div>
       </section>
 
-      {/* ══════ FOOTER (simplified) ══════ */}
-      <footer style={{ background: "#064e3b", color: "rgba(255,255,255,0.7)", padding: "60px 0 30px" }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
-          <div className="footer-grid-responsive" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: 40, marginBottom: 40 }}>
-            <div>
-              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
-                <span style={{
-                  width: 36, height: 36, borderRadius: 8,
-                  background: "linear-gradient(135deg, #16a34a, #15803d)",
-                  display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1rem",
-                }}><PiLightning style={{ color: "#fff" }} /></span>
-                <span style={{ color: "#fff", fontWeight: 700, fontSize: "1.15rem" }}>VPS Panel AI</span>
-              </div>
-              <p style={{ fontSize: "0.9rem", lineHeight: 1.7, maxWidth: 280 }}>
-                Nền tảng AI xử lý ảnh và quản lý server thông minh. Được phát triển tại Việt Nam 🇻🇳
-              </p>
-              <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
-                {[<PiFacebookLogo key="fb" />, <PiTwitterLogo key="tw" />, <PiLinkedinLogo key="li" />].map((s, i) => (
-                  <span key={i} style={{
-                    width: 36, height: 36, borderRadius: 8,
-                    background: "rgba(255,255,255,0.1)", display: "flex",
-                    alignItems: "center", justifyContent: "center",
-                    fontSize: "1rem", cursor: "pointer", color: "rgba(255,255,255,0.7)",
-                  }}>{s}</span>
-                ))}
-              </div>
-            </div>
-            <div>
-              <h4 style={{ color: "#fff", fontSize: "0.9rem", fontWeight: 600, marginBottom: 16 }}>Dịch vụ</h4>
-              {["Thiết kế Website", "Nhận diện thương hiệu", "Content Marketing", "Landing Page", "SEO tổng thể"].map((l, i) => (
-                <a key={i} href="/#services" style={{ display: "block", padding: "5px 0", fontSize: "0.88rem", color: "rgba(255,255,255,0.6)", transition: "color 0.2s" }}
-                  onMouseEnter={e => e.currentTarget.style.color = "#fff"}
-                  onMouseLeave={e => e.currentTarget.style.color = "rgba(255,255,255,0.6)"}
-                >{l}</a>
-              ))}
-            </div>
-            <div>
-              <h4 style={{ color: "#fff", fontSize: "0.9rem", fontWeight: 600, marginBottom: 16 }}>Hỗ trợ</h4>
-              {["Hướng dẫn", "API Docs", "Bảng giá", "FAQ"].map((l, i) => (
-                <a key={i} href="#" style={{ display: "block", padding: "5px 0", fontSize: "0.88rem", color: "rgba(255,255,255,0.6)", transition: "color 0.2s" }}
-                  onMouseEnter={e => e.currentTarget.style.color = "#fff"}
-                  onMouseLeave={e => e.currentTarget.style.color = "rgba(255,255,255,0.6)"}
-                >{l}</a>
-              ))}
-            </div>
-            <div>
-              <h4 style={{ color: "#fff", fontSize: "0.9rem", fontWeight: 600, marginBottom: 16 }}>Thông tin liên hệ</h4>
-              <p style={{ fontSize: "0.88rem", lineHeight: 2, display: "flex", flexDirection: "column" as const, gap: 4 }}>
-                <span style={{ display: "flex", alignItems: "center", gap: 6 }}><PiMapPin /> Ho Chi Minh City, Vietnam</span>
-                <span style={{ display: "flex", alignItems: "center", gap: 6 }}><PiPhone /> 0765.168.xxx</span>
-                <span style={{ display: "flex", alignItems: "center", gap: 6 }}><PiEnvelopeSimple /> admin@vpspanel.io.vn</span>
-              </p>
-            </div>
-          </div>
-          <div style={{
-            borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: 24,
-            textAlign: "center", fontSize: "0.82rem", color: "rgba(255,255,255,0.4)",
-          }}>
-            © 2026 VPS Panel AI. Bản quyền thuộc về VPS Panel AI. Được tạo với <PiHeart style={{ color: "#ef4444", margin: "0 4px", verticalAlign: "middle" }} /> tại Việt Nam 🇻🇳
-          </div>
-        </div>
-      </footer>
+      {/* ══════ SHARED FOOTER ══════ */}
+      <Footer />
     </div>
   );
 }
