@@ -35,7 +35,7 @@ export default function Navbar({ onOpenMobileMenu }: NavbarProps) {
               { label: "VỀ CHÚNG TÔI", href: "#about" },
               { label: "DỊCH VỤ", href: "#services", dropdown: true },
               { label: "DỰ ÁN", href: "#tools" },
-              { label: "HỖ TRỢ KHÁCH HÀNG", href: "#testimonials" },
+              { label: "HỖ TRỢ KHÁCH HÀNG", href: "/ho-tro-khach-hang" },
               { label: "TUYỂN DỤNG", href: "#", hot: true },
               { label: "BLOG", href: "#" },
             ].map((item, i) => (
