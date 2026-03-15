@@ -50,11 +50,14 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
         {/* Navigation Links */}
         <div style={{ padding: "8px 0" }}>
-          {(lang === "en"
-            ? ["Home", "Services", "AI Tools", "Pricing", "Contact"]
-            : ["Trang chủ", "Dịch vụ", "Công cụ AI", "Bảng giá", "Liên hệ"]
-          ).map((item, i) => (
-            <a key={i} href={i === 0 ? "/" : `#${["", "services", "tools", "pricing", "contact"][i]}`}
+          {[
+            { label: t("nav.about"), href: "/#about" },
+            { label: t("nav.services"), href: "/#services" },
+            { label: t("nav.projects"), href: "/projects" },
+            { label: t("nav.support"), href: supportHref },
+            { label: t("nav.blog"), href: "/blog" },
+          ].map((item, i) => (
+            <a key={i} href={item.href}
               onClick={onClose}
               style={{
                 display: "block", padding: "14px 24px",
@@ -63,7 +66,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 borderBottom: "1px solid rgba(255,255,255,0.08)",
                 transition: "background 0.2s",
               }}
-            >{item}</a>
+            >{item.label}</a>
           ))}
         </div>
 
