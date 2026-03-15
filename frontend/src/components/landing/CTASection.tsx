@@ -30,7 +30,7 @@ export default function CTASection() {
             fontWeight: 700, fontSize: "1rem",
             boxShadow: "0 6px 20px rgba(22,163,74,0.35)",
           }}><PiRocketLaunch style={{ marginRight: 6 }} /> {t("cta.btn1")}</a>
-          <a href="mailto:admin@nulith.io.vn" style={{
+          <a href="mailto:admin@vpspanel.io.vn" style={{
             padding: "14px 36px", borderRadius: 10,
             border: "2px solid rgba(255,255,255,0.3)", color: "#fff",
             fontWeight: 600, fontSize: "1rem",

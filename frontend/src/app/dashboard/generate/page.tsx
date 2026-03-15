@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 
-const API_URL = "/api";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://vpspanel.io.vn/api";
 
 interface GenerationResult {
   task_id: string;

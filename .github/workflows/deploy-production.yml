@@ -77,7 +77,7 @@ jobs:
             # Build frontend
             cd ${{ env.FRONTEND_PATH }}
             npm ci --production=false
-            npm run build
+            NEXT_PUBLIC_API_URL=https://vpspanel.io.vn/api npm run build
 
             # Restart service
             echo '123456789' | sudo -S systemctl restart saas-frontend
