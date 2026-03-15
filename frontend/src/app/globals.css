@@ -165,6 +165,16 @@ button {
   100% { transform: scale(1.8); opacity: 0; }
 }
 
+@keyframes floatCard {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes blinkCursor {
+  from, to { border-color: #16a34a; }
+  50% { border-color: transparent; }
+}
+
 /* ── Cards ── */
 .glass-card,
 .card {
@@ -1164,7 +1174,7 @@ table th {
   max-width: 85vw;
   height: 100vh;
   z-index: 9999;
-  background: linear-gradient(180deg, #9a3412 0%, #7c2d12 100%);
+  background: linear-gradient(180deg, #16a34a 0%, #15803d 100%);
   transition: right 0.35s ease;
   overflow-y: auto;
   box-shadow: -8px 0 30px rgba(0,0,0,0.3);
@@ -1197,6 +1207,14 @@ table th {
   }
   .hero-buttons-row a {
     text-align: center;
+  }
+
+  .float-card-1,
+  .float-card-2,
+  .float-card-3,
+  .float-card-4,
+  .float-card-5 {
+    display: none !important;
   }
 }
 
