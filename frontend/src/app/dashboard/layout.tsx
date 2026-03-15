@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.vpspanel.io.vn";
+const API_URL = "/api";
 
 interface User {
   id: string;

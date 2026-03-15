@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.vpspanel.io.vn";
+const API_URL = "/api";
 
 interface Stats { total_users: number; active_users_today: number; total_tasks: number; tasks_today: number; total_credits_spent: number; credits_spent_today: number; pending_orders: number; }
 interface UserItem { id: string; email: string; username: string; full_name: string | null; role: string; is_active: boolean; credits_balance: number; last_login_at: string | null; created_at: string; tasks_count: number; total_spent: number; }

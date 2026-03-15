@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.vpspanel.io.vn";
+const API_URL = "/api";
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);

@@ -12,7 +12,7 @@ class Settings(BaseSettings):
 
     # Domain
     DOMAIN: str = "vpspanel.io.vn"
-    API_URL: str = "https://api.vpspanel.io.vn"
+    API_URL: str = "https://vpspanel.io.vn/api"
     FRONTEND_URL: str = "https://vpspanel.io.vn"
 
     # Database

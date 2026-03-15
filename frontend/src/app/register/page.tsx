@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.vpspanel.io.vn";
+const API_URL = "/api";
 
 export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
