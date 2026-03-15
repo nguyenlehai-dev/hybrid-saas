@@ -4,7 +4,7 @@ import { useLang } from "@/lib/i18n";
 
 export default function SolutionsSection() {
   const { lang, t } = useLang();
-  const supportHref = lang === "en" ? "/support" : "/ho-tro-khach-hang";
+  const supportHref = "/support";
 
   const solutions = [
     { img: "/images/solution-website.png", icon: <PiRocketLaunch />, iconBg: "#fff7ed", iconColor: "#f97316", title: t("sol.s1.title"), subtitle: t("sol.s1.sub"), desc: t("sol.s1.desc") },

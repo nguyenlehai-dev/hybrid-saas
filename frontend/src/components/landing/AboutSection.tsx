@@ -55,8 +55,8 @@ export default function AboutSection() {
               fontSize: "clamp(1.8rem, 3.5vw, 2.6rem)", fontWeight: 800,
               color: "#111827", lineHeight: 1.25, marginBottom: 20,
             }}>
-              {lang === "en" ? "EMBRACING MODERN" : "HỘI NHẬP XU HƯỚNG"}<br />
-              <span style={{ color: "#16a34a" }}>MARKETING</span> {lang === "en" ? "TRENDS" : "HIỆN ĐẠI"}
+              {lang === "en" ? "YOUR TRUSTED" : "ĐỐI TÁC TIN CẬY"}<br />
+              <span style={{ color: "#16a34a" }}>DIGITAL</span> {lang === "en" ? "MARKETING PARTNER" : "MARKETING SỐ"}
             </h2>
 
             {/* Description */}
@@ -82,15 +82,15 @@ export default function AboutSection() {
             {/* Checklist */}
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               {(lang === "en" ? [
-                "Build multi-platform, multi-channel strategies.",
-                "Increase brand awareness for your business.",
-                "Boost customer satisfaction on digital platforms.",
-                "Suitable for businesses developing services or products.",
+                "Professional website & landing page design.",
+                "Multi-channel content creation with AI technology.",
+                "Comprehensive SEO to boost your online visibility.",
+                "End-to-end digital marketing strategies for growth.",
               ] : [
-                "Xây dựng chiến lược đa nền tảng, đa kênh.",
-                "Tăng mức độ nhận diện thương hiệu của doanh nghiệp.",
-                "Tăng độ hài lòng của khách hàng trên nền tảng số.",
-                "Phù hợp với doanh nghiệp phát triển dịch vụ hoặc sản phẩm.",
+                "Thiết kế website & landing page chuyên nghiệp, chuẩn SEO.",
+                "Sáng tạo nội dung đa kênh kết hợp công nghệ AI.",
+                "Dịch vụ SEO tổng thể giúp tăng thứ hạng trên Google.",
+                "Chiến lược marketing số toàn diện cho doanh nghiệp.",
               ]).map((text, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
                   <div style={{

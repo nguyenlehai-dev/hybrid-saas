@@ -9,7 +9,7 @@ interface MobileMenuProps {
 
 export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const { t, lang } = useLang();
-  const supportHref = lang === "en" ? "/support" : "/ho-tro-khach-hang";
+  const supportHref = "/support";
   return (
     <>
       <div className={`mobile-menu-overlay ${isOpen ? "active" : ""}`} onClick={onClose} />

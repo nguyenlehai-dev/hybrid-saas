@@ -53,12 +53,12 @@ const translations: Record<string, Record<Lang, string>> = {
   "svc.seo.desc": { vi: "Chiến lược SEO bài bản, kế hoạch rõ ràng, tối ưu công cụ tìm kiếm...", en: "Strategic SEO planning, clear roadmaps, search engine optimization..." },
 
   /* ── Hero ── */
-  "hero.badge": { vi: "🚀 Nền tảng AI #1 Việt Nam", en: "🚀 #1 AI Platform in Vietnam" },
+  "hero.badge": { vi: "🚀 Giải pháp Marketing số #1 Việt Nam", en: "🚀 #1 Digital Marketing Solutions in Vietnam" },
   "hero.heading_prefix": { vi: "Giải pháp", en: "Solutions for" },
   "hero.heading_suffix": { vi: "cho doanh nghiệp thời đại số", en: "businesses in the digital era" },
   "hero.desc": {
-    vi: "Nền tảng AI toàn diện — từ xử lý ảnh thông minh, tạo nội dung sáng tạo đến quản lý hệ thống server tự động. Được tin dùng bởi 500+ doanh nghiệp Việt Nam.",
-    en: "Comprehensive AI platform — from smart image processing, creative content generation to automated server management. Trusted by 500+ businesses in Vietnam.",
+    vi: "Giải pháp marketing số toàn diện — từ thiết kế website chuyên nghiệp, sáng tạo nội dung đa kênh đến ứng dụng AI trong truyền thông. Được tin dùng bởi 500+ doanh nghiệp Việt Nam.",
+    en: "Comprehensive digital marketing solutions — from professional website design, multi-channel content creation to AI-powered communications. Trusted by 500+ businesses in Vietnam.",
   },
   "hero.cta1": { vi: "Bắt đầu miễn phí", en: "Start for Free" },
   "hero.cta2": { vi: "Xem giới thiệu", en: "Watch Introduction" },
@@ -67,29 +67,29 @@ const translations: Record<string, Record<Lang, string>> = {
   "hero.stat.uptime": { vi: "Uptime", en: "Uptime" },
 
   /* ── Banner Carousel ── */
-  "banner.title": { vi: "Nền tảng AI hàng đầu Việt Nam!", en: "Vietnam's Leading AI Platform!" },
+  "banner.title": { vi: "Giải pháp Marketing số hàng đầu Việt Nam!", en: "Vietnam's Leading Digital Marketing Solutions!" },
 
   /* ── About ── */
   "about.tag": { vi: "VỀ CHÚNG TÔI", en: "ABOUT US" },
   "about.title": { vi: "CHÚNG TÔI LÀ AI?", en: "WHO ARE WE?" },
   "about.desc": {
-    vi: "Nulith là nền tảng công nghệ AI tiên phong tại Việt Nam, chuyên cung cấp giải pháp xử lý ảnh thông minh và quản lý server tự động cho doanh nghiệp.",
-    en: "Nulith is a pioneering AI technology platform in Vietnam, specializing in smart image processing and automated server management solutions for businesses.",
+    vi: "Nulith là đơn vị chuyên cung cấp giải pháp marketing số toàn diện tại Việt Nam — từ thiết kế website, sáng tạo nội dung, SEO đến ứng dụng công nghệ AI vào truyền thông và quảng cáo cho doanh nghiệp.",
+    en: "Nulith is a leading digital marketing solutions provider in Vietnam — from website design, content creation, SEO to applying AI technology in communications and advertising for businesses.",
   },
   "about.card1.title": { vi: "Sứ mệnh", en: "Mission" },
   "about.card1.desc": {
-    vi: "Democratize AI — giúp mọi doanh nghiệp tiếp cận công nghệ AI tiên tiến mà không cần chi phí đầu tư lớn",
-    en: "Democratize AI — helping every business access advanced AI technology without large upfront costs",
+    vi: "Đồng hành cùng doanh nghiệp Việt trong hành trình chuyển đổi số — giúp tối ưu chi phí marketing và gia tăng hiệu quả kinh doanh",
+    en: "Partnering with Vietnamese businesses on their digital transformation journey — optimizing marketing costs and boosting business performance",
   },
   "about.card2.title": { vi: "Tầm nhìn", en: "Vision" },
   "about.card2.desc": {
-    vi: "Trở thành nền tảng AI #1 Đông Nam Á, phục vụ hơn 10,000 doanh nghiệp vào năm 2026",
-    en: "Become the #1 AI platform in Southeast Asia, serving over 10,000 businesses by 2026",
+    vi: "Trở thành đơn vị cung cấp giải pháp marketing số hàng đầu Đông Nam Á, phục vụ hơn 10,000 doanh nghiệp vào năm 2027",
+    en: "Become the leading digital marketing solutions provider in Southeast Asia, serving over 10,000 businesses by 2027",
   },
   "about.card3.title": { vi: "Giá trị", en: "Values" },
   "about.card3.desc": {
-    vi: "Đổi mới không ngừng, chất lượng là trên hết, đồng hành cùng khách hàng trên hành trình chuyển đổi số",
-    en: "Continuous innovation, quality-first, partnering with customers on their digital transformation journey",
+    vi: "Sáng tạo không ngừng, chất lượng là trên hết, luôn lấy hiệu quả của khách hàng làm thước đo thành công",
+    en: "Endless creativity, quality-first, always measuring success by our clients' results",
   },
 
   /* ── Solutions ── */
@@ -145,8 +145,8 @@ const translations: Record<string, Record<Lang, string>> = {
 
   /* ── Footer ── */
   "footer.desc": {
-    vi: "Nền tảng AI xử lý ảnh và quản lý server thông minh. Được phát triển tại Việt Nam 🇻🇳",
-    en: "AI-powered image processing and smart server management platform. Made in Vietnam 🇻🇳",
+    vi: "Giải pháp marketing số toàn diện — thiết kế web, sáng tạo nội dung và ứng dụng AI cho doanh nghiệp Việt 🇻🇳",
+    en: "Comprehensive digital marketing solutions — web design, content creation and AI for Vietnamese businesses 🇻🇳",
   },
   "footer.services": { vi: "Dịch vụ", en: "Services" },
   "footer.support": { vi: "Hỗ trợ", en: "Support" },
@@ -184,8 +184,8 @@ const translations: Record<string, Record<Lang, string>> = {
 
   /* ── Banner ── */
   "banner.desc": {
-    vi: "Khám phá sức mạnh AI trong việc xử lý ảnh chuyên nghiệp",
-    en: "Discover the power of AI in professional image processing",
+    vi: "Khám phá sức mạnh marketing số kết hợp công nghệ AI cho doanh nghiệp",
+    en: "Discover the power of digital marketing combined with AI technology for businesses",
   },
 
   /* ── Pricing plans ── */
