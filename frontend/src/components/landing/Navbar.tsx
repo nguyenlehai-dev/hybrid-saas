@@ -1,65 +1,36 @@
 "use client";
 import { useState, useRef } from "react";
 import { PiList, PiMagnifyingGlass, PiPhone, PiCaretDown, PiGlobe, PiPalette, PiRocketLaunch, PiSparkle, PiPencilLine, PiChartLineUp } from "react-icons/pi";
+import { useLang } from "@/lib/i18n";
 
 interface NavbarProps {
   onOpenMobileMenu: () => void;
 }
 
-const serviceItems = [
-  {
-    icon: <PiRocketLaunch />,
-    title: "Thiết kế Landing Page bằng WP",
-    desc: "Landing page tối ưu chuyển đổi trên nền tảng WordPress, chuẩn SEO...",
-    href: "/#services",
-    color: "#f97316",
-    bg: "#fff7ed",
-  },
-  {
-    icon: <PiSparkle />,
-    title: "Thiết kế hình ảnh bằng Prompt",
-    desc: "Tạo hình ảnh chất lượng cao từ mô tả văn bản với công nghệ AI...",
-    href: "/#services",
-    color: "#a855f7",
-    bg: "#faf5ff",
-  },
-  {
-    icon: <PiPencilLine />,
-    title: "Quản trị & sáng tạo nội dung",
-    desc: "Chiến lược content đa kênh Facebook, TikTok, Instagram, Website...",
-    href: "/#services",
-    color: "#06b6d4",
-    bg: "#ecfeff",
-  },
-  {
-    icon: <PiGlobe />,
-    title: "Thiết kế website chuyên nghiệp",
-    desc: "Website bán hàng, giới thiệu doanh nghiệp chuẩn SEO & responsive...",
-    href: "/#services",
-    color: "#16a34a",
-    bg: "#f0fdf4",
-  },
-  {
-    icon: <PiPalette />,
-    title: "Kết nối nền tảng AI hình ảnh & video",
-    desc: "Tích hợp các nền tảng dựng hình ảnh, video bằng AI hàng đầu...",
-    href: "/#services",
-    color: "#ec4899",
-    bg: "#fdf2f8",
-  },
-  {
-    icon: <PiChartLineUp />,
-    title: "Dịch vụ SEO tổng thể",
-    desc: "Chiến lược SEO bài bản, kế hoạch rõ ràng, tối ưu công cụ tìm kiếm...",
-    href: "/#services",
-    color: "#16a34a",
-    bg: "#f0fdf4",
-  },
-];
-
 export default function Navbar({ onOpenMobileMenu }: NavbarProps) {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { lang, t } = useLang();
+
+  const supportHref = lang === "en" ? "/support" : "/ho-tro-khach-hang";
+
+  const serviceItems = [
+    { icon: <PiRocketLaunch />, title: t("svc.landing.title"), desc: t("svc.landing.desc"), href: "/#services", color: "#f97316", bg: "#fff7ed" },
+    { icon: <PiSparkle />, title: t("svc.prompt.title"), desc: t("svc.prompt.desc"), href: "/#services", color: "#a855f7", bg: "#faf5ff" },
+    { icon: <PiPencilLine />, title: t("svc.content.title"), desc: t("svc.content.desc"), href: "/#services", color: "#06b6d4", bg: "#ecfeff" },
+    { icon: <PiGlobe />, title: t("svc.website.title"), desc: t("svc.website.desc"), href: "/#services", color: "#16a34a", bg: "#f0fdf4" },
+    { icon: <PiPalette />, title: t("svc.ai.title"), desc: t("svc.ai.desc"), href: "/#services", color: "#ec4899", bg: "#fdf2f8" },
+    { icon: <PiChartLineUp />, title: t("svc.seo.title"), desc: t("svc.seo.desc"), href: "/#services", color: "#16a34a", bg: "#f0fdf4" },
+  ];
+
+  const navItems = [
+    { label: t("nav.about"), href: "#about" },
+    { label: t("nav.services"), href: "#services", dropdown: true },
+    { label: t("nav.projects"), href: "#tools" },
+    { label: t("nav.support"), href: supportHref },
+    { label: t("nav.careers"), href: "#", hot: true },
+    { label: t("nav.blog"), href: "#" },
+  ];
 
   const handleMouseEnter = () => {
     if (dropdownTimeout.current) clearTimeout(dropdownTimeout.current);
@@ -95,14 +66,7 @@ export default function Navbar({ onOpenMobileMenu }: NavbarProps) {
 
           {/* Nav Links */}
           <div className="nav-links-desktop" style={{ alignItems: "center", gap: 32 }}>
-            {[
-              { label: "VỀ CHÚNG TÔI", href: "#about" },
-              { label: "DỊCH VỤ", href: "#services", dropdown: true },
-              { label: "DỰ ÁN", href: "#tools" },
-              { label: "HỖ TRỢ KHÁCH HÀNG", href: "/ho-tro-khach-hang" },
-              { label: "TUYỂN DỤNG", href: "#", hot: true },
-              { label: "BLOG", href: "#" },
-            ].map((item, i) => (
+            {navItems.map((item, i) => (
               <div
                 key={i}
                 style={{ position: "relative" }}
@@ -183,7 +147,6 @@ export default function Navbar({ onOpenMobileMenu }: NavbarProps) {
                           onMouseEnter={e => e.currentTarget.style.background = "#f9fafb"}
                           onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                         >
-                          {/* Icon */}
                           <div style={{
                             width: 44, height: 44, borderRadius: 10, flexShrink: 0,
                             background: service.bg,
@@ -192,7 +155,6 @@ export default function Navbar({ onOpenMobileMenu }: NavbarProps) {
                           }}>
                             {service.icon}
                           </div>
-                          {/* Text */}
                           <div>
                             <div style={{
                               fontSize: "0.85rem", fontWeight: 700, color: "#111827",
@@ -222,7 +184,7 @@ export default function Navbar({ onOpenMobileMenu }: NavbarProps) {
             }}
               onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 6px 20px rgba(22,163,74,0.4)"; }}
               onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 12px rgba(22,163,74,0.3)"; }}
-            ><PiPhone style={{ fontSize: "1rem" }} /> LIÊN HỆ TƯ VẤN</a>
+            ><PiPhone style={{ fontSize: "1rem" }} /> {t("nav.cta")}</a>
           </div>
 
           {/* Search icon (mobile only) */}

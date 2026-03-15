@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { PiCaretDown, PiCaretUp, PiCaretRight } from "react-icons/pi";
 import { TopBar, Navbar, MobileMenu, Footer } from "@/components/landing";
+import { useLang } from "@/lib/i18n";
 
 /* ── FAQ Data per service ── */
 const faqData: Record<string, { intro: string; questions: { q: string; a: string }[] }> = {
@@ -95,6 +96,7 @@ export default function SupportPage() {
   const [activeTab, setActiveTab] = useState("website");
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { t } = useLang();
 
   const currentData = faqData[activeTab];
 
@@ -130,19 +132,19 @@ export default function SupportPage() {
             <a href="/" style={{ color: "rgba(255,255,255,0.6)", transition: "color 0.2s" }}
               onMouseEnter={e => e.currentTarget.style.color = "#fff"}
               onMouseLeave={e => e.currentTarget.style.color = "rgba(255,255,255,0.6)"}
-            >Trang chủ</a>
+            >{t("sup.home")}</a>
             <PiCaretRight style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.7rem" }} />
-            <span style={{ color: "#fff", fontWeight: 600 }}>Hỗ trợ khách hàng</span>
+            <span style={{ color: "#fff", fontWeight: 600 }}>{t("sup.title")}</span>
           </div>
 
           <h1 style={{
             fontSize: "clamp(1.8rem, 4vw, 2.8rem)", fontWeight: 800,
             color: "#fff", lineHeight: 1.3, marginBottom: 12,
           }}>
-            Hỗ trợ khách hàng
+            {t("sup.title")}
           </h1>
           <p style={{ color: "rgba(255,255,255,0.7)", fontSize: "0.95rem", maxWidth: 520, lineHeight: 1.7 }}>
-            Với hơn 5 năm kinh nghiệm chuyên sâu — Đã có 500+ khách hàng tin tưởng sử dụng dịch vụ
+            {t("sup.desc")}
           </p>
         </div>
       </section>

@@ -1,0 +1,189 @@
+"use client";
+import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+
+export type Lang = "vi" | "en";
+
+interface LangContextType {
+  lang: Lang;
+  setLang: (l: Lang) => void;
+  t: (key: string) => string;
+}
+
+const LangContext = createContext<LangContextType>({
+  lang: "vi",
+  setLang: () => {},
+  t: (k) => k,
+});
+
+export function useLang() {
+  return useContext(LangContext);
+}
+
+/* ═══════════════════════════════════════════════
+   TRANSLATIONS
+   ═══════════════════════════════════════════════ */
+const translations: Record<string, Record<Lang, string>> = {
+  /* ── TopBar ── */
+  "topbar.promo": {
+    vi: "Hỗ trợ giá các gói dịch vụ lên tới 50% trong mùa dịch",
+    en: "Up to 50% off all service packages this season",
+  },
+
+  /* ── Navbar ── */
+  "nav.about": { vi: "VỀ CHÚNG TÔI", en: "ABOUT US" },
+  "nav.services": { vi: "DỊCH VỤ", en: "SERVICES" },
+  "nav.projects": { vi: "DỰ ÁN", en: "PROJECTS" },
+  "nav.support": { vi: "HỖ TRỢ KHÁCH HÀNG", en: "CUSTOMER SUPPORT" },
+  "nav.careers": { vi: "TUYỂN DỤNG", en: "CAREERS" },
+  "nav.blog": { vi: "BLOG", en: "BLOG" },
+  "nav.cta": { vi: "LIÊN HỆ TƯ VẤN", en: "CONTACT US" },
+
+  /* ── Navbar Dropdown Services ── */
+  "svc.landing.title": { vi: "Thiết kế Landing Page bằng WP", en: "WordPress Landing Page Design" },
+  "svc.landing.desc": { vi: "Landing page tối ưu chuyển đổi trên nền tảng WordPress, chuẩn SEO...", en: "Conversion-optimized landing pages on WordPress, SEO-ready..." },
+  "svc.prompt.title": { vi: "Thiết kế hình ảnh bằng Prompt", en: "AI Image Design via Prompt" },
+  "svc.prompt.desc": { vi: "Tạo hình ảnh chất lượng cao từ mô tả văn bản với công nghệ AI...", en: "Create high-quality images from text descriptions with AI..." },
+  "svc.content.title": { vi: "Quản trị & sáng tạo nội dung", en: "Content Management & Creation" },
+  "svc.content.desc": { vi: "Chiến lược content đa kênh Facebook, TikTok, Instagram, Website...", en: "Multi-channel content strategy for Facebook, TikTok, Instagram..." },
+  "svc.website.title": { vi: "Thiết kế website chuyên nghiệp", en: "Professional Website Design" },
+  "svc.website.desc": { vi: "Website bán hàng, giới thiệu doanh nghiệp chuẩn SEO & responsive...", en: "E-commerce & business websites, SEO-optimized & responsive..." },
+  "svc.ai.title": { vi: "Kết nối nền tảng AI hình ảnh & video", en: "AI Image & Video Platform Integration" },
+  "svc.ai.desc": { vi: "Tích hợp các nền tảng dựng hình ảnh, video bằng AI hàng đầu...", en: "Integrate leading AI image & video generation platforms..." },
+  "svc.seo.title": { vi: "Dịch vụ SEO tổng thể", en: "Comprehensive SEO Services" },
+  "svc.seo.desc": { vi: "Chiến lược SEO bài bản, kế hoạch rõ ràng, tối ưu công cụ tìm kiếm...", en: "Strategic SEO planning, clear roadmaps, search engine optimization..." },
+
+  /* ── Hero ── */
+  "hero.badge": { vi: "🚀 Nền tảng AI #1 Việt Nam", en: "🚀 #1 AI Platform in Vietnam" },
+  "hero.heading_prefix": { vi: "Giải pháp", en: "Solutions for" },
+  "hero.heading_suffix": { vi: "cho doanh nghiệp thời đại số", en: "businesses in the digital era" },
+  "hero.desc": {
+    vi: "Nền tảng AI toàn diện — từ xử lý ảnh thông minh, tạo nội dung sáng tạo đến quản lý hệ thống server tự động. Được tin dùng bởi 500+ doanh nghiệp Việt Nam.",
+    en: "Comprehensive AI platform — from smart image processing, creative content generation to automated server management. Trusted by 500+ businesses in Vietnam.",
+  },
+  "hero.cta1": { vi: "Bắt đầu miễn phí", en: "Start for Free" },
+  "hero.cta2": { vi: "Xem giới thiệu", en: "Watch Introduction" },
+  "hero.stat.users": { vi: "Doanh nghiệp", en: "Businesses" },
+  "hero.stat.images": { vi: "Ảnh đã xử lý", en: "Images Processed" },
+  "hero.stat.uptime": { vi: "Uptime", en: "Uptime" },
+
+  /* ── Banner Carousel ── */
+  "banner.title": { vi: "Nền tảng AI hàng đầu Việt Nam!", en: "Vietnam's Leading AI Platform!" },
+
+  /* ── About ── */
+  "about.tag": { vi: "VỀ CHÚNG TÔI", en: "ABOUT US" },
+  "about.title": { vi: "CHÚNG TÔI LÀ AI?", en: "WHO ARE WE?" },
+  "about.desc": {
+    vi: "VPS Panel AI là nền tảng công nghệ AI tiên phong tại Việt Nam, chuyên cung cấp giải pháp xử lý ảnh thông minh và quản lý server tự động cho doanh nghiệp.",
+    en: "VPS Panel AI is a pioneering AI technology platform in Vietnam, specializing in smart image processing and automated server management solutions for businesses.",
+  },
+  "about.card1.title": { vi: "Sứ mệnh", en: "Mission" },
+  "about.card1.desc": {
+    vi: "Democratize AI — giúp mọi doanh nghiệp tiếp cận công nghệ AI tiên tiến mà không cần chi phí đầu tư lớn",
+    en: "Democratize AI — helping every business access advanced AI technology without large upfront costs",
+  },
+  "about.card2.title": { vi: "Tầm nhìn", en: "Vision" },
+  "about.card2.desc": {
+    vi: "Trở thành nền tảng AI #1 Đông Nam Á, phục vụ hơn 10,000 doanh nghiệp vào năm 2026",
+    en: "Become the #1 AI platform in Southeast Asia, serving over 10,000 businesses by 2026",
+  },
+  "about.card3.title": { vi: "Giá trị", en: "Values" },
+  "about.card3.desc": {
+    vi: "Đổi mới không ngừng, chất lượng là trên hết, đồng hành cùng khách hàng trên hành trình chuyển đổi số",
+    en: "Continuous innovation, quality-first, partnering with customers on their digital transformation journey",
+  },
+
+  /* ── Solutions ── */
+  "sol.tag": { vi: "DỊCH VỤ CỦA VPS PANEL AI", en: "VPS PANEL AI SERVICES" },
+  "sol.title1": { vi: "GIẢI PHÁP CHO DOANH NGHIỆP", en: "SOLUTIONS FOR BUSINESSES" },
+  "sol.title2": { vi: "TRONG THỜI ĐẠI 4.0", en: "IN THE 4.0 ERA" },
+  "sol.s1.title": { vi: "THIẾT KẾ LANDING PAGE BẰNG WP", en: "WORDPRESS LANDING PAGE DESIGN" },
+  "sol.s1.sub": { vi: "Landing page tối ưu chuyển đổi và tìm kiếm khách hàng tiềm năng", en: "Conversion-optimized landing page for lead generation" },
+  "sol.s1.desc": { vi: "Thiết kế landing page tối ưu chuyển đổi trên nền tảng WordPress — dễ quản trị, chuẩn SEO, tích hợp sẵn form liên hệ và hệ thống tracking chuyển đổi.", en: "Conversion-optimized landing pages on WordPress — easy to manage, SEO-ready, with built-in contact forms and conversion tracking." },
+  "sol.s2.title": { vi: "THIẾT KẾ HÌNH ẢNH BẰNG PROMPT", en: "AI IMAGE DESIGN VIA PROMPT" },
+  "sol.s2.sub": { vi: "AI Image Generation từ mô tả văn bản", en: "AI Image Generation from text descriptions" },
+  "sol.s2.desc": { vi: "Tạo hình ảnh chất lượng cao từ prompt — ảnh sản phẩm, banner quảng cáo, ảnh minh họa bài viết với công nghệ AI tiên tiến nhất hiện nay.", en: "Create high-quality images from prompts — product photos, ad banners, article illustrations with cutting-edge AI technology." },
+  "sol.s3.title": { vi: "QUẢN TRỊ VÀ SÁNG TẠO NỘI DUNG", en: "CONTENT MANAGEMENT & CREATION" },
+  "sol.s3.sub": { vi: "Phát triển và sáng tạo nội dung trên các kênh truyền thông", en: "Develop and create content across media channels" },
+  "sol.s3.desc": { vi: "Xây dựng chiến lược content sáng tạo trên các kênh digital giúp doanh nghiệp tiếp cận được hàng triệu khách hàng.", en: "Build creative content strategies across digital channels to help businesses reach millions of customers." },
+  "sol.s4.title": { vi: "THIẾT KẾ WEBSITE CHUYÊN NGHIỆP", en: "PROFESSIONAL WEBSITE DESIGN" },
+  "sol.s4.sub": { vi: "Giải pháp thiết kế website bán hàng, giới thiệu dịch vụ chuyên nghiệp", en: "E-commerce & service showcase website solutions" },
+  "sol.s4.desc": { vi: "Sở hữu một website chuẩn SEO, giao diện responsive với đầy đủ tính năng bán hàng online, giới thiệu dịch vụ, dự án,...", en: "SEO-optimized websites with responsive design, full e-commerce capabilities, service & project showcases..." },
+  "sol.s5.title": { vi: "KẾT NỐI NỀN TẢNG DỰNG HÌNH ẢNH & VIDEO AI", en: "AI IMAGE & VIDEO PLATFORM INTEGRATION" },
+  "sol.s5.sub": { vi: "Tích hợp các nền tảng AI hàng đầu", en: "Integrate leading AI platforms" },
+  "sol.s5.desc": { vi: "Kết nối trực tiếp đến các nền tảng dựng hình ảnh, video bằng AI — tự động hóa quy trình sản xuất nội dung đa phương tiện cho doanh nghiệp.", en: "Direct integration with AI image & video platforms — automate multimedia content production for businesses." },
+  "sol.s6.title": { vi: "DỊCH VỤ SEO TỔNG THỂ", en: "COMPREHENSIVE SEO SERVICES" },
+  "sol.s6.sub": { vi: "Giải pháp tối ưu hóa công cụ tìm kiếm cho website của bạn", en: "Search engine optimization solutions for your website" },
+  "sol.s6.desc": { vi: "Chiến lược SEO bài bản, kế hoạch rõ ràng kết hợp với nội dung chuyên sâu giúp khách hàng tìm thấy bạn trên Google.", en: "Strategic SEO planning with clear roadmaps and specialized content to help customers find you on Google." },
+  "sol.cta": { vi: "Liên hệ tư vấn", en: "Contact Us" },
+  "sol.more": { vi: "Xem thêm", en: "Learn More" },
+
+  /* ── Testimonials ── */
+  "test.tag": { vi: "KHÁCH HÀNG NÓI GÌ", en: "WHAT CUSTOMERS SAY" },
+  "test.title": { vi: "ĐƯỢC TIN TƯỞNG BỞI", en: "TRUSTED BY" },
+  "test.title2": { vi: "500+ DOANH NGHIỆP", en: "500+ BUSINESSES" },
+
+  /* ── Case Studies ── */
+  "case.tag": { vi: "DỰ ÁN TIÊU BIỂU", en: "FEATURED PROJECTS" },
+  "case.title": { vi: "NHỮNG DỰ ÁN CHÚNG TÔI TỰ HÀO", en: "PROJECTS WE'RE PROUD OF" },
+
+  /* ── Pricing ── */
+  "price.tag": { vi: "Bảng giá", en: "Pricing" },
+  "price.title": { vi: "Chọn gói phù hợp", en: "Choose Your Plan" },
+  "price.monthly": { vi: "/ tháng", en: "/ month" },
+  "price.points": { vi: "Điểm", en: "Credits" },
+  "price.cta": { vi: "Chọn gói này", en: "Select Plan" },
+  "price.contact": { vi: "Liên hệ", en: "Contact Us" },
+
+  /* ── CTA ── */
+  "cta.title": { vi: "Sẵn sàng bắt đầu?", en: "Ready to Get Started?" },
+  "cta.desc": {
+    vi: "Trải nghiệm sức mạnh AI ngay hôm nay với 50 credits miễn phí",
+    en: "Experience the power of AI today with 50 free credits",
+  },
+  "cta.btn1": { vi: "Bắt đầu miễn phí", en: "Start for Free" },
+  "cta.btn2": { vi: "Liên hệ tư vấn", en: "Contact Sales" },
+
+  /* ── Footer ── */
+  "footer.desc": {
+    vi: "Nền tảng AI xử lý ảnh và quản lý server thông minh. Được phát triển tại Việt Nam 🇻🇳",
+    en: "AI-powered image processing and smart server management platform. Made in Vietnam 🇻🇳",
+  },
+  "footer.services": { vi: "Dịch vụ", en: "Services" },
+  "footer.support": { vi: "Hỗ trợ", en: "Support" },
+  "footer.contact": { vi: "Liên hệ", en: "Contact" },
+  "footer.guide": { vi: "Hướng dẫn", en: "Guides" },
+  "footer.pricing": { vi: "Bảng giá", en: "Pricing" },
+  "footer.copyright": {
+    vi: "© 2026 VPS Panel AI. Bản quyền thuộc về VPS Panel AI.",
+    en: "© 2026 VPS Panel AI. All rights reserved.",
+  },
+
+  /* ── Support Page ── */
+  "sup.home": { vi: "Trang chủ", en: "Home" },
+  "sup.title": { vi: "Hỗ trợ khách hàng", en: "Customer Support" },
+  "sup.desc": {
+    vi: "Với hơn 5 năm kinh nghiệm chuyên sâu — Đã có 500+ khách hàng tin tưởng sử dụng dịch vụ",
+    en: "With over 5 years of expertise — Trusted by 500+ satisfied customers",
+  },
+
+  /* ── Mobile Menu ── */
+  "mobile.home": { vi: "TRANG CHỦ", en: "HOME" },
+  "mobile.contact": { vi: "LIÊN HỆ", en: "CONTACT" },
+  "mobile.phone_label": { vi: "Hotline tư vấn:", en: "Support Hotline:" },
+  "mobile.email_label": { vi: "Email:", en: "Email:" },
+};
+
+/* ─── Provider ─── */
+export function LanguageProvider({ children }: { children: ReactNode }) {
+  const [lang, setLang] = useState<Lang>("vi");
+
+  const t = useCallback((key: string): string => {
+    return translations[key]?.[lang] ?? key;
+  }, [lang]);
+
+  return (
+    <LangContext.Provider value={{ lang, setLang, t }}>
+      {children}
+    </LangContext.Provider>
+  );
+}

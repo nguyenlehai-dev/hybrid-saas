@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { LanguageProvider } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -26,7 +27,9 @@ export default function RootLayout({
       </head>
       <body suppressHydrationWarning>
         <div className="bg-mesh" />
-        {children}
+        <LanguageProvider>
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   );
