@@ -41,10 +41,10 @@ export default function Navbar({ onOpenMobileMenu }: NavbarProps) {
 
   const serviceItems = [
     { icon: <PiRocketLaunch />, title: t("svc.landing.title"), desc: t("svc.landing.desc"), href: "/#services", color: "#f97316", bg: "#fff7ed" },
-    { icon: <PiSparkle />, title: t("svc.prompt.title"), desc: t("svc.prompt.desc"), href: "/dashboard/generate", color: "#a855f7", bg: "#faf5ff" },
+    { icon: <PiSparkle />, title: t("svc.prompt.title"), desc: t("svc.prompt.desc"), href: "/generate", color: "#a855f7", bg: "#faf5ff" },
     { icon: <PiPencilLine />, title: t("svc.content.title"), desc: t("svc.content.desc"), href: "/#services", color: "#06b6d4", bg: "#ecfeff" },
     { icon: <PiGlobe />, title: t("svc.website.title"), desc: t("svc.website.desc"), href: "/#services", color: "#16a34a", bg: "#f0fdf4" },
-    { icon: <PiPalette />, title: t("svc.ai.title"), desc: t("svc.ai.desc"), href: "/dashboard/generate", color: "#ec4899", bg: "#fdf2f8" },
+    { icon: <PiPalette />, title: t("svc.ai.title"), desc: t("svc.ai.desc"), href: "/generate", color: "#ec4899", bg: "#fdf2f8" },
     { icon: <PiChartLineUp />, title: t("svc.seo.title"), desc: t("svc.seo.desc"), href: "/#services", color: "#16a34a", bg: "#f0fdf4" },
   ];
 
@@ -253,7 +253,7 @@ export default function Navbar({ onOpenMobileMenu }: NavbarProps) {
                     </div>
                     {[
                       { icon: <PiUser />, label: "Dashboard", href: "/dashboard" },
-                      { icon: <PiSparkle />, label: "Tạo ảnh AI", href: "/dashboard/generate" },
+                      { icon: <PiSparkle />, label: "Tạo ảnh AI", href: "/generate" },
                       { icon: <PiGear />, label: "Quản lý tài khoản", href: "/dashboard" },
                       ...(userRole === "admin" ? [{ icon: <PiGear />, label: "👑 Quản trị hệ thống", href: "/dashboard/admin" }] : []),
                     ].map((menuItem, mi) => (

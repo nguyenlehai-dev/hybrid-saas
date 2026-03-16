@@ -149,7 +149,7 @@ export default function AIGenerateSection() {
             >
               {loading ? "⏳ Đang xử lý..." : `🎨 Tạo ảnh — ${currentTool.cost} credits`}
             </button>
-            <a href="/dashboard/generate" style={{
+            <a href="/generate" style={{
               fontSize: "0.85rem", fontWeight: 600, color: "#16a34a",
               display: "flex", alignItems: "center", gap: 4,
             }}>

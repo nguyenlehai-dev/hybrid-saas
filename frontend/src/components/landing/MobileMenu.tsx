@@ -77,7 +77,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                   flex: 1, padding: "8px 0", borderRadius: 8, textAlign: "center",
                   background: "#16a34a", color: "#fff", fontSize: "0.8rem", fontWeight: 600,
                 }}>Dashboard</a>
-                <a href="/dashboard/generate" onClick={onClose} style={{
+                <a href="/generate" onClick={onClose} style={{
                   flex: 1, padding: "8px 0", borderRadius: 8, textAlign: "center",
                   background: "rgba(255,255,255,0.1)", color: "#fff", fontSize: "0.8rem", fontWeight: 600,
                 }}>Tạo ảnh AI</a>
@@ -107,7 +107,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
           {[
             { label: t("nav.about"), href: "/#about" },
             { label: t("nav.services"), href: "/#services" },
-            { label: "✨ Tạo ảnh AI", href: "/dashboard/generate" },
+            { label: "✨ Tạo ảnh AI", href: "/generate" },
             { label: t("nav.projects"), href: "/projects" },
             { label: t("nav.support"), href: supportHref },
             { label: t("nav.blog"), href: "/blog" },
