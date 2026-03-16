@@ -145,7 +145,7 @@ export default function GeneratePublicPage() {
   };
 
   return (
-    <div style={{ overflow: "hidden", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+    <div style={{ overflow: "hidden", height: "100vh", display: "flex", flexDirection: "column" }}>
       {/* Header */}
       <div style={{ background: "#fafbfc", position: "relative", display: "flex", flexDirection: "column" as const }}>
         <TopBar />
@@ -154,7 +154,7 @@ export default function GeneratePublicPage() {
       <MobileMenu isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
 
       {/* ══════ MAIN WORKSPACE ══════ */}
-      <div className="gen-workspace" style={{ flex: 1, display: "flex", background: "#111827" }}>
+      <div className="gen-workspace" style={{ flex: 1, display: "flex", background: "#111827", overflow: "hidden", minHeight: 0 }}>
 
         {/* ── LEFT SIDEBAR ── */}
         <div className="gen-sidebar" style={{
@@ -412,7 +412,7 @@ export default function GeneratePublicPage() {
         </div>
 
         {/* ── RIGHT CONTENT AREA ── */}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0, overflow: "hidden" }}>
 
           {/* Top Bar */}
           <div style={{
