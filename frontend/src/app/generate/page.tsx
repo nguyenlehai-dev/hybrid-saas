@@ -83,12 +83,12 @@ export default function GeneratePublicPage() {
       <MobileMenu isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
 
       {/* ══════ MAIN WORKSPACE ══════ */}
-      <div className="gen-workspace" style={{ flex: 1, display: "flex", background: "#0c0d14" }}>
+      <div className="gen-workspace" style={{ flex: 1, display: "flex", background: "#111827" }}>
 
         {/* ── LEFT SIDEBAR ── */}
         <div className="gen-sidebar" style={{
-          width: 340, flexShrink: 0, background: "#141627",
-          borderRight: "1px solid rgba(255,255,255,0.06)",
+          width: 340, flexShrink: 0, background: "#1a2332",
+          borderRight: "1px solid rgba(255,255,255,0.08)",
           display: "flex", flexDirection: "column", overflow: "hidden",
         }}>
           {/* Tool Tab */}
@@ -218,7 +218,7 @@ export default function GeneratePublicPage() {
           <div style={{
             display: "flex", alignItems: "center", justifyContent: "space-between",
             padding: "10px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)",
-            background: "#10111d",
+            background: "#15202e",
           }}>
             {/* Left: Tabs */}
             <div style={{ display: "flex", gap: 4 }}>
