@@ -83,7 +83,8 @@ export default function GeneratePublicPage() {
     { label: "4:3", w: 768, h: 576, steps: 25, cfg: 7.5 },
     { label: "16:9", w: 1024, h: 576, steps: 20, cfg: 8.0 },
     { label: "9:16", w: 576, h: 1024, steps: 20, cfg: 8.0 },
-    { label: "3:4", w: 576, h: 768, steps: 25, cfg: 7.5 },
+    { label: "FHD", w: 1920, h: 1080, steps: 20, cfg: 8.0 },
+    { label: "2K", w: 2560, h: 1440, steps: 15, cfg: 8.5 },
   ];
   const currentSize = SIZES.find(s => s.w === width && s.h === height) || SIZES[0];
 
