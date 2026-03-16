@@ -6,6 +6,7 @@ import { TopBar, Navbar, MobileMenu, Footer, FloatingButtons } from "@/component
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://vpspanel.io.vn/api";
 
 const AI_MODELS = [
+  { id: "mixProV3_v3", name: "MixPro V3 (Anime)", icon: "🎌", tag: "NEW" },
   { id: "Realistic_Vision_V5", name: "Realistic Vision V5", icon: "🎨", tag: "HOT" },
   { id: "v1-5-pruned-emaonly", name: "Stable Diffusion 1.5", icon: "⚡", tag: "" },
 ];
