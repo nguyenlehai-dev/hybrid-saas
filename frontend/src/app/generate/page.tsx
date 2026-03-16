@@ -439,30 +439,146 @@ export default function GeneratePublicPage() {
           {/* Content Area */}
           <div style={{ flex: 1, padding: 20, overflowY: "auto" }}>
             {activeTab === "create" && (
-              <div style={{ maxWidth: 700, margin: "0 auto", padding: "40px 20px" }}>
-                <h2 style={{ color: "#fff", fontSize: "1.3rem", fontWeight: 700, marginBottom: 20 }}>📖 Hướng dẫn sử dụng</h2>
-                <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-                  {[
-                    { step: "1", title: "Nhập mô tả hình ảnh", desc: "Mô tả chi tiết hình ảnh bạn muốn tạo bằng tiếng Anh hoặc tiếng Việt. Ví dụ: 'Professional product photo of a modern smartwatch on white marble, studio lighting, 4K quality'" },
-                    { step: "2", title: "Chọn tỷ lệ và cài đặt", desc: "Chọn tỷ lệ ảnh phù hợp (1:1 cho avatar, 16:9 cho banner, 9:16 cho story). Điều chỉnh Steps (chất lượng) và CFG Scale (độ sáng tạo)" },
-                    { step: "3", title: "Nhấn 'Tạo ảnh'", desc: "Mỗi ảnh tốn 1 credit. Kết quả thường mất 10-30 giây. Ảnh sẽ hiện trong tab 'Lịch sử'" },
-                  ].map(item => (
-                    <div key={item.step} style={{
-                      display: "flex", gap: 14, padding: "16px 18px", borderRadius: 12,
-                      background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)",
-                    }}>
-                      <div style={{
-                        width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-                        background: "linear-gradient(135deg, #16a34a, #15803d)",
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        color: "#fff", fontSize: "0.85rem", fontWeight: 700,
-                      }}>{item.step}</div>
-                      <div>
-                        <div style={{ color: "#fff", fontSize: "0.88rem", fontWeight: 600, marginBottom: 4 }}>{item.title}</div>
-                        <div style={{ color: "rgba(255,255,255,0.45)", fontSize: "0.8rem", lineHeight: 1.6 }}>{item.desc}</div>
+              <div style={{ maxWidth: 750, margin: "0 auto", padding: "30px 20px" }}>
+                <h2 style={{ color: "#fff", fontSize: "1.3rem", fontWeight: 700, marginBottom: 6 }}>📖 Hướng dẫn sử dụng AI Generate</h2>
+                <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.82rem", marginBottom: 24, lineHeight: 1.6 }}>
+                  Tạo ảnh chất lượng cao bằng AI với Stable Diffusion. Dưới đây là hướng dẫn chi tiết từng bước.
+                </p>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                  {/* Section 1: Model */}
+                  <div style={{ padding: "18px", borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                    <h3 style={{ color: "#4ade80", fontSize: "0.92rem", fontWeight: 700, marginBottom: 10, display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ width: 28, height: 28, borderRadius: 8, background: "linear-gradient(135deg,#22c55e,#16a34a)", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: "0.75rem", color: "#fff" }}>1</span>
+                      Chọn Model AI
+                    </h3>
+                    <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.8rem", lineHeight: 1.7 }}>
+                      <b style={{ color: "rgba(255,255,255,0.7)" }}>Realistic Vision V5</b> — Tạo ảnh thực tế, chân dung, sản phẩm, phong cảnh. Phù hợp cho hầu hết nhu cầu.<br/>
+                      <b style={{ color: "rgba(255,255,255,0.7)" }}>Stable Diffusion 1.5</b> — Model gốc, đa dạng phong cách, từ anime đến realistic.
+                    </p>
+                  </div>
+
+                  {/* Section 2: Prompt */}
+                  <div style={{ padding: "18px", borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                    <h3 style={{ color: "#4ade80", fontSize: "0.92rem", fontWeight: 700, marginBottom: 10, display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ width: 28, height: 28, borderRadius: 8, background: "linear-gradient(135deg,#22c55e,#16a34a)", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: "0.75rem", color: "#fff" }}>2</span>
+                      Viết Prompt (Mô tả ảnh)
+                    </h3>
+                    <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.8rem", lineHeight: 1.7, marginBottom: 10 }}>
+                      Mô tả chi tiết hình ảnh bạn muốn tạo. <b style={{ color: "rgba(255,255,255,0.7)" }}>Nên viết bằng tiếng Anh</b> để đạt kết quả tốt nhất.
+                    </p>
+                    <div style={{ background: "rgba(0,0,0,0.2)", borderRadius: 8, padding: "12px 14px", marginBottom: 10 }}>
+                      <div style={{ color: "#4ade80", fontSize: "0.72rem", fontWeight: 600, marginBottom: 6 }}>✅ VÍ DỤ PROMPT TỐT:</div>
+                      <div style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.78rem", lineHeight: 1.6, fontStyle: "italic" }}>
+                        &quot;Professional product photo of a modern smartwatch on white marble, studio lighting, 4K quality, sharp focus, bokeh background&quot;
                       </div>
                     </div>
-                  ))}
+                    <div style={{ background: "rgba(0,0,0,0.2)", borderRadius: 8, padding: "12px 14px" }}>
+                      <div style={{ color: "#f87171", fontSize: "0.72rem", fontWeight: 600, marginBottom: 6 }}>⚠️ NEGATIVE PROMPT (Những gì không muốn):</div>
+                      <div style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.78rem", lineHeight: 1.6, fontStyle: "italic" }}>
+                        &quot;blurry, low quality, distorted, ugly, watermark, text, bad anatomy, deformed fingers&quot;
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Section 3: Sampler */}
+                  <div style={{ padding: "18px", borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                    <h3 style={{ color: "#4ade80", fontSize: "0.92rem", fontWeight: 700, marginBottom: 10, display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ width: 28, height: 28, borderRadius: 8, background: "linear-gradient(135deg,#22c55e,#16a34a)", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: "0.75rem", color: "#fff" }}>3</span>
+                      Sampling Method (Phương pháp lấy mẫu)
+                    </h3>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                      {[
+                        { name: "DPM++ 2M", note: "⭐ Mặc định, nhanh, chất lượng tốt" },
+                        { name: "Euler a", note: "Sáng tạo, phong cách đa dạng" },
+                        { name: "DPM++ SDE", note: "Chi tiết cao, chậm hơn" },
+                        { name: "DDIM", note: "Ổn định, tái tạo được với same seed" },
+                      ].map(s => (
+                        <div key={s.name} style={{ padding: "8px 12px", borderRadius: 8, background: "rgba(255,255,255,0.03)" }}>
+                          <div style={{ color: "rgba(255,255,255,0.7)", fontSize: "0.78rem", fontWeight: 600 }}>{s.name}</div>
+                          <div style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.7rem" }}>{s.note}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Section 4: Settings */}
+                  <div style={{ padding: "18px", borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                    <h3 style={{ color: "#4ade80", fontSize: "0.92rem", fontWeight: 700, marginBottom: 10, display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ width: 28, height: 28, borderRadius: 8, background: "linear-gradient(135deg,#22c55e,#16a34a)", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: "0.75rem", color: "#fff" }}>4</span>
+                      Cài đặt tham số
+                    </h3>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                      {[
+                        { param: "Steps (10-60)", desc: "Số bước xử lý. Cao hơn = chi tiết hơn nhưng chậm hơn. Khuyến nghị: 20-30" },
+                        { param: "CFG Scale (1-20)", desc: "Mức tuân theo prompt. Thấp = sáng tạo tự do, Cao = bám sát prompt. Khuyến nghị: 7-8" },
+                        { param: "Seed", desc: "Số hạt giống. -1 = ngẫu nhiên. Cùng seed + prompt = cùng kết quả. Dùng để tái tạo ảnh đã thích" },
+                        { param: "Batch count (1-8)", desc: "Tạo nhiều ảnh cùng lúc với seed khác nhau. Tốn thêm credits theo số lượng" },
+                        { param: "Restore faces", desc: "Tự động sửa khuôn mặt người. Bật khi tạo ảnh chân dung" },
+                      ].map(p => (
+                        <div key={p.param} style={{ display: "flex", gap: 10, padding: "8px 0", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                          <div style={{ minWidth: 130, color: "rgba(255,255,255,0.7)", fontSize: "0.78rem", fontWeight: 600 }}>{p.param}</div>
+                          <div style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.78rem", lineHeight: 1.5 }}>{p.desc}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Section 5: Hires Fix */}
+                  <div style={{ padding: "18px", borderRadius: 12, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                    <h3 style={{ color: "#4ade80", fontSize: "0.92rem", fontWeight: 700, marginBottom: 10, display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ width: 28, height: 28, borderRadius: 8, background: "linear-gradient(135deg,#22c55e,#16a34a)", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: "0.75rem", color: "#fff" }}>5</span>
+                      Hires. Fix (Nâng cấp độ phân giải)
+                    </h3>
+                    <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.8rem", lineHeight: 1.7, marginBottom: 8 }}>
+                      Tạo ảnh ở kích thước nhỏ trước, sau đó <b style={{ color: "rgba(255,255,255,0.7)" }}>upscale lên kích thước lớn hơn</b> với chi tiết tốt hơn. Thay vì tạo ảnh 2K trực tiếp (chậm, hay lỗi), hãy dùng Hires Fix:
+                    </p>
+                    <div style={{ display: "flex", gap: 10 }}>
+                      <div style={{ flex: 1, padding: "10px 14px", borderRadius: 8, background: "rgba(22,163,74,0.08)", border: "1px solid rgba(22,163,74,0.15)" }}>
+                        <div style={{ color: "#4ade80", fontSize: "0.72rem", fontWeight: 600, marginBottom: 4 }}>✅ CÁCH TỐT</div>
+                        <div style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.72rem", lineHeight: 1.5 }}>512×512 + Hires Fix 2x<br/>→ Ra ảnh 1024×1024 đẹp</div>
+                      </div>
+                      <div style={{ flex: 1, padding: "10px 14px", borderRadius: 8, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.15)" }}>
+                        <div style={{ color: "#f87171", fontSize: "0.72rem", fontWeight: 600, marginBottom: 4 }}>❌ CÁCH XẤU</div>
+                        <div style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.72rem", lineHeight: 1.5 }}>2K trực tiếp<br/>→ Chậm, hay lỗi, ảnh xấu</div>
+                      </div>
+                    </div>
+                    <div style={{ marginTop: 10 }}>
+                      {[
+                        { param: "Upscale by", desc: "Hệ số phóng to (1.5x - 4x)" },
+                        { param: "Denoising (0-1)", desc: "Mức tạo chi tiết mới. 0.3-0.5 = giữ cấu trúc. 0.6+ = thay đổi nhiều" },
+                        { param: "Hires steps", desc: "Bước xử lý upscale. 0 = tự động. 10-20 = đủ tốt" },
+                      ].map(p => (
+                        <div key={p.param} style={{ display: "flex", gap: 10, padding: "6px 0", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                          <div style={{ minWidth: 120, color: "rgba(255,255,255,0.6)", fontSize: "0.75rem", fontWeight: 600 }}>{p.param}</div>
+                          <div style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.75rem" }}>{p.desc}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Section 6: Tips */}
+                  <div style={{ padding: "18px", borderRadius: 12, background: "linear-gradient(135deg, rgba(22,163,74,0.06), rgba(22,163,74,0.02))", border: "1px solid rgba(22,163,74,0.15)" }}>
+                    <h3 style={{ color: "#4ade80", fontSize: "0.92rem", fontWeight: 700, marginBottom: 12 }}>💡 Mẹo tạo ảnh đẹp</h3>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                      {[
+                        "Viết prompt bằng tiếng Anh, chi tiết và cụ thể",
+                        "Thêm từ khóa chất lượng: masterpiece, best quality, 4K, ultra-detailed",
+                        "Luôn dùng Negative Prompt để loại bỏ lỗi phổ biến",
+                        "Dùng Realistic Vision V5 cho ảnh thực tế, SD 1.5 cho anime/art",
+                        "DPM++ 2M là sampler tốt nhất cho hầu hết trường hợp",
+                        "Steps 20-30 là đủ, không cần quá 50",
+                        "CFG Scale 7-8 cân bằng giữa sáng tạo và chính xác",
+                        "Dùng Hires Fix thay vì chọn kích thước lớn trực tiếp",
+                        "Lưu lại Seed của ảnh đẹp để tái tạo hoặc tinh chỉnh",
+                      ].map((tip, i) => (
+                        <div key={i} style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+                          <span style={{ color: "#22c55e", fontSize: "0.75rem", flexShrink: 0 }}>✦</span>
+                          <span style={{ color: "rgba(255,255,255,0.55)", fontSize: "0.78rem", lineHeight: 1.5 }}>{tip}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
