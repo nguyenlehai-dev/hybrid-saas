@@ -252,10 +252,11 @@ export default function Navbar({ onOpenMobileMenu }: NavbarProps) {
                       <div style={{ fontSize: "0.72rem", color: userRole === "admin" ? "#f59e0b" : "#9ca3af", marginTop: 2 }}>{userRole === "admin" ? "Quản trị viên" : "Thành viên"}</div>
                     </div>
                     {[
-                      { icon: <PiUser />, label: "Dashboard", href: "/dashboard" },
                       { icon: <PiSparkle />, label: "Tạo ảnh AI", href: "/generate" },
-                      { icon: <PiGear />, label: "Quản lý tài khoản", href: "/dashboard" },
-                      ...(userRole === "admin" ? [{ icon: <PiGear />, label: "👑 Quản trị hệ thống", href: "/dashboard/admin" }] : []),
+                      ...(userRole === "admin" ? [
+                        { icon: <PiUser />, label: "Dashboard", href: "/dashboard" },
+                        { icon: <PiGear />, label: "👑 Quản trị hệ thống", href: "/dashboard/admin" },
+                      ] : []),
                     ].map((menuItem, mi) => (
                       <a key={mi} href={menuItem.href} style={{
                         display: "flex", alignItems: "center", gap: 10,

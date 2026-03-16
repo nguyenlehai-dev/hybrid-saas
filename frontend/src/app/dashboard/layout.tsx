@@ -33,7 +33,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       window.location.href = "/login";
       return;
     }
-    setUser(JSON.parse(stored));
+    const parsed = JSON.parse(stored);
+    setUser(parsed);
 
     fetch(`${API_URL}/auth/me`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -43,8 +44,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         return r.json();
       })
       .then((data) => {
+        // Block non-admin users
+        if (data.role !== "admin") {
+          window.location.href = "/";
+          return;
+        }
         const updated = {
-          ...JSON.parse(stored),
+          ...parsed,
           role: data.role,
           credits_balance: data.credits_balance,
           email: data.email,
@@ -52,6 +58,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         };
         setUser(updated);
         localStorage.setItem("user", JSON.stringify(updated));
+        localStorage.setItem("role", data.role);
       })
       .catch(() => {});
   }, []);
