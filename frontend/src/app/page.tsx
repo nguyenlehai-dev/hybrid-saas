@@ -15,6 +15,7 @@ import {
   CTASection,
   Footer,
   FloatingButtons,
+  AIGenerateSection,
 } from "@/components/landing";
 
 export default function HomePage() {
@@ -51,6 +52,7 @@ export default function HomePage() {
       {/* ══════ SECTIONS ══════ */}
       <BannerCarousel />
       <AboutSection />
+      <AIGenerateSection />
       <SolutionsSection />
       <TestimonialsSection />
       <CaseStudiesSection />

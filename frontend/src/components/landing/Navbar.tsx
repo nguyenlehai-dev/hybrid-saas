@@ -12,6 +12,7 @@ export default function Navbar({ onOpenMobileMenu }: NavbarProps) {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
+  const [userRole, setUserRole] = useState("");
   const dropdownTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const userMenuTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { lang, t } = useLang();
@@ -19,9 +20,11 @@ export default function Navbar({ onOpenMobileMenu }: NavbarProps) {
   useEffect(() => {
     const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
     const user = typeof window !== "undefined" ? localStorage.getItem("username") : null;
+    const role = typeof window !== "undefined" ? localStorage.getItem("role") : null;
     if (token) {
       setIsLoggedIn(true);
       setUsername(user || "User");
+      setUserRole(role || "user");
     }
   }, []);
 
@@ -246,22 +249,24 @@ export default function Navbar({ onOpenMobileMenu }: NavbarProps) {
                     {/* User Info */}
                     <div style={{ padding: "12px 16px", borderBottom: "1px solid #f1f5f9" }}>
                       <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "#111827" }}>{username}</div>
-                      <div style={{ fontSize: "0.72rem", color: "#9ca3af", marginTop: 2 }}>Thành viên</div>
+                      <div style={{ fontSize: "0.72rem", color: userRole === "admin" ? "#f59e0b" : "#9ca3af", marginTop: 2 }}>{userRole === "admin" ? "Quản trị viên" : "Thành viên"}</div>
                     </div>
                     {[
                       { icon: <PiUser />, label: "Dashboard", href: "/dashboard" },
                       { icon: <PiSparkle />, label: "Tạo ảnh AI", href: "/dashboard/generate" },
                       { icon: <PiGear />, label: "Quản lý tài khoản", href: "/dashboard" },
+                      ...(userRole === "admin" ? [{ icon: <PiGear />, label: "👑 Quản trị hệ thống", href: "/dashboard/admin" }] : []),
                     ].map((menuItem, mi) => (
                       <a key={mi} href={menuItem.href} style={{
                         display: "flex", alignItems: "center", gap: 10,
                         padding: "10px 16px", fontSize: "0.82rem", fontWeight: 500,
-                        color: "#374151", textDecoration: "none", transition: "background 0.15s",
+                        color: menuItem.href === "/dashboard/admin" ? "#f59e0b" : "#374151",
+                        textDecoration: "none", transition: "background 0.15s",
                       }}
                         onMouseEnter={e => e.currentTarget.style.background = "#f9fafb"}
                         onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                       >
-                        <span style={{ fontSize: "1rem", color: "#16a34a" }}>{menuItem.icon}</span>
+                        <span style={{ fontSize: "1rem", color: menuItem.href === "/dashboard/admin" ? "#f59e0b" : "#16a34a" }}>{menuItem.icon}</span>
                         {menuItem.label}
                       </a>
                     ))}
