@@ -454,7 +454,7 @@ export default function GeneratePublicPage() {
           </div>
 
           {/* Content Area */}
-          <div style={{ flex: 1, padding: 20, overflowY: "auto" }}>
+          <div className="gen-scroll" style={{ flex: 1, padding: 20, overflowY: "auto" }}>
             {activeTab === "create" && (
               <div style={{ maxWidth: 750, margin: "0 auto", padding: "30px 20px" }}>
                 <h2 style={{ color: "#fff", fontSize: "1.3rem", fontWeight: 700, marginBottom: 6 }}>📖 Hướng dẫn sử dụng AI Generate</h2>
@@ -682,20 +682,20 @@ export default function GeneratePublicPage() {
 
       {/* ── IMAGE DETAIL MODAL ── */}
       {selectedImage && selectedImage.output_image_url && (
-        <div onClick={() => setSelectedImage(null)} style={{
+        <div className="gen-modal-wrap" onClick={() => setSelectedImage(null)} style={{
           position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.85)",
           display: "flex", backdropFilter: "blur(8px)",
         }}>
           {/* Left: Image */}
           <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: 20, minWidth: 0 }} onClick={() => setSelectedImage(null)}>
-            <img src={selectedImage.output_image_url} alt="Preview" style={{
+            <img className="gen-modal-img" src={selectedImage.output_image_url} alt="Preview" style={{
               maxWidth: "100%", maxHeight: "90vh", objectFit: "contain", borderRadius: 8,
               boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
             }} onClick={e => e.stopPropagation()} />
           </div>
 
           {/* Right: Info Panel */}
-          <div onClick={e => e.stopPropagation()} style={{
+          <div className="gen-modal-panel gen-scroll" onClick={e => e.stopPropagation()} style={{
             width: 360, background: "#1a2332", borderLeft: "1px solid rgba(255,255,255,0.08)",
             display: "flex", flexDirection: "column", overflowY: "auto",
           }}>
@@ -789,11 +789,65 @@ export default function GeneratePublicPage() {
       <style>{`
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        .gen-sidebar::-webkit-scrollbar { width: 4px; }
-        .gen-sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+        /* Custom scrollbar - hidden by default, show on hover */
+        .gen-scroll {
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+          overflow-y: auto;
+        }
+        .gen-scroll::-webkit-scrollbar { width: 6px; }
+        .gen-scroll::-webkit-scrollbar-track { background: transparent; }
+        .gen-scroll::-webkit-scrollbar-thumb {
+          background: transparent;
+          border-radius: 3px;
+          transition: background 0.3s;
+        }
+        .gen-scroll:hover::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); }
+        .gen-scroll:hover::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
+        .gen-scroll:hover { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.15) transparent; }
+
+        .gen-sidebar::-webkit-scrollbar { width: 6px; }
+        .gen-sidebar::-webkit-scrollbar-track { background: transparent; }
+        .gen-sidebar::-webkit-scrollbar-thumb { background: transparent; border-radius: 3px; }
+        .gen-sidebar:hover::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); }
+        .gen-sidebar:hover::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
+        .gen-sidebar { scrollbar-width: none; }
+        .gen-sidebar:hover { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.12) transparent; }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+          .gen-workspace { flex-direction: column !important; }
+          .gen-sidebar {
+            width: 100% !important;
+            max-height: 45vh !important;
+            border-right: none !important;
+            border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+          }
+        }
         @media (max-width: 768px) {
           .gen-workspace { flex-direction: column !important; }
-          .gen-sidebar { width: 100% !important; max-height: 60vh; }
+          .gen-sidebar {
+            width: 100% !important;
+            max-height: 40vh !important;
+            border-right: none !important;
+            border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+          }
+          .gen-modal-panel {
+            width: 100% !important;
+            max-width: 100% !important;
+            border-left: none !important;
+            border-top: 1px solid rgba(255,255,255,0.08) !important;
+          }
+          .gen-modal-wrap {
+            flex-direction: column !important;
+          }
+          .gen-modal-img {
+            max-height: 50vh !important;
+          }
+        }
+        @media (max-width: 480px) {
+          .gen-sidebar { max-height: 35vh !important; }
         }
       `}</style>
     </div>
