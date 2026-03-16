@@ -30,7 +30,7 @@ export default function AdminPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalUsers, setTotalUsers] = useState(0);
-  const PER_PAGE = 15;
+  const PER_PAGE = 5;
   const [vouchers, setVouchers] = useState<VoucherItem[]>([]);
   const [newVoucher, setNewVoucher] = useState({ code: "", credits_amount: "", description: "" });
   const [editUser, setEditUser] = useState<UserItem | null>(null);
