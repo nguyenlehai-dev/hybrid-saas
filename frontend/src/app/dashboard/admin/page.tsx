@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://vpspanel.io.vn/api";
 
@@ -349,6 +349,7 @@ export default function AdminPage() {
                   const pendingCount = orders.filter(o => o.status === "pending").length;
                   const allPendingIds = orders.filter(o => o.status === "pending").map(o => o.id);
                   const allSelected = allPendingIds.length > 0 && allPendingIds.every(id => selectedOrders.has(id));
+                  const COL_COUNT = 10;
 
                   return (
                   <>
@@ -374,73 +375,78 @@ export default function AdminPage() {
                     {orders.length === 0 ? (
                       <div className="glass-card" style={{ padding: "40px", textAlign: "center", color: "var(--text-muted)" }}>Chưa có đơn hàng nào</div>
                     ) : (
-                      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                        {pagedGroups.map(([username, groupOrders]) => {
-                          const isExpanded = expandedGroups.has(username) || groupOrders.length === 1;
-                          const pendingInGroup = groupOrders.filter(o => o.status === "pending");
-                          const allGroupSelected = pendingInGroup.length > 0 && pendingInGroup.every(o => selectedOrders.has(o.id));
-                          const totalAmount = groupOrders.reduce((s, o) => s + o.amount_vnd, 0);
-                          const totalCredits = groupOrders.reduce((s, o) => s + o.credits_amount, 0);
-                          const userEmail = groupOrders[0]?.user_email || "";
+                      <div className="glass-card" style={{ padding: 0, overflow: "auto" }}>
+                        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.8rem", minWidth: "900px" }}>
+                          <thead>
+                            <tr style={{ borderBottom: "2px solid var(--border-color)" }}>
+                              <th style={{ width: "36px", padding: "10px 8px" }}></th>
+                              <th style={{ width: "24px", padding: "10px 4px" }}></th>
+                              {["Mã đơn", "User", "Gói", "Số tiền", "Credits", "NDCK", "Trạng thái", "Thời gian", "Hành động"].map(h => (
+                                <th key={h} style={{ padding: "10px 10px", textAlign: "left", color: "var(--text-secondary)", fontWeight: 600, fontSize: "0.75rem" }}>{h}</th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {pagedGroups.map(([username, groupOrders]) => {
+                              const isExpanded = expandedGroups.has(username) || groupOrders.length === 1;
+                              const pendingInGroup = groupOrders.filter(o => o.status === "pending");
+                              const allGroupSelected = pendingInGroup.length > 0 && pendingInGroup.every(o => selectedOrders.has(o.id));
+                              const totalAmount = groupOrders.reduce((s, o) => s + o.amount_vnd, 0);
+                              const totalCredits = groupOrders.reduce((s, o) => s + o.credits_amount, 0);
+                              const userEmail = groupOrders[0]?.user_email || "";
 
-                          return (
-                            <div key={username} className="glass-card" style={{ padding: 0, overflow: "hidden" }}>
-                              {/* Group Header */}
-                              <div
-                                onClick={() => groupOrders.length > 1 && toggleGroup(username)}
-                                style={{
-                                  display: "flex", alignItems: "center", gap: "10px", padding: "12px 16px",
-                                  cursor: groupOrders.length > 1 ? "pointer" : "default",
-                                  background: pendingInGroup.length > 0 ? "rgba(245,158,11,0.06)" : "transparent",
-                                  borderBottom: isExpanded ? "1px solid var(--border-color)" : "none",
-                                }}
-                              >
-                                {pendingInGroup.length > 0 && (
-                                  <input type="checkbox" checked={allGroupSelected}
-                                    onChange={(e) => { e.stopPropagation(); toggleSelectGroup(groupOrders); }}
-                                    onClick={(e) => e.stopPropagation()}
-                                    style={{ width: "16px", height: "16px", accentColor: "var(--primary)" }} />
-                                )}
-                                {groupOrders.length > 1 && (
-                                  <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", width: "16px" }}>{isExpanded ? "▼" : "▶"}</span>
-                                )}
-                                <div style={{ flex: 1 }}>
-                                  <span style={{ fontWeight: 700, fontSize: "0.85rem" }}>{username}</span>
-                                  <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", marginLeft: "8px" }}>{userEmail}</span>
-                                </div>
-                                <span style={{ padding: "2px 10px", borderRadius: "12px", fontSize: "0.7rem", fontWeight: 600, background: "rgba(59,130,246,0.12)", color: "#3b82f6" }}>
-                                  ({groupOrders.length}) đơn hàng
-                                </span>
-                                <span style={{ fontSize: "0.8rem", fontWeight: 600, minWidth: "100px", textAlign: "right" }}>{formatVND(totalAmount)}</span>
-                                <span style={{ fontSize: "0.75rem", color: "#10b981", fontWeight: 600, minWidth: "70px", textAlign: "right" }}>{totalCredits} cr</span>
-                                {pendingInGroup.length > 0 && (
-                                  <span style={{ padding: "2px 8px", borderRadius: "12px", fontSize: "0.65rem", fontWeight: 600, background: "rgba(245,158,11,0.15)", color: "#f59e0b" }}>
-                                    {pendingInGroup.length} chờ duyệt
-                                  </span>
-                                )}
-                              </div>
-
-                              {/* Expanded Orders */}
-                              {isExpanded && (
-                                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.78rem" }}>
-                                  <thead>
-                                    <tr style={{ background: "rgba(0,0,0,0.02)" }}>
-                                      <th style={{ width: "36px", padding: "6px 12px" }}></th>
-                                      {["Mã đơn", "Gói", "Số tiền", "Credits", "NDCK", "Trạng thái", "Thời gian", "Hành động"].map(h => (
-                                        <th key={h} style={{ padding: "6px 10px", textAlign: "left", color: "var(--text-secondary)", fontWeight: 600, fontSize: "0.72rem" }}>{h}</th>
-                                      ))}
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    {groupOrders.map((o) => (
-                                      <tr key={o.id} style={{ borderTop: "1px solid var(--border-color)" }}>
-                                        <td style={{ padding: "8px 12px", textAlign: "center" }}>
+                              return (
+                                <React.Fragment key={username}>
+                                  {/* Group Header Row */}
+                                  <tr
+                                    onClick={() => groupOrders.length > 1 && toggleGroup(username)}
+                                    style={{
+                                      borderTop: "2px solid var(--border-color)",
+                                      background: pendingInGroup.length > 0 ? "rgba(245,158,11,0.06)" : "rgba(0,0,0,0.02)",
+                                      cursor: groupOrders.length > 1 ? "pointer" : "default",
+                                    }}
+                                  >
+                                    <td style={{ padding: "10px 8px", textAlign: "center" }}>
+                                      {pendingInGroup.length > 0 && (
+                                        <input type="checkbox" checked={allGroupSelected}
+                                          onChange={(e) => { e.stopPropagation(); toggleSelectGroup(groupOrders); }}
+                                          onClick={(e) => e.stopPropagation()}
+                                          style={{ width: "16px", height: "16px", accentColor: "var(--primary)" }} />
+                                      )}
+                                    </td>
+                                    <td style={{ padding: "10px 4px", textAlign: "center", fontSize: "0.7rem", color: "var(--text-muted)" }}>
+                                      {groupOrders.length > 1 && (isExpanded ? "▼" : "▶")}
+                                    </td>
+                                    <td colSpan={9} style={{ padding: "10px 10px" }}>
+                                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                        <span style={{ fontWeight: 700, fontSize: "0.85rem" }}>{username}</span>
+                                        <span style={{ fontSize: "0.7rem", color: "var(--text-muted)" }}>{userEmail}</span>
+                                        <span style={{ padding: "2px 10px", borderRadius: "12px", fontSize: "0.7rem", fontWeight: 600, background: "rgba(59,130,246,0.12)", color: "#3b82f6" }}>
+                                          ({groupOrders.length}) đơn hàng
+                                        </span>
+                                        <div style={{ flex: 1 }} />
+                                        <span style={{ fontSize: "0.8rem", fontWeight: 600 }}>{formatVND(totalAmount)}</span>
+                                        <span style={{ fontSize: "0.75rem", color: "#10b981", fontWeight: 600 }}>{totalCredits} cr</span>
+                                        {pendingInGroup.length > 0 && (
+                                          <span style={{ padding: "2px 8px", borderRadius: "12px", fontSize: "0.65rem", fontWeight: 600, background: "rgba(245,158,11,0.15)", color: "#f59e0b" }}>
+                                            {pendingInGroup.length} chờ duyệt
+                                          </span>
+                                        )}
+                                      </div>
+                                    </td>
+                                  </tr>
+                                  {/* Child Order Rows */}
+                                  {isExpanded && groupOrders.map((o) => (
+                                      <tr key={o.id} style={{ borderTop: "1px solid var(--border-color)", background: "rgba(255,255,255,0.02)" }}>
+                                        <td style={{ padding: "8px 8px", textAlign: "center" }}>
                                           {o.status === "pending" && (
                                             <input type="checkbox" checked={selectedOrders.has(o.id)} onChange={() => toggleSelectOrder(o.id)}
                                               style={{ width: "15px", height: "15px", accentColor: "var(--primary)" }} />
                                           )}
                                         </td>
+                                        <td style={{ padding: "8px 4px" }}></td>
                                         <td style={{ padding: "8px 10px", fontWeight: 600 }}>{o.order_code}</td>
+                                        <td style={{ padding: "8px 10px", fontSize: "0.75rem", color: "var(--text-muted)" }}>{o.username}</td>
                                         <td style={{ padding: "8px 10px" }}>{o.plan_name}</td>
                                         <td style={{ padding: "8px 10px" }}>{formatVND(o.amount_vnd)}</td>
                                         <td style={{ padding: "8px 10px" }}>{o.credits_amount}</td>
@@ -461,12 +467,11 @@ export default function AdminPage() {
                                         </td>
                                       </tr>
                                     ))}
-                                  </tbody>
-                                </table>
-                              )}
-                            </div>
-                          );
-                        })}
+                                </React.Fragment>
+                              );
+                            })}
+                          </tbody>
+                        </table>
                       </div>
                     )}
                     <div style={{ marginTop: "8px" }}>
