@@ -133,7 +133,7 @@ async def generate_image(
         task_type=req.task_type,
         status="queued",
         credits_cost=credits_cost,
-        input_params={
+        input_params={k: v for k, v in {
             "prompt": req.prompt,
             "negative_prompt": req.negative_prompt,
             "width": req.width,
@@ -145,7 +145,7 @@ async def generate_image(
             "lora": req.lora,
             "controlnet": req.controlnet,
             **req.extra_params,
-        },
+        }.items() if v is not None},
     )
     db.add(task)
     await db.flush()

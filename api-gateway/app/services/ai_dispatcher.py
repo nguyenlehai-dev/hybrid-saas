@@ -101,7 +101,8 @@ class AIDispatcher:
 
     def _build_payload(self, task) -> dict:
         """Build the API payload based on task type and input parameters."""
-        params = task.input_params or {}
+        # Filter out None values
+        params = {k: v for k, v in (task.input_params or {}).items() if v is not None}
         base_payload = {
             "prompt": params.get("prompt") or "",
             "negative_prompt": params.get("negative_prompt") or "",
@@ -119,12 +120,13 @@ class AIDispatcher:
             "denoising_strength": params.get("denoising_strength", 0.35),
         }
 
-        # Apply model selection
+        # Apply model selection - use partial match
         model = params.get("model")
         if model:
             base_payload["override_settings"] = {
                 "sd_model_checkpoint": model,
             }
+            base_payload["override_settings_restore_afterwards"] = True
 
         # Task-specific configurations
         if task.task_type == "review_product":
