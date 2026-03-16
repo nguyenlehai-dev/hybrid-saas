@@ -83,11 +83,11 @@ export default function GeneratePublicPage() {
       <MobileMenu isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
 
       {/* ══════ MAIN WORKSPACE ══════ */}
-      <div className="gen-workspace" style={{ flex: 1, display: "flex", background: "#0f1117" }}>
+      <div className="gen-workspace" style={{ flex: 1, display: "flex", background: "#0c0d14" }}>
 
         {/* ── LEFT SIDEBAR ── */}
         <div className="gen-sidebar" style={{
-          width: 340, flexShrink: 0, background: "#161822",
+          width: 340, flexShrink: 0, background: "#141627",
           borderRight: "1px solid rgba(255,255,255,0.06)",
           display: "flex", flexDirection: "column", overflow: "hidden",
         }}>
@@ -95,8 +95,8 @@ export default function GeneratePublicPage() {
           <div style={{ padding: "14px 16px 0", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
             <div style={{ display: "flex", gap: 4, marginBottom: 14 }}>
               <button style={{
-                padding: "8px 16px", borderRadius: 8, border: "none", cursor: "pointer",
-                background: "linear-gradient(135deg, #16a34a, #15803d)", color: "#fff",
+                padding: "8px 16px", borderRadius: 8, border: "1px solid rgba(22,163,74,0.3)", cursor: "pointer",
+                background: "rgba(22,163,74,0.15)", color: "#4ade80",
                 fontSize: "0.8rem", fontWeight: 600,
               }}>✨ Text to Image</button>
             </div>
@@ -190,11 +190,11 @@ export default function GeneratePublicPage() {
             <button onClick={handleGenerate} disabled={loading} style={{
               width: "100%", padding: "14px 0", borderRadius: 10, border: "none",
               cursor: loading ? "wait" : "pointer",
-              background: loading ? "rgba(255,255,255,0.1)" : "linear-gradient(135deg, #16a34a, #15803d)",
+              background: loading ? "rgba(255,255,255,0.08)" : "linear-gradient(135deg, #22c55e, #16a34a)",
               color: "#fff", fontSize: "0.88rem", fontWeight: 700,
               display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
               transition: "all 0.2s",
-              boxShadow: loading ? "none" : "0 4px 15px rgba(22,163,74,0.25)",
+              boxShadow: loading ? "none" : "0 4px 20px rgba(34,197,94,0.3)",
             }}>
               {loading ? (
                 <><span style={{ animation: "spin 1s linear infinite", display: "inline-block" }}>⏳</span> Đang xử lý...</>
@@ -218,7 +218,7 @@ export default function GeneratePublicPage() {
           <div style={{
             display: "flex", alignItems: "center", justifyContent: "space-between",
             padding: "10px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)",
-            background: "rgba(255,255,255,0.02)",
+            background: "#10111d",
           }}>
             {/* Left: Tabs */}
             <div style={{ display: "flex", gap: 4 }}>
