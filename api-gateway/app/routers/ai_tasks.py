@@ -150,9 +150,51 @@ async def generate_image(
     db.add(task)
     await db.flush()
 
-    # Dispatch to VM2 AI Engine (async - fire and forget)
+    # Dispatch to VM2 AI Engine and process result
     try:
-        await ai_dispatcher.dispatch(task)
+        result = await ai_dispatcher.dispatch(task)
+
+        # SD WebUI returns base64 images in the response
+        images = result.get("images", [])
+        if images:
+            import base64
+            from pathlib import Path
+            from app.config import settings as app_settings
+
+            # Save first image
+            img_data = base64.b64decode(images[0].split(",")[-1] if "," in images[0] else images[0])
+            img_dir = Path(app_settings.UPLOAD_DIR) / "generated" / str(user.id)
+            img_dir.mkdir(parents=True, exist_ok=True)
+            img_filename = f"{task.id}.png"
+            img_path = img_dir / img_filename
+            img_path.write_bytes(img_data)
+
+            # Build public URL
+            output_url = f"/uploads/generated/{user.id}/{img_filename}"
+            task.output_image_url = output_url
+            task.status = "completed"
+            task.completed_at = datetime.now(timezone.utc)
+
+            # Save seed info from response
+            info = result.get("info", "")
+            task.output_metadata = {"seed": result.get("parameters", {}).get("seed", -1), "info": str(info)[:500]}
+
+            # Also save to GeneratedImage table
+            gen_img = GeneratedImage(
+                user_id=user.id,
+                task_id=task.id,
+                image_url=output_url,
+                prompt=req.prompt or "",
+                task_type=req.task_type,
+                metadata=task.output_metadata,
+            )
+            db.add(gen_img)
+        else:
+            # No images in response - keep as queued
+            task.status = "processing"
+
+        await db.flush()
+
     except Exception as e:
         # If dispatch fails, refund credits and mark task as failed
         user.credits_balance += credits_cost
@@ -168,14 +210,14 @@ async def generate_image(
         task.status = "failed"
         task.error_message = str(e)
         await db.flush()
-        raise HTTPException(status_code=503, detail=f"AI Engine unavailable: {str(e)}")
+        raise HTTPException(status_code=503, detail={"error": f"AI Engine: {str(e)}"})
 
     return TaskResponse(
         task_id=str(task.id),
         status=task.status,
         task_type=req.task_type,
         credits_cost=float(credits_cost),
-        message=f"Task queued successfully. Cost: {credits_cost} credits.",
+        message=f"Task {'completed' if task.status == 'completed' else 'queued'}. Cost: {credits_cost} credits.",
     )
 
 
