@@ -24,6 +24,12 @@ interface GenerationResult {
   task_id: string;
   status: string;
   output_image_url?: string;
+  prompt?: string;
+  model?: string;
+  width?: number;
+  height?: number;
+  created_at?: string;
+  input_params?: any;
 }
 
 export default function GeneratePublicPage() {
@@ -52,13 +58,20 @@ export default function GeneratePublicPage() {
   const [activeTab, setActiveTab] = useState<"create" | "history">("create");
   const [selectedModel, setSelectedModel] = useState("Realistic_Vision_V5");
   const [showModelPicker, setShowModelPicker] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<GenerationResult | null>(null);
+  const [promptCopied, setPromptCopied] = useState(false);
 
   const loadHistory = async (token: string) => {
     try {
       const res = await fetch(`${API_URL}/ai/history?per_page=50`, { headers: { Authorization: `Bearer ${token}` } });
       if (res.ok) {
         const data = await res.json();
-        setResults(data.tasks.map((t: any) => ({ task_id: t.id, status: t.status, output_image_url: t.output_image_url, prompt: t.input_params?.prompt })));
+        setResults(data.tasks.map((t: any) => ({
+          task_id: t.id, status: t.status, output_image_url: t.output_image_url,
+          prompt: t.input_params?.prompt, model: t.input_params?.model,
+          width: t.input_params?.width, height: t.input_params?.height,
+          created_at: t.created_at, input_params: t.input_params,
+        })));
         if (data.tasks.length > 0) setActiveTab("history");
       }
     } catch {}
@@ -614,30 +627,24 @@ export default function GeneratePublicPage() {
                     onMouseLeave={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"}
                   >
                     {r.output_image_url ? (
-                      <div style={{ position: "relative", aspectRatio: viewMode === "grid" ? "1" : "auto" }}>
+                      <div style={{ position: "relative", aspectRatio: viewMode === "grid" ? "1" : "auto", cursor: "pointer" }} onClick={() => setSelectedImage(r)}>
                         <img src={r.output_image_url} alt="Generated" style={{
                           width: "100%", height: viewMode === "grid" ? "100%" : "auto",
                           objectFit: "cover", display: "block",
                         }} />
-                        {/* Hover overlay */}
                         <div style={{
-                          position: "absolute", inset: 0, background: "rgba(0,0,0,0.5)",
+                          position: "absolute", inset: 0, background: "rgba(0,0,0,0.4)",
                           display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
                           opacity: 0, transition: "opacity 0.2s",
                         }}
                           onMouseEnter={e => e.currentTarget.style.opacity = "1"}
                           onMouseLeave={e => e.currentTarget.style.opacity = "0"}
                         >
-                          <a href={r.output_image_url} download style={{
-                            width: 40, height: 40, borderRadius: 10, background: "rgba(255,255,255,0.15)",
+                          <div style={{
+                            width: 44, height: 44, borderRadius: 12, background: "rgba(255,255,255,0.15)",
                             display: "flex", alignItems: "center", justifyContent: "center",
-                            color: "#fff", fontSize: "1.1rem", backdropFilter: "blur(4px)",
-                          }}><PiDownloadSimple /></a>
-                          <a href={r.output_image_url} target="_blank" rel="noopener noreferrer" style={{
-                            width: 40, height: 40, borderRadius: 10, background: "rgba(255,255,255,0.15)",
-                            display: "flex", alignItems: "center", justifyContent: "center",
-                            color: "#fff", fontSize: "1.1rem", backdropFilter: "blur(4px)",
-                          }}><PiArrowsOut /></a>
+                            color: "#fff", fontSize: "1.2rem", backdropFilter: "blur(6px)",
+                          }}><PiArrowsOut /></div>
                         </div>
                       </div>
                     ) : (
@@ -672,6 +679,112 @@ export default function GeneratePublicPage() {
           </div>
         </div>
       </div>
+
+      {/* ── IMAGE DETAIL MODAL ── */}
+      {selectedImage && selectedImage.output_image_url && (
+        <div onClick={() => setSelectedImage(null)} style={{
+          position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.85)",
+          display: "flex", backdropFilter: "blur(8px)",
+        }}>
+          {/* Left: Image */}
+          <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: 20, minWidth: 0 }} onClick={() => setSelectedImage(null)}>
+            <img src={selectedImage.output_image_url} alt="Preview" style={{
+              maxWidth: "100%", maxHeight: "90vh", objectFit: "contain", borderRadius: 8,
+              boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
+            }} onClick={e => e.stopPropagation()} />
+          </div>
+
+          {/* Right: Info Panel */}
+          <div onClick={e => e.stopPropagation()} style={{
+            width: 360, background: "#1a2332", borderLeft: "1px solid rgba(255,255,255,0.08)",
+            display: "flex", flexDirection: "column", overflowY: "auto",
+          }}>
+            {/* Header */}
+            <div style={{ padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg,#22c55e,#16a34a)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: "0.85rem", fontWeight: 700 }}>{username.slice(0,1).toUpperCase()}</div>
+                <div>
+                  <div style={{ color: "#fff", fontSize: "0.85rem", fontWeight: 600 }}>{username}</div>
+                  <div style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.7rem" }}>Owner</div>
+                </div>
+              </div>
+              <button onClick={() => setSelectedImage(null)} style={{
+                width: 32, height: 32, borderRadius: 8, border: "none", cursor: "pointer",
+                background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.5)", fontSize: "1.1rem",
+              }}>✕</button>
+            </div>
+
+            {/* Prompt */}
+            <div style={{ padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                <span style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.72rem", fontWeight: 600, letterSpacing: "0.5px" }}>✨ PROMPT</span>
+                <button onClick={() => {
+                  navigator.clipboard.writeText(selectedImage.prompt || "");
+                  setPromptCopied(true); setTimeout(() => setPromptCopied(false), 2000);
+                }} style={{
+                  padding: "4px 10px", borderRadius: 6, border: "none", cursor: "pointer",
+                  background: promptCopied ? "rgba(22,163,74,0.2)" : "rgba(255,255,255,0.05)",
+                  color: promptCopied ? "#4ade80" : "rgba(255,255,255,0.5)", fontSize: "0.7rem", fontWeight: 600,
+                }}>{promptCopied ? "Copied!" : "Copy"}</button>
+              </div>
+              <p style={{ color: "rgba(255,255,255,0.7)", fontSize: "0.8rem", lineHeight: 1.6, margin: 0, wordBreak: "break-word" }}>
+                {selectedImage.prompt || "No prompt"}
+              </p>
+            </div>
+
+            {/* Information */}
+            <div style={{ padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+              <div style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.72rem", fontWeight: 600, letterSpacing: "0.5px", marginBottom: 12 }}>ℹ️ INFORMATION</div>
+              {[
+                { label: "Model", value: AI_MODELS.find(m => m.id === selectedImage.model)?.name || selectedImage.model || "Unknown" },
+                { label: "Resolution", value: selectedImage.width && selectedImage.height ? `${selectedImage.width}×${selectedImage.height}` : "N/A" },
+                { label: "Sampler", value: selectedImage.input_params?.sampler_name || "DPM++ 2M Karras" },
+                { label: "Steps", value: selectedImage.input_params?.steps || "?" },
+                { label: "CFG Scale", value: selectedImage.input_params?.cfg_scale || "?" },
+                { label: "Seed", value: selectedImage.input_params?.seed ?? "-1" },
+                { label: "Created", value: selectedImage.created_at ? new Date(selectedImage.created_at).toLocaleString("vi-VN") : "N/A" },
+              ].map(item => (
+                <div key={item.label} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid rgba(255,255,255,0.03)" }}>
+                  <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.78rem" }}>{item.label}</span>
+                  <span style={{ color: "#fff", fontSize: "0.78rem", fontWeight: 500 }}>{String(item.value)}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Actions */}
+            <div style={{ padding: "16px 20px", marginTop: "auto" }}>
+              <a href={selectedImage.output_image_url} download style={{
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                width: "100%", padding: "12px 0", borderRadius: 10, border: "none",
+                background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "#fff",
+                fontSize: "0.85rem", fontWeight: 600, cursor: "pointer", textDecoration: "none",
+                transition: "opacity 0.2s",
+              }}
+                onMouseEnter={e => e.currentTarget.style.opacity = "0.85"}
+                onMouseLeave={e => e.currentTarget.style.opacity = "1"}
+              >
+                <PiDownloadSimple /> Download
+              </a>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 8 }}>
+                <a href={selectedImage.output_image_url} target="_blank" rel="noopener noreferrer" style={{
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                  padding: "10px 0", borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)",
+                  background: "transparent", color: "rgba(255,255,255,0.6)",
+                  fontSize: "0.78rem", cursor: "pointer", textDecoration: "none",
+                }}><PiArrowsOut /> Open</a>
+                <button onClick={() => {
+                  navigator.clipboard.writeText(selectedImage.output_image_url || "");
+                }} style={{
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                  padding: "10px 0", borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)",
+                  background: "transparent", color: "rgba(255,255,255,0.6)",
+                  fontSize: "0.78rem", cursor: "pointer",
+                }}>📋 Copy URL</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <style>{`
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
