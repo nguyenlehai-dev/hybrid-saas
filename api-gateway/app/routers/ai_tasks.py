@@ -182,11 +182,14 @@ async def generate_image(
             # Also save to GeneratedImage table
             gen_img = GeneratedImage(
                 user_id=user.id,
-                task_id=task.id,
-                image_url=output_url,
+                ai_task_id=task.id,
+                file_path=str(img_path),
+                file_url=output_url,
                 prompt=req.prompt or "",
-                task_type=req.task_type,
-                metadata=task.output_metadata,
+                negative_prompt=req.negative_prompt or "",
+                width=req.width,
+                height=req.height,
+                generation_params=task.output_metadata,
             )
             db.add(gen_img)
         else:

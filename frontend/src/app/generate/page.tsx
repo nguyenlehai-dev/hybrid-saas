@@ -79,13 +79,17 @@ export default function GeneratePublicPage() {
   };
 
   const SIZES = [
-    { label: "1:1", w: 512, h: 512 },
-    { label: "4:3", w: 768, h: 576 },
-    { label: "16:9", w: 1024, h: 576 },
-    { label: "9:16", w: 576, h: 1024 },
-    { label: "3:4", w: 576, h: 768 },
+    { label: "1:1", w: 512, h: 512, steps: 30, cfg: 7.0 },
+    { label: "4:3", w: 768, h: 576, steps: 25, cfg: 7.5 },
+    { label: "16:9", w: 1024, h: 576, steps: 20, cfg: 8.0 },
+    { label: "9:16", w: 576, h: 1024, steps: 20, cfg: 8.0 },
+    { label: "3:4", w: 576, h: 768, steps: 25, cfg: 7.5 },
   ];
   const currentSize = SIZES.find(s => s.w === width && s.h === height) || SIZES[0];
+
+  const selectSize = (s: typeof SIZES[0]) => {
+    setWidth(s.w); setHeight(s.h); setSteps(s.steps); setCfgScale(s.cfg);
+  };
 
   return (
     <div style={{ overflow: "hidden", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
@@ -162,7 +166,7 @@ export default function GeneratePublicPage() {
               </div>
               <div style={{ display: "flex", gap: 6 }}>
                 {SIZES.map(s => (
-                  <button key={s.label} onClick={() => { setWidth(s.w); setHeight(s.h); }} style={{
+                  <button key={s.label} onClick={() => selectSize(s)} style={{
                     flex: 1, padding: "8px 0", borderRadius: 8, border: "none", cursor: "pointer",
                     background: currentSize.label === s.label ? "rgba(22,163,74,0.2)" : "rgba(255,255,255,0.05)",
                     color: currentSize.label === s.label ? "#16a34a" : "rgba(255,255,255,0.5)",
