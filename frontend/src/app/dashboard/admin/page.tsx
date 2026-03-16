@@ -37,11 +37,12 @@ export default function AdminPage() {
   const [showCreateUser, setShowCreateUser] = useState(false);
   const [newUser, setNewUser] = useState({ email: "", username: "", password: "", full_name: "", role: "user", credits_balance: "10" });
   const [spamAlerts, setSpamAlerts] = useState<UserItem[]>([]);
+  const [orderPage, setOrderPage] = useState(1);
 
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
   const headers: Record<string, string> = { Authorization: `Bearer ${token}`, "Content-Type": "application/json" };
 
-  useEffect(() => { if (!token) { window.location.href = "/login"; return; } if (tab !== "users") setPage(1); fetchData(); }, [tab]);
+  useEffect(() => { if (!token) { window.location.href = "/login"; return; } if (tab !== "users") setPage(1); setOrderPage(1); fetchData(); }, [tab]);
   useEffect(() => { if (tab === "users") fetchData(); }, [page]);
 
   const fetchData = async () => {
@@ -213,7 +214,7 @@ export default function AdminPage() {
             {/* Tabs */}
             <div style={{ display: "flex", gap: "8px", marginBottom: "20px", flexWrap: "wrap" }}>
               {(["overview", "orders", "users", "vouchers", "activity"] as const).map((t) => (
-                <button key={t} onClick={() => { setTab(t); setPage(1); }}
+                <button key={t} onClick={() => { setTab(t); setPage(1); setOrderPage(1); }}
                   className={`btn ${tab === t ? "btn-primary" : "btn-secondary"} btn-sm`}>
                   {t === "overview" ? "📊 Tổng quan" : t === "orders" ? `💳 Đơn hàng${stats?.pending_orders ? ` (${stats.pending_orders})` : ""}` : t === "users" ? "👥 Users" : t === "vouchers" ? "🎟️ Voucher" : "📋 Hoạt động"}
                 </button>
@@ -284,7 +285,11 @@ export default function AdminPage() {
                 )}
 
                 {/* Orders Tab */}
-                {tab === "orders" && (
+                {tab === "orders" && (() => {
+                  const orderTotalPages = Math.ceil(orders.length / PER_PAGE);
+                  const orderStart = (orderPage - 1) * PER_PAGE;
+                  const pagedOrders = orders.slice(orderStart, orderStart + PER_PAGE);
+                  return (
                   <div className="glass-card" style={{ padding: 0, overflow: "auto" }}>
                     {orders.length === 0 ? (
                       <div style={{ padding: "40px", textAlign: "center", color: "var(--text-muted)" }}>Chưa có đơn hàng nào</div>
@@ -298,7 +303,7 @@ export default function AdminPage() {
                           </tr>
                         </thead>
                         <tbody>
-                          {orders.map((o) => (
+                          {pagedOrders.map((o) => (
                             <tr key={o.id} style={{ borderBottom: "1px solid var(--border-color)" }}>
                               <td style={{ padding: "10px 12px", fontWeight: 600 }}>{o.order_code}</td>
                               <td style={{ padding: "10px 12px" }}>{o.username}</td>
@@ -325,8 +330,10 @@ export default function AdminPage() {
                         </tbody>
                       </table>
                     )}
+                    <PaginationBar currentPage={orderPage} totalPg={orderTotalPages} count={orders.length} onPageChange={setOrderPage} />
                   </div>
-                )}
+                  );
+                })()}
 
                 {/* Users Tab */}
                 {tab === "users" && (
