@@ -70,8 +70,9 @@ export default function LoginPage() {
       localStorage.setItem("username", data.user?.username || data.user?.email || "User");
       localStorage.setItem("role", data.user?.role || "user");
 
-      // Redirect to dashboard
-      window.location.href = "/dashboard";
+      // Redirect based on role
+      const role = data.user?.role || "user";
+      window.location.href = role === "admin" ? "/dashboard" : "/";
     } catch (err: any) {
       setError(err.message);
     } finally {
