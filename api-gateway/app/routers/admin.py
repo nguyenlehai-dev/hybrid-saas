@@ -457,6 +457,82 @@ async def reject_order(
     return {"message": "Đã từ chối đơn hàng"}
 
 
+@router.post("/orders/bulk-approve")
+async def bulk_approve_orders(
+    body: dict,
+    admin: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    """Approve multiple orders at once."""
+    order_ids = body.get("order_ids", [])
+    if not order_ids:
+        raise HTTPException(status_code=400, detail="Chưa chọn đơn hàng nào")
+
+    approved = 0
+    for oid in order_ids:
+        result = await db.execute(
+            text("SELECT id, user_id, credits_amount, status FROM purchase_orders WHERE id = :oid"),
+            {"oid": oid},
+        )
+        order = result.fetchone()
+        if not order or order[3] != "pending":
+            continue
+
+        await db.execute(
+            text("UPDATE purchase_orders SET status = 'approved', approved_by = :admin_id, approved_at = NOW() WHERE id = :oid"),
+            {"admin_id": str(admin.id), "oid": oid},
+        )
+
+        user_result = await db.execute(select(User).where(User.id == order[1]))
+        user = user_result.scalar_one()
+        user.credits_balance = user.credits_balance + order[2]
+
+        tx = CreditTransaction(
+            user_id=user.id,
+            amount=order[2],
+            balance_after=user.credits_balance,
+            type="purchase",
+            description=f"Mua credits - Đơn hàng đã duyệt (bulk)",
+            reference_id=order[0],
+        )
+        db.add(tx)
+        approved += 1
+
+    await db.commit()
+    return {"message": f"Đã duyệt {approved}/{len(order_ids)} đơn hàng"}
+
+
+@router.post("/orders/bulk-reject")
+async def bulk_reject_orders(
+    body: dict,
+    admin: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    """Reject multiple orders at once."""
+    order_ids = body.get("order_ids", [])
+    if not order_ids:
+        raise HTTPException(status_code=400, detail="Chưa chọn đơn hàng nào")
+
+    rejected = 0
+    for oid in order_ids:
+        result = await db.execute(
+            text("SELECT id, status FROM purchase_orders WHERE id = :oid"),
+            {"oid": oid},
+        )
+        order = result.fetchone()
+        if not order or order[1] != "pending":
+            continue
+
+        await db.execute(
+            text("UPDATE purchase_orders SET status = 'rejected', approved_by = :admin_id, approved_at = NOW() WHERE id = :oid"),
+            {"admin_id": str(admin.id), "oid": oid},
+        )
+        rejected += 1
+
+    await db.commit()
+    return {"message": f"Đã từ chối {rejected}/{len(order_ids)} đơn hàng"}
+
+
 # ── Activity ──
 
 @router.get("/activity")

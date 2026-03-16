@@ -38,6 +38,8 @@ export default function AdminPage() {
   const [newUser, setNewUser] = useState({ email: "", username: "", password: "", full_name: "", role: "user", credits_balance: "10" });
   const [spamAlerts, setSpamAlerts] = useState<UserItem[]>([]);
   const [orderPage, setOrderPage] = useState(1);
+  const [selectedOrders, setSelectedOrders] = useState<Set<string>>(new Set());
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
 
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
   const headers: Record<string, string> = { Authorization: `Bearer ${token}`, "Content-Type": "application/json" };
@@ -132,6 +134,52 @@ export default function AdminPage() {
     if (!confirm("Xác nhận từ chối đơn hàng này?")) return;
     const res = await fetch(`${API_URL}/admin/orders/${orderId}/reject`, { method: "POST", headers });
     showMsg(`✅ ${(await res.json()).message}`); fetchData();
+  };
+
+  const bulkApprove = async () => {
+    if (selectedOrders.size === 0) { alert("Chưa chọn đơn hàng nào"); return; }
+    if (!confirm(`Duyệt ${selectedOrders.size} đơn hàng đã chọn?`)) return;
+    const res = await fetch(`${API_URL}/admin/orders/bulk-approve`, {
+      method: "POST", headers, body: JSON.stringify({ order_ids: Array.from(selectedOrders) }),
+    });
+    const data = await res.json();
+    showMsg(`✅ ${data.message}`); setSelectedOrders(new Set()); fetchData();
+  };
+
+  const bulkReject = async () => {
+    if (selectedOrders.size === 0) { alert("Chưa chọn đơn hàng nào"); return; }
+    if (!confirm(`Từ chối ${selectedOrders.size} đơn hàng đã chọn?`)) return;
+    const res = await fetch(`${API_URL}/admin/orders/bulk-reject`, {
+      method: "POST", headers, body: JSON.stringify({ order_ids: Array.from(selectedOrders) }),
+    });
+    const data = await res.json();
+    showMsg(`✅ ${data.message}`); setSelectedOrders(new Set()); fetchData();
+  };
+
+  const toggleSelectOrder = (id: string) => {
+    const next = new Set(selectedOrders);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    setSelectedOrders(next);
+  };
+
+  const toggleSelectGroup = (groupOrders: OrderItem[]) => {
+    const pendingIds = groupOrders.filter(o => o.status === "pending").map(o => o.id);
+    const allSelected = pendingIds.every(id => selectedOrders.has(id));
+    const next = new Set(selectedOrders);
+    pendingIds.forEach(id => { if (allSelected) next.delete(id); else next.add(id); });
+    setSelectedOrders(next);
+  };
+
+  const toggleSelectAll = () => {
+    const pendingIds = orders.filter(o => o.status === "pending").map(o => o.id);
+    const allSelected = pendingIds.every(id => selectedOrders.has(id));
+    setSelectedOrders(allSelected ? new Set() : new Set(pendingIds));
+  };
+
+  const toggleGroup = (username: string) => {
+    const next = new Set(expandedGroups);
+    if (next.has(username)) next.delete(username); else next.add(username);
+    setExpandedGroups(next);
   };
 
   const saveEditUser = async () => {
@@ -286,52 +334,145 @@ export default function AdminPage() {
 
                 {/* Orders Tab */}
                 {tab === "orders" && (() => {
-                  const orderTotalPages = Math.ceil(orders.length / PER_PAGE);
-                  const orderStart = (orderPage - 1) * PER_PAGE;
-                  const pagedOrders = orders.slice(orderStart, orderStart + PER_PAGE);
+                  // Group orders by username
+                  const grouped: Record<string, OrderItem[]> = {};
+                  orders.forEach(o => {
+                    const key = o.username;
+                    if (!grouped[key]) grouped[key] = [];
+                    grouped[key].push(o);
+                  });
+                  const groupEntries = Object.entries(grouped);
+                  // Paginate groups
+                  const groupTotalPages = Math.ceil(groupEntries.length / PER_PAGE);
+                  const groupStart = (orderPage - 1) * PER_PAGE;
+                  const pagedGroups = groupEntries.slice(groupStart, groupStart + PER_PAGE);
+                  const pendingCount = orders.filter(o => o.status === "pending").length;
+                  const allPendingIds = orders.filter(o => o.status === "pending").map(o => o.id);
+                  const allSelected = allPendingIds.length > 0 && allPendingIds.every(id => selectedOrders.has(id));
+
                   return (
-                  <div className="glass-card" style={{ padding: 0, overflow: "auto" }}>
-                    {orders.length === 0 ? (
-                      <div style={{ padding: "40px", textAlign: "center", color: "var(--text-muted)" }}>Chưa có đơn hàng nào</div>
-                    ) : (
-                      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.8rem", minWidth: "800px" }}>
-                        <thead>
-                          <tr style={{ borderBottom: "1px solid var(--border-color)" }}>
-                            {["Mã đơn", "User", "Gói", "Số tiền", "Credits", "NDCK", "Trạng thái", "Thời gian", "Hành động"].map(h => (
-                              <th key={h} style={{ padding: "10px 12px", textAlign: "left", color: "var(--text-secondary)", fontWeight: 600 }}>{h}</th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {pagedOrders.map((o) => (
-                            <tr key={o.id} style={{ borderBottom: "1px solid var(--border-color)" }}>
-                              <td style={{ padding: "10px 12px", fontWeight: 600 }}>{o.order_code}</td>
-                              <td style={{ padding: "10px 12px" }}>{o.username}</td>
-                              <td style={{ padding: "10px 12px" }}>{o.plan_name}</td>
-                              <td style={{ padding: "10px 12px" }}>{formatVND(o.amount_vnd)}</td>
-                              <td style={{ padding: "10px 12px" }}>{o.credits_amount}</td>
-                              <td style={{ padding: "10px 12px", fontSize: "0.75rem", fontWeight: 600, color: "var(--text-accent)" }}>{o.transfer_content}</td>
-                              <td style={{ padding: "10px 12px" }}>
-                                <span style={{ padding: "2px 8px", borderRadius: "12px", fontSize: "0.7rem", fontWeight: 600, background: o.status === "approved" ? "rgba(16,185,129,0.15)" : o.status === "rejected" ? "rgba(239,68,68,0.15)" : "rgba(245,158,11,0.15)", color: o.status === "approved" ? "#10b981" : o.status === "rejected" ? "#ef4444" : "#f59e0b" }}>
-                                  {o.status === "approved" ? "Đã duyệt" : o.status === "rejected" ? "Từ chối" : "Chờ duyệt"}
-                                </span>
-                              </td>
-                              <td style={{ padding: "10px 12px", fontSize: "0.75rem" }}>{formatDate(o.created_at)}</td>
-                              <td style={{ padding: "10px 12px" }}>
-                                {o.status === "pending" && (
-                                  <div style={{ display: "flex", gap: "4px" }}>
-                                    <button onClick={() => approveOrder(o.id)} className="btn btn-primary btn-sm" style={{ fontSize: "0.7rem", padding: "4px 8px" }}>✅ Duyệt</button>
-                                    <button onClick={() => rejectOrder(o.id)} className="btn btn-secondary btn-sm" style={{ fontSize: "0.7rem", padding: "4px 8px" }}>❌</button>
-                                  </div>
-                                )}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                  <>
+                    {/* Bulk Actions Bar */}
+                    {pendingCount > 0 && (
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px", flexWrap: "wrap" }}>
+                        <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.8rem", cursor: "pointer" }}>
+                          <input type="checkbox" checked={allSelected} onChange={toggleSelectAll} style={{ width: "16px", height: "16px", accentColor: "var(--primary)" }} />
+                          Chọn tất cả ({pendingCount} chờ duyệt)
+                        </label>
+                        {selectedOrders.size > 0 && (
+                          <>
+                            <span style={{ fontSize: "0.8rem", color: "var(--text-accent)", fontWeight: 600 }}>Đã chọn {selectedOrders.size}</span>
+                            <button onClick={bulkApprove} className="btn btn-primary btn-sm" style={{ fontSize: "0.75rem" }}>✅ Duyệt {selectedOrders.size} đơn</button>
+                            <button onClick={bulkReject} className="btn btn-secondary btn-sm" style={{ fontSize: "0.75rem", color: "#ef4444" }}>❌ Từ chối {selectedOrders.size} đơn</button>
+                          </>
+                        )}
+                        <div style={{ flex: 1 }} />
+                        <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>{groupEntries.length} tài khoản · {orders.length} đơn hàng</span>
+                      </div>
                     )}
-                    <PaginationBar currentPage={orderPage} totalPg={orderTotalPages} count={orders.length} onPageChange={setOrderPage} />
-                  </div>
+
+                    {orders.length === 0 ? (
+                      <div className="glass-card" style={{ padding: "40px", textAlign: "center", color: "var(--text-muted)" }}>Chưa có đơn hàng nào</div>
+                    ) : (
+                      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                        {pagedGroups.map(([username, groupOrders]) => {
+                          const isExpanded = expandedGroups.has(username) || groupOrders.length === 1;
+                          const pendingInGroup = groupOrders.filter(o => o.status === "pending");
+                          const allGroupSelected = pendingInGroup.length > 0 && pendingInGroup.every(o => selectedOrders.has(o.id));
+                          const totalAmount = groupOrders.reduce((s, o) => s + o.amount_vnd, 0);
+                          const totalCredits = groupOrders.reduce((s, o) => s + o.credits_amount, 0);
+                          const userEmail = groupOrders[0]?.user_email || "";
+
+                          return (
+                            <div key={username} className="glass-card" style={{ padding: 0, overflow: "hidden" }}>
+                              {/* Group Header */}
+                              <div
+                                onClick={() => groupOrders.length > 1 && toggleGroup(username)}
+                                style={{
+                                  display: "flex", alignItems: "center", gap: "10px", padding: "12px 16px",
+                                  cursor: groupOrders.length > 1 ? "pointer" : "default",
+                                  background: pendingInGroup.length > 0 ? "rgba(245,158,11,0.06)" : "transparent",
+                                  borderBottom: isExpanded ? "1px solid var(--border-color)" : "none",
+                                }}
+                              >
+                                {pendingInGroup.length > 0 && (
+                                  <input type="checkbox" checked={allGroupSelected}
+                                    onChange={(e) => { e.stopPropagation(); toggleSelectGroup(groupOrders); }}
+                                    onClick={(e) => e.stopPropagation()}
+                                    style={{ width: "16px", height: "16px", accentColor: "var(--primary)" }} />
+                                )}
+                                {groupOrders.length > 1 && (
+                                  <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", width: "16px" }}>{isExpanded ? "▼" : "▶"}</span>
+                                )}
+                                <div style={{ flex: 1 }}>
+                                  <span style={{ fontWeight: 700, fontSize: "0.85rem" }}>{username}</span>
+                                  <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", marginLeft: "8px" }}>{userEmail}</span>
+                                </div>
+                                <span style={{ padding: "2px 10px", borderRadius: "12px", fontSize: "0.7rem", fontWeight: 600, background: "rgba(59,130,246,0.12)", color: "#3b82f6" }}>
+                                  ({groupOrders.length}) đơn hàng
+                                </span>
+                                <span style={{ fontSize: "0.8rem", fontWeight: 600, minWidth: "100px", textAlign: "right" }}>{formatVND(totalAmount)}</span>
+                                <span style={{ fontSize: "0.75rem", color: "#10b981", fontWeight: 600, minWidth: "70px", textAlign: "right" }}>{totalCredits} cr</span>
+                                {pendingInGroup.length > 0 && (
+                                  <span style={{ padding: "2px 8px", borderRadius: "12px", fontSize: "0.65rem", fontWeight: 600, background: "rgba(245,158,11,0.15)", color: "#f59e0b" }}>
+                                    {pendingInGroup.length} chờ duyệt
+                                  </span>
+                                )}
+                              </div>
+
+                              {/* Expanded Orders */}
+                              {isExpanded && (
+                                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.78rem" }}>
+                                  <thead>
+                                    <tr style={{ background: "rgba(0,0,0,0.02)" }}>
+                                      <th style={{ width: "36px", padding: "6px 12px" }}></th>
+                                      {["Mã đơn", "Gói", "Số tiền", "Credits", "NDCK", "Trạng thái", "Thời gian", "Hành động"].map(h => (
+                                        <th key={h} style={{ padding: "6px 10px", textAlign: "left", color: "var(--text-secondary)", fontWeight: 600, fontSize: "0.72rem" }}>{h}</th>
+                                      ))}
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {groupOrders.map((o) => (
+                                      <tr key={o.id} style={{ borderTop: "1px solid var(--border-color)" }}>
+                                        <td style={{ padding: "8px 12px", textAlign: "center" }}>
+                                          {o.status === "pending" && (
+                                            <input type="checkbox" checked={selectedOrders.has(o.id)} onChange={() => toggleSelectOrder(o.id)}
+                                              style={{ width: "15px", height: "15px", accentColor: "var(--primary)" }} />
+                                          )}
+                                        </td>
+                                        <td style={{ padding: "8px 10px", fontWeight: 600 }}>{o.order_code}</td>
+                                        <td style={{ padding: "8px 10px" }}>{o.plan_name}</td>
+                                        <td style={{ padding: "8px 10px" }}>{formatVND(o.amount_vnd)}</td>
+                                        <td style={{ padding: "8px 10px" }}>{o.credits_amount}</td>
+                                        <td style={{ padding: "8px 10px", fontSize: "0.72rem", fontWeight: 600, color: "var(--text-accent)" }}>{o.transfer_content}</td>
+                                        <td style={{ padding: "8px 10px" }}>
+                                          <span style={{ padding: "2px 8px", borderRadius: "12px", fontSize: "0.68rem", fontWeight: 600, background: o.status === "approved" ? "rgba(16,185,129,0.15)" : o.status === "rejected" ? "rgba(239,68,68,0.15)" : "rgba(245,158,11,0.15)", color: o.status === "approved" ? "#10b981" : o.status === "rejected" ? "#ef4444" : "#f59e0b" }}>
+                                            {o.status === "approved" ? "Đã duyệt" : o.status === "rejected" ? "Từ chối" : "Chờ duyệt"}
+                                          </span>
+                                        </td>
+                                        <td style={{ padding: "8px 10px", fontSize: "0.72rem" }}>{formatDate(o.created_at)}</td>
+                                        <td style={{ padding: "8px 10px" }}>
+                                          {o.status === "pending" && (
+                                            <div style={{ display: "flex", gap: "4px" }}>
+                                              <button onClick={() => approveOrder(o.id)} className="btn btn-primary btn-sm" style={{ fontSize: "0.68rem", padding: "3px 8px" }}>✅</button>
+                                              <button onClick={() => rejectOrder(o.id)} className="btn btn-secondary btn-sm" style={{ fontSize: "0.68rem", padding: "3px 8px" }}>❌</button>
+                                            </div>
+                                          )}
+                                        </td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                    <div style={{ marginTop: "8px" }}>
+                      <PaginationBar currentPage={orderPage} totalPg={groupTotalPages} count={groupEntries.length} onPageChange={setOrderPage} />
+                    </div>
+                  </>
                   );
                 })()}
 
