@@ -10,7 +10,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.config import settings
 from app.database import engine, Base
-from app.routers import auth, credits, ai_tasks, landing_pages
+from app.routers import auth, credits, ai_tasks, landing_pages, admin
 
 
 @asynccontextmanager
@@ -52,6 +52,7 @@ app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 app.include_router(credits.router, prefix="/credits", tags=["Credits"])
 app.include_router(ai_tasks.router, prefix="/ai", tags=["AI Tasks"])
 app.include_router(landing_pages.router, prefix="/pages", tags=["Landing Pages"])
+app.include_router(admin.router, prefix="/admin", tags=["Admin"])
 
 # ── Static Files ──
 app.mount("/uploads", StaticFiles(directory=settings.UPLOAD_DIR), name="uploads")
