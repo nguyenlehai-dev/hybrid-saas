@@ -5,6 +5,11 @@ import { TopBar, Navbar, MobileMenu, Footer, FloatingButtons } from "@/component
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://vpspanel.io.vn/api";
 
+const AI_MODELS = [
+  { id: "Realistic_Vision_V5", name: "Realistic Vision V5", icon: "🎨", tag: "HOT" },
+  { id: "v1-5-pruned-emaonly", name: "Stable Diffusion 1.5", icon: "⚡", tag: "" },
+];
+
 interface GenerationResult {
   task_id: string;
   status: string;
@@ -27,6 +32,8 @@ export default function GeneratePublicPage() {
   const [mounted, setMounted] = useState(false);
   const [viewMode, setViewMode] = useState<"list" | "grid">("grid");
   const [activeTab, setActiveTab] = useState<"create" | "history">("create");
+  const [selectedModel, setSelectedModel] = useState("Realistic_Vision_V5");
+  const [showModelPicker, setShowModelPicker] = useState(false);
 
   const loadHistory = async (token: string) => {
     try {
@@ -64,7 +71,7 @@ export default function GeneratePublicPage() {
       const res = await fetch(`${API_URL}/ai/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ task_type: "text_to_image", prompt, negative_prompt: negPrompt, width, height, steps, cfg_scale: cfgScale, seed: -1 }),
+        body: JSON.stringify({ task_type: "text_to_image", prompt, negative_prompt: negPrompt, width, height, steps, cfg_scale: cfgScale, seed: -1, model: selectedModel }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail?.error || data.detail || "Đã xảy ra lỗi");
@@ -123,6 +130,63 @@ export default function GeneratePublicPage() {
 
           {/* Scrollable Form */}
           <div style={{ flex: 1, overflowY: "auto", padding: "16px" }}>
+
+            {/* Model Selector */}
+            <div style={{ marginBottom: 16, position: "relative" }}>
+              <label style={{ fontSize: "0.78rem", fontWeight: 600, color: "rgba(255,255,255,0.6)", marginBottom: 8, display: "block" }}>Model</label>
+              <button onClick={() => setShowModelPicker(!showModelPicker)} style={{
+                width: "100%", padding: "10px 14px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.1)",
+                background: "rgba(255,255,255,0.05)", color: "#fff", fontSize: "0.85rem", cursor: "pointer",
+                display: "flex", alignItems: "center", justifyContent: "space-between", textAlign: "left",
+                transition: "border-color 0.2s",
+              }}>
+                <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#22c55e" }} />
+                  {AI_MODELS.find(m => m.id === selectedModel)?.name || selectedModel}
+                </span>
+                <span style={{ fontSize: "0.7rem", opacity: 0.5 }}>{showModelPicker ? "▲" : "▼"}</span>
+              </button>
+
+              {showModelPicker && (
+                <div style={{
+                  position: "absolute", top: "100%", left: 0, right: 0, marginTop: 4, zIndex: 50,
+                  background: "#1e293b", borderRadius: 12, border: "1px solid rgba(255,255,255,0.1)",
+                  boxShadow: "0 8px 30px rgba(0,0,0,0.4)", overflow: "hidden",
+                }}>
+                  {AI_MODELS.map(m => (
+                    <button key={m.id} onClick={() => { setSelectedModel(m.id); setShowModelPicker(false); }} style={{
+                      width: "100%", padding: "12px 14px", border: "none", cursor: "pointer",
+                      background: selectedModel === m.id ? "rgba(22,163,74,0.12)" : "transparent",
+                      color: "#fff", fontSize: "0.84rem", textAlign: "left",
+                      display: "flex", alignItems: "center", justifyContent: "space-between",
+                      borderBottom: "1px solid rgba(255,255,255,0.04)",
+                      transition: "background 0.15s",
+                    }}
+                      onMouseEnter={e => { if (selectedModel !== m.id) e.currentTarget.style.background = "rgba(255,255,255,0.05)"; }}
+                      onMouseLeave={e => { if (selectedModel !== m.id) e.currentTarget.style.background = "transparent"; }}
+                    >
+                      <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <span style={{
+                          width: 8, height: 8, borderRadius: "50%",
+                          background: selectedModel === m.id ? "#22c55e" : "rgba(255,255,255,0.15)",
+                        }} />
+                        <span>{m.icon} {m.name}</span>
+                      </span>
+                      <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        {m.tag && (
+                          <span style={{
+                            fontSize: "0.6rem", fontWeight: 700, padding: "2px 6px", borderRadius: 4,
+                            background: m.tag === "HOT" ? "rgba(239,68,68,0.2)" : "rgba(245,158,11,0.2)",
+                            color: m.tag === "HOT" ? "#f87171" : "#fbbf24",
+                          }}>{m.tag}</span>
+                        )}
+                        <span style={{ fontSize: "0.7rem", opacity: 0.3 }}>🔒</span>
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
 
             {/* Prompt */}
             <div style={{ marginBottom: 16 }}>

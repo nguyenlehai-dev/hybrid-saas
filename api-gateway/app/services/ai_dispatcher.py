@@ -113,6 +113,13 @@ class AIDispatcher:
             "seed": params.get("seed", -1),
         }
 
+        # Apply model selection
+        model = params.get("model")
+        if model:
+            base_payload["override_settings"] = {
+                "sd_model_checkpoint": model,
+            }
+
         # Task-specific configurations
         if task.task_type == "review_product":
             base_payload["override_settings"] = {
