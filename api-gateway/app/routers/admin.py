@@ -7,13 +7,13 @@ from datetime import datetime, timezone, timedelta
 from decimal import Decimal
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from pydantic import BaseModel
-from sqlalchemy import select, func, case, and_, desc, text
+from pydantic import BaseModel, EmailStr
+from sqlalchemy import select, func, case, and_, or_, desc, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.models import User, AITask, CreditTransaction, PricingPlan
-from app.routers.auth import require_admin
+from app.routers.auth import require_admin, hash_password
 
 router = APIRouter()
 
@@ -73,31 +73,123 @@ async def get_stats(
     }
 
 
+# ── Spam/Scam Detection ──
+
+async def detect_spam_flags(user: User, db: AsyncSession) -> dict:
+    """Detect suspicious behavior for a user."""
+    flags = []
+    risk_score = 0
+    now = datetime.now(timezone.utc)
+    account_age_hours = (now - user.created_at).total_seconds() / 3600 if user.created_at else 999
+
+    # Count tasks
+    tasks_count = (await db.execute(
+        select(func.count(AITask.id)).where(AITask.user_id == user.id)
+    )).scalar() or 0
+
+    # Failed tasks
+    failed_tasks = (await db.execute(
+        select(func.count(AITask.id)).where(
+            and_(AITask.user_id == user.id, AITask.status == "failed")
+        )
+    )).scalar() or 0
+
+    # Tasks in last 1 hour
+    recent_tasks = (await db.execute(
+        select(func.count(AITask.id)).where(
+            and_(AITask.user_id == user.id, AITask.created_at >= now - timedelta(hours=1))
+        )
+    )).scalar() or 0
+
+    # Tasks in last 24h
+    daily_tasks = (await db.execute(
+        select(func.count(AITask.id)).where(
+            and_(AITask.user_id == user.id, AITask.created_at >= now - timedelta(hours=24))
+        )
+    )).scalar() or 0
+
+    # 1. New account with high activity
+    if account_age_hours < 24 and tasks_count > 20:
+        flags.append("🆕 Tài khoản mới + hoạt động bất thường")
+        risk_score += 30
+
+    # 2. High failed task ratio
+    if tasks_count > 5 and failed_tasks / tasks_count > 0.6:
+        flags.append(f"❌ Tỉ lệ thất bại cao ({failed_tasks}/{tasks_count})")
+        risk_score += 25
+
+    # 3. Rapid task submission (>15 tasks/hour)
+    if recent_tasks > 15:
+        flags.append(f"⚡ Spam tasks ({recent_tasks} tasks/giờ)")
+        risk_score += 35
+
+    # 4. Excessive daily usage (>50 tasks/day)
+    if daily_tasks > 50:
+        flags.append(f"🔥 Usage quá cao ({daily_tasks} tasks/ngày)")
+        risk_score += 20
+
+    # 5. Zero balance but keeps trying
+    if float(user.credits_balance) <= 0 and recent_tasks > 5:
+        flags.append("💸 Hết credits nhưng vẫn spam")
+        risk_score += 30
+
+    # 6. Suspicious email patterns
+    email = user.email.lower()
+    disposable_domains = ["tempmail", "throwaway", "guerrillamail", "mailinator", "yopmail", "10minutemail", "trashmail"]
+    if any(d in email for d in disposable_domains):
+        flags.append("📧 Email tạm thời")
+        risk_score += 40
+
+    risk_level = "safe"
+    if risk_score >= 50:
+        risk_level = "danger"
+    elif risk_score >= 25:
+        risk_level = "warning"
+
+    return {
+        "risk_score": min(risk_score, 100),
+        "risk_level": risk_level,
+        "flags": flags,
+        "tasks_count": tasks_count,
+        "failed_tasks": failed_tasks,
+        "recent_tasks_1h": recent_tasks,
+        "daily_tasks_24h": daily_tasks,
+    }
+
+
 # ── Users ──
 
 @router.get("/users")
 async def list_users(
     search: str = "",
-    per_page: int = Query(default=20, le=100),
+    page: int = Query(default=1, ge=1),
+    per_page: int = Query(default=15, le=100),
     admin: User = Depends(require_admin),
     db: AsyncSession = Depends(get_db),
 ):
-    """List all users with stats."""
+    """List all users with stats, pagination, and spam detection."""
+    # Count total
+    count_query = select(func.count(User.id))
+    if search:
+        count_query = count_query.where(
+            User.email.ilike(f"%{search}%") | User.username.ilike(f"%{search}%")
+        )
+    total = (await db.execute(count_query)).scalar() or 0
+
+    # Fetch page
     query = select(User)
     if search:
         query = query.where(
             User.email.ilike(f"%{search}%") | User.username.ilike(f"%{search}%")
         )
-    query = query.order_by(desc(User.created_at)).limit(per_page)
+    offset = (page - 1) * per_page
+    query = query.order_by(desc(User.created_at)).offset(offset).limit(per_page)
     result = await db.execute(query)
     users = result.scalars().all()
 
     user_list = []
     for u in users:
-        # Count tasks
-        tasks_count = (await db.execute(
-            select(func.count(AITask.id)).where(AITask.user_id == u.id)
-        )).scalar() or 0
+        spam_info = await detect_spam_flags(u, db)
 
         # Total credits spent
         total_spent = (await db.execute(
@@ -115,11 +207,72 @@ async def list_users(
             "credits_balance": float(u.credits_balance),
             "last_login_at": u.last_login_at.isoformat() if u.last_login_at else None,
             "created_at": u.created_at.isoformat() if u.created_at else None,
-            "tasks_count": tasks_count,
+            "tasks_count": spam_info["tasks_count"],
             "total_spent": float(total_spent),
+            "spam": spam_info,
         })
 
-    return {"users": user_list, "total": len(user_list)}
+    total_pages = (total + per_page - 1) // per_page
+    return {"users": user_list, "total": total, "page": page, "per_page": per_page, "total_pages": total_pages}
+
+
+@router.post("/users/create")
+async def create_user(
+    body: dict,
+    admin: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    """Create a new user account (admin)."""
+    email = body.get("email", "").strip()
+    username = body.get("username", "").strip()
+    password = body.get("password", "").strip()
+    full_name = body.get("full_name", "").strip() or None
+    role = body.get("role", "user")
+    credits = float(body.get("credits_balance", 10))
+
+    if not email or not username or not password:
+        raise HTTPException(status_code=400, detail="Email, username và password là bắt buộc")
+    if len(password) < 6:
+        raise HTTPException(status_code=400, detail="Mật khẩu tối thiểu 6 ký tự")
+
+    # Check duplicates
+    existing = await db.execute(select(User).where(or_(User.email == email, User.username == username)))
+    if existing.scalar_one_or_none():
+        raise HTTPException(status_code=409, detail="Email hoặc username đã tồn tại")
+
+    user = User(
+        email=email,
+        username=username,
+        password_hash=hash_password(password),
+        full_name=full_name,
+        role=role if role in ("user", "admin") else "user",
+        is_active=True,
+        is_verified=True,
+        credits_balance=Decimal(str(credits)),
+    )
+    db.add(user)
+    await db.commit()
+    return {"message": f"Đã tạo tài khoản {username} ({email})", "user_id": str(user.id)}
+
+
+@router.delete("/users/{user_id}")
+async def delete_user(
+    user_id: str,
+    admin: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    """Delete a user account."""
+    result = await db.execute(select(User).where(User.id == uuid.UUID(user_id)))
+    user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if user.role == "admin":
+        raise HTTPException(status_code=400, detail="Không thể xóa tài khoản admin")
+
+    username = user.username
+    await db.delete(user)
+    await db.commit()
+    return {"message": f"Đã xóa tài khoản {username}"}
 
 
 @router.post("/users/{user_id}/toggle-active")

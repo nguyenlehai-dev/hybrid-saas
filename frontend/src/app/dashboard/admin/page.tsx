@@ -3,13 +3,19 @@ import { useState, useEffect } from "react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://vpspanel.io.vn/api";
 
+interface SpamInfo { risk_score: number; risk_level: string; flags: string[]; tasks_count: number; failed_tasks: number; recent_tasks_1h: number; daily_tasks_24h: number; }
 interface Stats { total_users: number; active_users_today: number; total_tasks: number; tasks_today: number; total_credits_spent: number; credits_spent_today: number; pending_orders: number; }
-interface UserItem { id: string; email: string; username: string; full_name: string | null; role: string; is_active: boolean; credits_balance: number; last_login_at: string | null; created_at: string; tasks_count: number; total_spent: number; }
+interface UserItem { id: string; email: string; username: string; full_name: string | null; role: string; is_active: boolean; credits_balance: number; last_login_at: string | null; created_at: string; tasks_count: number; total_spent: number; spam?: SpamInfo; }
 interface Activity { user_email: string; username: string; task_id: string; task_type: string; status: string; credits_cost: number; prompt: string | null; created_at: string; }
 interface OrderItem { id: string; order_code: string; user_email: string; username: string; plan_name: string; amount_vnd: number; credits_amount: number; status: string; transfer_content: string; created_at: string; }
 interface VoucherItem { id: string; code: string; credits_amount: number; description: string | null; is_used: boolean; used_by_email: string | null; used_at: string | null; created_at: string; }
 
 const STATUS_COLORS: Record<string, string> = { completed: "#10b981", failed: "#ef4444", queued: "#f59e0b", processing: "#3b82f6" };
+const RISK_COLORS: Record<string, { bg: string; color: string; label: string }> = {
+  safe: { bg: "rgba(16,185,129,0.12)", color: "#10b981", label: "An toàn" },
+  warning: { bg: "rgba(245,158,11,0.15)", color: "#f59e0b", label: "⚠️ Cảnh báo" },
+  danger: { bg: "rgba(239,68,68,0.15)", color: "#ef4444", label: "🚨 Nguy hiểm" },
+};
 
 export default function AdminPage() {
   const [stats, setStats] = useState<Stats | null>(null);
@@ -22,15 +28,21 @@ export default function AdminPage() {
   const [error, setError] = useState("");
   const [actionMsg, setActionMsg] = useState("");
   const [page, setPage] = useState(1);
-  const PER_PAGE = 10;
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const PER_PAGE = 15;
   const [vouchers, setVouchers] = useState<VoucherItem[]>([]);
   const [newVoucher, setNewVoucher] = useState({ code: "", credits_amount: "", description: "" });
   const [editUser, setEditUser] = useState<UserItem | null>(null);
+  const [showCreateUser, setShowCreateUser] = useState(false);
+  const [newUser, setNewUser] = useState({ email: "", username: "", password: "", full_name: "", role: "user", credits_balance: "10" });
+  const [spamAlerts, setSpamAlerts] = useState<UserItem[]>([]);
 
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
   const headers: Record<string, string> = { Authorization: `Bearer ${token}`, "Content-Type": "application/json" };
 
-  useEffect(() => { if (!token) { window.location.href = "/login"; return; } setPage(1); fetchData(); }, [tab]);
+  useEffect(() => { if (!token) { window.location.href = "/login"; return; } if (tab !== "users") setPage(1); fetchData(); }, [tab]);
+  useEffect(() => { if (tab === "users") fetchData(); }, [page]);
 
   const fetchData = async () => {
     setLoading(true); setError("");
@@ -39,15 +51,18 @@ export default function AdminPage() {
         const res = await fetch(`${API_URL}/admin/stats`, { headers });
         if (res.status === 403) { setError("⛔ Bạn không có quyền admin"); setLoading(false); return; }
         setStats(await res.json());
-        // Also fetch pending orders
         const ordRes = await fetch(`${API_URL}/admin/orders?status=pending`, { headers });
         setOrders(await ordRes.json());
       }
       if (tab === "users") {
-        const res = await fetch(`${API_URL}/admin/users?per_page=50${search ? `&search=${search}` : ""}`, { headers });
+        const res = await fetch(`${API_URL}/admin/users?page=${page}&per_page=${PER_PAGE}${search ? `&search=${search}` : ""}`, { headers });
         if (res.status === 403) { setError("⛔ Bạn không có quyền admin"); setLoading(false); return; }
         const ud = await res.json();
         setUsers(ud.users || []);
+        setTotalPages(ud.total_pages || 1);
+        setTotalUsers(ud.total || 0);
+        // Filter spam alerts
+        setSpamAlerts((ud.users || []).filter((u: UserItem) => u.spam && u.spam.risk_level !== "safe"));
       }
       if (tab === "orders") {
         const res = await fetch(`${API_URL}/admin/orders`, { headers });
@@ -80,6 +95,30 @@ export default function AdminPage() {
     if (!amount || isNaN(Number(amount))) return;
     const res = await fetch(`${API_URL}/admin/users/${userId}/add-credits?amount=${amount}`, { method: "POST", headers });
     showMsg(`✅ ${(await res.json()).message}`); fetchData();
+  };
+
+  const deleteUser = async (userId: string, username: string) => {
+    if (!confirm(`⚠️ Xác nhận XÓA tài khoản "${username}"?\nHành động này không thể hoàn tác!`)) return;
+    const res = await fetch(`${API_URL}/admin/users/${userId}`, { method: "DELETE", headers });
+    const data = await res.json();
+    if (res.ok) { showMsg(`✅ ${data.message}`); fetchData(); }
+    else { alert(data.detail); }
+  };
+
+  const createUser = async () => {
+    if (!newUser.email || !newUser.username || !newUser.password) { alert("Vui lòng nhập đầy đủ thông tin"); return; }
+    const res = await fetch(`${API_URL}/admin/users/create`, {
+      method: "POST", headers, body: JSON.stringify({
+        ...newUser, credits_balance: parseFloat(newUser.credits_balance) || 10,
+      }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      showMsg(`✅ ${data.message}`);
+      setShowCreateUser(false);
+      setNewUser({ email: "", username: "", password: "", full_name: "", role: "user", credits_balance: "10" });
+      fetchData();
+    } else { alert(data.detail); }
   };
 
   const approveOrder = async (orderId: string) => {
@@ -128,18 +167,32 @@ export default function AdminPage() {
   const formatDate = (s: string) => new Date(s).toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
   const formatVND = (n: number) => new Intl.NumberFormat("vi-VN").format(n) + "₫";
 
-  const paginate = <T,>(items: T[]) => {
-    const total = Math.ceil(items.length / PER_PAGE);
-    const start = (page - 1) * PER_PAGE;
-    return { data: items.slice(start, start + PER_PAGE), total, count: items.length };
+  // Client-side pagination for non-user tabs
+  const paginate = <T,>(items: T[], perPage = 10) => {
+    const total = Math.ceil(items.length / perPage);
+    const start = (page - 1) * perPage;
+    return { data: items.slice(start, start + perPage), total, count: items.length };
   };
 
-  const PaginationBar = ({ total, count }: { total: number; count: number }) => total <= 1 ? null : (
+  const PaginationBar = ({ currentPage, totalPg, count, onPageChange }: { currentPage: number; totalPg: number; count: number; onPageChange: (p: number) => void }) => totalPg <= 1 ? null : (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", borderTop: "1px solid var(--border-color)", fontSize: "0.8rem" }}>
-      <span style={{ color: "var(--text-muted)" }}>Trang {page}/{total} ({count} mục)</span>
+      <span style={{ color: "var(--text-muted)" }}>Trang {currentPage}/{totalPg} ({count} mục)</span>
       <div style={{ display: "flex", gap: "6px" }}>
-        <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="btn btn-secondary btn-sm" style={{ fontSize: "0.75rem", padding: "4px 10px", opacity: page <= 1 ? 0.4 : 1 }}>← Trước</button>
-        <button onClick={() => setPage(p => Math.min(total, p + 1))} disabled={page >= total} className="btn btn-secondary btn-sm" style={{ fontSize: "0.75rem", padding: "4px 10px", opacity: page >= total ? 0.4 : 1 }}>Sau →</button>
+        <button onClick={() => onPageChange(Math.max(1, currentPage - 1))} disabled={currentPage <= 1} className="btn btn-secondary btn-sm" style={{ fontSize: "0.75rem", padding: "4px 10px", opacity: currentPage <= 1 ? 0.4 : 1 }}>← Trước</button>
+        {/* Page numbers */}
+        {Array.from({ length: Math.min(5, totalPg) }, (_, i) => {
+          let p = i + 1;
+          if (totalPg > 5) {
+            if (currentPage <= 3) p = i + 1;
+            else if (currentPage >= totalPg - 2) p = totalPg - 4 + i;
+            else p = currentPage - 2 + i;
+          }
+          return (
+            <button key={p} onClick={() => onPageChange(p)} className={`btn ${currentPage === p ? "btn-primary" : "btn-secondary"} btn-sm`}
+              style={{ fontSize: "0.75rem", padding: "4px 10px", minWidth: "32px" }}>{p}</button>
+          );
+        })}
+        <button onClick={() => onPageChange(Math.min(totalPg, currentPage + 1))} disabled={currentPage >= totalPg} className="btn btn-secondary btn-sm" style={{ fontSize: "0.75rem", padding: "4px 10px", opacity: currentPage >= totalPg ? 0.4 : 1 }}>Sau →</button>
       </div>
     </div>
   );
@@ -160,7 +213,7 @@ export default function AdminPage() {
             {/* Tabs */}
             <div style={{ display: "flex", gap: "8px", marginBottom: "20px", flexWrap: "wrap" }}>
               {(["overview", "orders", "users", "vouchers", "activity"] as const).map((t) => (
-                <button key={t} onClick={() => setTab(t)}
+                <button key={t} onClick={() => { setTab(t); setPage(1); }}
                   className={`btn ${tab === t ? "btn-primary" : "btn-secondary"} btn-sm`}>
                   {t === "overview" ? "📊 Tổng quan" : t === "orders" ? `💳 Đơn hàng${stats?.pending_orders ? ` (${stats.pending_orders})` : ""}` : t === "users" ? "👥 Users" : t === "vouchers" ? "🎟️ Voucher" : "📋 Hoạt động"}
                 </button>
@@ -193,7 +246,6 @@ export default function AdminPage() {
                       ))}
                     </div>
 
-                    {/* Pending orders on overview */}
                     {orders.length > 0 && (
                       <>
                         <h3 style={{ fontSize: "1rem", fontWeight: 600, marginBottom: "12px", color: "#f59e0b" }}>⚠️ Đơn hàng chờ duyệt ({orders.length})</h3>
@@ -207,7 +259,7 @@ export default function AdminPage() {
                               </tr>
                             </thead>
                             <tbody>
-                              {paginate(orders).data.map((o) => (
+                              {orders.map((o) => (
                                 <tr key={o.id} style={{ borderBottom: "1px solid var(--border-color)" }}>
                                   <td style={{ padding: "10px 12px", fontWeight: 600 }}>{o.order_code}</td>
                                   <td style={{ padding: "10px 12px" }}>{o.username}<br/><span style={{fontSize:"0.7rem",color:"var(--text-muted)"}}>{o.user_email}</span></td>
@@ -225,7 +277,6 @@ export default function AdminPage() {
                               ))}
                             </tbody>
                           </table>
-                          <PaginationBar total={paginate(orders).total} count={paginate(orders).count} />
                         </div>
                       </>
                     )}
@@ -247,7 +298,7 @@ export default function AdminPage() {
                           </tr>
                         </thead>
                         <tbody>
-                          {paginate(orders).data.map((o) => (
+                          {orders.map((o) => (
                             <tr key={o.id} style={{ borderBottom: "1px solid var(--border-color)" }}>
                               <td style={{ padding: "10px 12px", fontWeight: 600 }}>{o.order_code}</td>
                               <td style={{ padding: "10px 12px" }}>{o.username}</td>
@@ -274,45 +325,109 @@ export default function AdminPage() {
                         </tbody>
                       </table>
                     )}
-                    <PaginationBar total={paginate(orders).total} count={paginate(orders).count} />
                   </div>
                 )}
 
                 {/* Users Tab */}
                 {tab === "users" && (
                   <>
-                    <div style={{ marginBottom: "16px" }}>
-                      <input value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => e.key === "Enter" && fetchData()} placeholder="🔍 Tìm theo email hoặc username..." className="form-input" style={{ maxWidth: "400px" }} />
+                    {/* Spam Alerts Banner */}
+                    {spamAlerts.length > 0 && (
+                      <div style={{ padding: "16px", marginBottom: "16px", borderRadius: "12px", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)" }}>
+                        <h3 style={{ fontSize: "0.95rem", fontWeight: 700, color: "#ef4444", marginBottom: "10px" }}>
+                          🚨 Phát hiện {spamAlerts.length} tài khoản đáng ngờ
+                        </h3>
+                        {spamAlerts.map((u) => (
+                          <div key={u.id} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "8px 12px", marginBottom: "6px", borderRadius: "8px", background: "rgba(239,68,68,0.06)", fontSize: "0.8rem" }}>
+                            <span style={{ fontWeight: 700, minWidth: "120px" }}>{u.username}</span>
+                            <span style={{ color: "var(--text-muted)", minWidth: "180px" }}>{u.email}</span>
+                            <span style={{ padding: "2px 8px", borderRadius: "8px", fontSize: "0.7rem", fontWeight: 600, background: RISK_COLORS[u.spam?.risk_level || "safe"].bg, color: RISK_COLORS[u.spam?.risk_level || "safe"].color }}>
+                              Risk: {u.spam?.risk_score || 0}%
+                            </span>
+                            <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", flex: 1 }}>
+                              {u.spam?.flags.map((f, i) => (
+                                <span key={i} style={{ fontSize: "0.7rem", color: "#ef4444" }}>{f}</span>
+                              ))}
+                            </div>
+                            <button onClick={() => toggleUser(u.id)} className="btn btn-secondary btn-sm" style={{ fontSize: "0.7rem", padding: "4px 8px" }}>
+                              {u.is_active ? "🚫 Khóa" : "✅ Mở"}
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Search + Create */}
+                    <div style={{ display: "flex", gap: "10px", marginBottom: "16px", flexWrap: "wrap", alignItems: "center" }}>
+                      <input value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { setPage(1); fetchData(); } }} placeholder="🔍 Tìm email hoặc username..." className="form-input" style={{ maxWidth: "300px", flex: 1 }} />
+                      <button onClick={() => { setPage(1); fetchData(); }} className="btn btn-secondary btn-sm">Tìm</button>
+                      <div style={{ flex: 1 }} />
+                      <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>Tổng: {totalUsers} users</span>
+                      <button onClick={() => setShowCreateUser(true)} className="btn btn-primary btn-sm">➕ Tạo tài khoản</button>
                     </div>
+
+                    {/* Users Table */}
                     <div className="glass-card" style={{ padding: 0, overflow: "auto" }}>
-                      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.8rem", minWidth: "700px" }}>
+                      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.8rem", minWidth: "900px" }}>
                         <thead>
                           <tr style={{ borderBottom: "1px solid var(--border-color)" }}>
-                            {["User", "Role", "Status", "Credits", "Tasks", "Hành động"].map(h => (
+                            {["User", "Role", "Status", "Risk", "Credits", "Tasks", "Ngày tạo", "Hành động"].map(h => (
                               <th key={h} style={{ padding: "10px 12px", textAlign: "left", color: "var(--text-secondary)", fontWeight: 600 }}>{h}</th>
                             ))}
                           </tr>
                         </thead>
                         <tbody>
-                          {paginate(users).data.map((u) => (
-                            <tr key={u.id} style={{ borderBottom: "1px solid var(--border-color)" }}>
-                              <td style={{ padding: "10px 12px" }}><div style={{ fontWeight: 600 }}>{u.username}</div><div style={{ fontSize: "0.7rem", color: "var(--text-muted)" }}>{u.email}</div></td>
-                              <td style={{ padding: "10px 12px" }}><span style={{ padding: "2px 8px", borderRadius: "12px", fontSize: "0.7rem", fontWeight: 600, background: u.role === "admin" ? "rgba(245,158,11,0.15)" : "rgba(59,130,246,0.15)", color: u.role === "admin" ? "#f59e0b" : "#3b82f6" }}>{u.role}</span></td>
-                              <td style={{ padding: "10px 12px" }}><span style={{ padding: "2px 8px", borderRadius: "12px", fontSize: "0.7rem", fontWeight: 600, background: u.is_active ? "rgba(16,185,129,0.15)" : "rgba(239,68,68,0.15)", color: u.is_active ? "#10b981" : "#ef4444" }}>{u.is_active ? "Active" : "Banned"}</span></td>
-                              <td style={{ padding: "10px 12px", fontWeight: 600 }}>{u.credits_balance.toFixed(1)}</td>
-                              <td style={{ padding: "10px 12px" }}>{u.tasks_count}</td>
-                              <td style={{ padding: "10px 12px" }}>
-                                <div style={{ display: "flex", gap: "4px" }}>
-                                  <button onClick={() => setEditUser({...u})} className="btn btn-secondary btn-sm" style={{ fontSize: "0.7rem", padding: "4px 8px" }}>✏️ Sửa</button>
-                                  <button onClick={() => toggleUser(u.id)} className="btn btn-secondary btn-sm" style={{ fontSize: "0.7rem", padding: "4px 8px" }}>{u.is_active ? "🚫" : "✅"}</button>
-                                  <button onClick={() => addCredits(u.id)} className="btn btn-secondary btn-sm" style={{ fontSize: "0.7rem", padding: "4px 8px" }}>💰+</button>
-                                </div>
-                              </td>
-                            </tr>
-                          ))}
+                          {users.map((u) => {
+                            const risk = RISK_COLORS[u.spam?.risk_level || "safe"];
+                            return (
+                              <tr key={u.id} style={{ borderBottom: "1px solid var(--border-color)", background: u.spam?.risk_level === "danger" ? "rgba(239,68,68,0.04)" : u.spam?.risk_level === "warning" ? "rgba(245,158,11,0.04)" : undefined }}>
+                                <td style={{ padding: "10px 12px" }}>
+                                  <div style={{ fontWeight: 600 }}>{u.username}</div>
+                                  <div style={{ fontSize: "0.7rem", color: "var(--text-muted)" }}>{u.email}</div>
+                                  {u.full_name && <div style={{ fontSize: "0.65rem", color: "var(--text-muted)" }}>{u.full_name}</div>}
+                                </td>
+                                <td style={{ padding: "10px 12px" }}>
+                                  <span style={{ padding: "2px 8px", borderRadius: "12px", fontSize: "0.7rem", fontWeight: 600, background: u.role === "admin" ? "rgba(245,158,11,0.15)" : "rgba(59,130,246,0.15)", color: u.role === "admin" ? "#f59e0b" : "#3b82f6" }}>{u.role}</span>
+                                </td>
+                                <td style={{ padding: "10px 12px" }}>
+                                  <span style={{ padding: "2px 8px", borderRadius: "12px", fontSize: "0.7rem", fontWeight: 600, background: u.is_active ? "rgba(16,185,129,0.15)" : "rgba(239,68,68,0.15)", color: u.is_active ? "#10b981" : "#ef4444" }}>{u.is_active ? "Active" : "Banned"}</span>
+                                </td>
+                                <td style={{ padding: "10px 12px" }}>
+                                  <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                                    <span style={{ padding: "2px 8px", borderRadius: "8px", fontSize: "0.7rem", fontWeight: 600, background: risk.bg, color: risk.color, display: "inline-block", width: "fit-content" }}>
+                                      {risk.label} {(u.spam?.risk_score || 0) > 0 ? `(${u.spam?.risk_score}%)` : ""}
+                                    </span>
+                                    {u.spam?.flags && u.spam.flags.length > 0 && (
+                                      <div style={{ fontSize: "0.65rem", color: "#ef4444", maxWidth: "180px" }}>
+                                        {u.spam.flags.slice(0, 2).join(" · ")}
+                                      </div>
+                                    )}
+                                  </div>
+                                </td>
+                                <td style={{ padding: "10px 12px", fontWeight: 600 }}>{u.credits_balance.toFixed(1)}</td>
+                                <td style={{ padding: "10px 12px" }}>
+                                  <span>{u.tasks_count}</span>
+                                  {u.spam && u.spam.failed_tasks > 0 && (
+                                    <span style={{ fontSize: "0.65rem", color: "#ef4444", marginLeft: "4px" }}>({u.spam.failed_tasks} fail)</span>
+                                  )}
+                                </td>
+                                <td style={{ padding: "10px 12px", fontSize: "0.75rem" }}>{u.created_at ? formatDate(u.created_at) : "—"}</td>
+                                <td style={{ padding: "10px 12px" }}>
+                                  <div style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
+                                    <button onClick={() => setEditUser({...u})} className="btn btn-secondary btn-sm" style={{ fontSize: "0.7rem", padding: "4px 8px" }}>✏️</button>
+                                    <button onClick={() => toggleUser(u.id)} className="btn btn-secondary btn-sm" style={{ fontSize: "0.7rem", padding: "4px 8px" }}>{u.is_active ? "🚫" : "✅"}</button>
+                                    <button onClick={() => addCredits(u.id)} className="btn btn-secondary btn-sm" style={{ fontSize: "0.7rem", padding: "4px 8px" }}>💰+</button>
+                                    {u.role !== "admin" && (
+                                      <button onClick={() => deleteUser(u.id, u.username)} className="btn btn-secondary btn-sm" style={{ fontSize: "0.7rem", padding: "4px 8px", color: "#ef4444" }}>🗑️</button>
+                                    )}
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
                         </tbody>
                       </table>
-                      <PaginationBar total={paginate(users).total} count={paginate(users).count} />
+                      <PaginationBar currentPage={page} totalPg={totalPages} count={totalUsers} onPageChange={setPage} />
                     </div>
                   </>
                 )}
@@ -329,7 +444,7 @@ export default function AdminPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {paginate(activity).data.map((a, i) => (
+                        {activity.map((a, i) => (
                           <tr key={i} style={{ borderBottom: "1px solid var(--border-color)" }}>
                             <td style={{ padding: "10px 12px", fontSize: "0.75rem" }}>{formatDate(a.created_at)}</td>
                             <td style={{ padding: "10px 12px", fontWeight: 600 }}>{a.username}</td>
@@ -341,7 +456,6 @@ export default function AdminPage() {
                         ))}
                       </tbody>
                     </table>
-                    <PaginationBar total={paginate(activity).total} count={paginate(activity).count} />
                   </div>
                 )}
 
@@ -379,7 +493,7 @@ export default function AdminPage() {
                             </tr>
                           </thead>
                           <tbody>
-                            {paginate(vouchers).data.map((v) => (
+                            {vouchers.map((v) => (
                               <tr key={v.id} style={{ borderBottom: "1px solid var(--border-color)" }}>
                                 <td style={{ padding: "10px 12px", fontWeight: 700, fontFamily: "monospace", color: "var(--text-accent)" }}>{v.code}</td>
                                 <td style={{ padding: "10px 12px", fontWeight: 600, color: "#10b981" }}>+{v.credits_amount}</td>
@@ -399,7 +513,6 @@ export default function AdminPage() {
                           </tbody>
                         </table>
                       )}
-                      <PaginationBar total={paginate(vouchers).total} count={paginate(vouchers).count} />
                     </div>
                   </>
                 )}
@@ -443,7 +556,43 @@ export default function AdminPage() {
             </div>
           </div>
         )}
-      </>
 
+        {/* Create User Modal */}
+        {showCreateUser && (
+          <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.85)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999 }} onClick={() => setShowCreateUser(false)}>
+            <div style={{ maxWidth: "420px", width: "100%", background: "var(--bg-card)", borderRadius: "var(--radius-lg)", padding: "28px" }} onClick={(e) => e.stopPropagation()}>
+              <h3 style={{ fontSize: "1.1rem", fontWeight: 700, marginBottom: "20px" }}>➕ Tạo tài khoản mới</h3>
+              {[
+                { label: "Email *", key: "email", type: "email", placeholder: "user@example.com" },
+                { label: "Username *", key: "username", type: "text", placeholder: "username" },
+                { label: "Mật khẩu *", key: "password", type: "password", placeholder: "Tối thiểu 6 ký tự" },
+                { label: "Họ tên", key: "full_name", type: "text", placeholder: "Nguyễn Văn A" },
+                { label: "Credits ban đầu", key: "credits_balance", type: "number", placeholder: "10" },
+              ].map((f) => (
+                <div key={f.key} style={{ marginBottom: "12px" }}>
+                  <label style={{ fontSize: "0.8rem", color: "var(--text-secondary)", marginBottom: "4px", display: "block" }}>{f.label}</label>
+                  <input
+                    value={(newUser as unknown as Record<string, string>)[f.key] || ""}
+                    onChange={(e) => setNewUser({ ...newUser, [f.key]: e.target.value })}
+                    className="form-input" style={{ width: "100%" }}
+                    type={f.type} placeholder={f.placeholder}
+                  />
+                </div>
+              ))}
+              <div style={{ marginBottom: "16px" }}>
+                <label style={{ fontSize: "0.8rem", color: "var(--text-secondary)", marginBottom: "4px", display: "block" }}>Role</label>
+                <select value={newUser.role} onChange={(e) => setNewUser({ ...newUser, role: e.target.value })} className="form-input" style={{ width: "100%" }}>
+                  <option value="user">User</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+              <div style={{ display: "flex", gap: "8px" }}>
+                <button onClick={createUser} className="btn btn-primary" style={{ flex: 1 }}>✅ Tạo tài khoản</button>
+                <button onClick={() => setShowCreateUser(false)} className="btn btn-secondary" style={{ flex: 1 }}>Hủy</button>
+              </div>
+            </div>
+          </div>
+        )}
+      </>
   );
 }
