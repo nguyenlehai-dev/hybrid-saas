@@ -1,6 +1,6 @@
 "use client";
-import { useState, useRef } from "react";
-import { PiList, PiMagnifyingGlass, PiPhone, PiCaretDown, PiGlobe, PiPalette, PiRocketLaunch, PiSparkle, PiPencilLine, PiChartLineUp } from "react-icons/pi";
+import { useState, useRef, useEffect } from "react";
+import { PiList, PiMagnifyingGlass, PiPhone, PiCaretDown, PiGlobe, PiPalette, PiRocketLaunch, PiSparkle, PiPencilLine, PiChartLineUp, PiUser, PiSignOut, PiGear, PiUserCircle } from "react-icons/pi";
 import { useLang } from "@/lib/i18n";
 
 interface NavbarProps {
@@ -9,17 +9,39 @@ interface NavbarProps {
 
 export default function Navbar({ onOpenMobileMenu }: NavbarProps) {
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState("");
   const dropdownTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const userMenuTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { lang, t } = useLang();
+
+  useEffect(() => {
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    const user = typeof window !== "undefined" ? localStorage.getItem("username") : null;
+    if (token) {
+      setIsLoggedIn(true);
+      setUsername(user || "User");
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    localStorage.removeItem("role");
+    setIsLoggedIn(false);
+    setUsername("");
+    window.location.href = "/";
+  };
 
   const supportHref = "/support";
 
   const serviceItems = [
     { icon: <PiRocketLaunch />, title: t("svc.landing.title"), desc: t("svc.landing.desc"), href: "/#services", color: "#f97316", bg: "#fff7ed" },
-    { icon: <PiSparkle />, title: t("svc.prompt.title"), desc: t("svc.prompt.desc"), href: "/#services", color: "#a855f7", bg: "#faf5ff" },
+    { icon: <PiSparkle />, title: t("svc.prompt.title"), desc: t("svc.prompt.desc"), href: "/dashboard/generate", color: "#a855f7", bg: "#faf5ff" },
     { icon: <PiPencilLine />, title: t("svc.content.title"), desc: t("svc.content.desc"), href: "/#services", color: "#06b6d4", bg: "#ecfeff" },
     { icon: <PiGlobe />, title: t("svc.website.title"), desc: t("svc.website.desc"), href: "/#services", color: "#16a34a", bg: "#f0fdf4" },
-    { icon: <PiPalette />, title: t("svc.ai.title"), desc: t("svc.ai.desc"), href: "/#services", color: "#ec4899", bg: "#fdf2f8" },
+    { icon: <PiPalette />, title: t("svc.ai.title"), desc: t("svc.ai.desc"), href: "/dashboard/generate", color: "#ec4899", bg: "#fdf2f8" },
     { icon: <PiChartLineUp />, title: t("svc.seo.title"), desc: t("svc.seo.desc"), href: "/#services", color: "#16a34a", bg: "#f0fdf4" },
   ];
 
@@ -38,6 +60,15 @@ export default function Navbar({ onOpenMobileMenu }: NavbarProps) {
 
   const handleMouseLeave = () => {
     dropdownTimeout.current = setTimeout(() => setShowDropdown(false), 200);
+  };
+
+  const handleUserMenuEnter = () => {
+    if (userMenuTimeout.current) clearTimeout(userMenuTimeout.current);
+    setShowUserMenu(true);
+  };
+
+  const handleUserMenuLeave = () => {
+    userMenuTimeout.current = setTimeout(() => setShowUserMenu(false), 200);
   };
 
   return (
@@ -172,18 +203,111 @@ export default function Navbar({ onOpenMobileMenu }: NavbarProps) {
             ))}
           </div>
 
-          {/* CTA Button */}
-          <div className="nav-actions-desktop" style={{ alignItems: "center", gap: 16 }}>
-            <a href="/login" style={{
-              padding: "10px 24px", borderRadius: 24,
-              background: "linear-gradient(135deg, #16a34a, #15803d)",
-              color: "#fff", fontSize: "0.85rem", fontWeight: 600,
-              boxShadow: "0 4px 12px rgba(22,163,74,0.3)", transition: "all 0.2s",
-              display: "flex", alignItems: "center", gap: 6,
-            }}
-              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 6px 20px rgba(22,163,74,0.4)"; }}
-              onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 12px rgba(22,163,74,0.3)"; }}
-            ><PiPhone style={{ fontSize: "1rem" }} /> {t("nav.cta")}</a>
+          {/* Right Side: Auth Buttons */}
+          <div className="nav-actions-desktop" style={{ alignItems: "center", gap: 12 }}>
+            {isLoggedIn ? (
+              /* Logged In: User Menu */
+              <div
+                style={{ position: "relative" }}
+                onMouseEnter={handleUserMenuEnter}
+                onMouseLeave={handleUserMenuLeave}
+              >
+                <button style={{
+                  display: "flex", alignItems: "center", gap: 8,
+                  padding: "8px 16px", borderRadius: 24,
+                  background: "linear-gradient(135deg, #16a34a, #15803d)",
+                  color: "#fff", fontSize: "0.82rem", fontWeight: 600,
+                  border: "none", cursor: "pointer",
+                  boxShadow: "0 4px 12px rgba(22,163,74,0.3)",
+                  transition: "all 0.2s",
+                }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 6px 20px rgba(22,163,74,0.4)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 12px rgba(22,163,74,0.3)"; }}
+                >
+                  <PiUserCircle style={{ fontSize: "1.2rem" }} />
+                  {username}
+                  <PiCaretDown style={{ fontSize: "0.65rem", transition: "transform 0.2s", transform: showUserMenu ? "rotate(180deg)" : "rotate(0)" }} />
+                </button>
+
+                {/* User Dropdown */}
+                <div style={{
+                  position: "absolute", top: "100%", right: 0,
+                  paddingTop: 10,
+                  opacity: showUserMenu ? 1 : 0,
+                  visibility: showUserMenu ? "visible" : "hidden",
+                  transition: "opacity 0.2s, visibility 0.2s",
+                  pointerEvents: showUserMenu ? "auto" : "none",
+                }}>
+                  <div style={{
+                    background: "#fff", borderRadius: 12, width: 220,
+                    boxShadow: "0 10px 40px rgba(0,0,0,0.12), 0 2px 10px rgba(0,0,0,0.06)",
+                    padding: "8px 0", overflow: "hidden",
+                  }}>
+                    {/* User Info */}
+                    <div style={{ padding: "12px 16px", borderBottom: "1px solid #f1f5f9" }}>
+                      <div style={{ fontSize: "0.85rem", fontWeight: 700, color: "#111827" }}>{username}</div>
+                      <div style={{ fontSize: "0.72rem", color: "#9ca3af", marginTop: 2 }}>Thành viên</div>
+                    </div>
+                    {[
+                      { icon: <PiUser />, label: "Dashboard", href: "/dashboard" },
+                      { icon: <PiSparkle />, label: "Tạo ảnh AI", href: "/dashboard/generate" },
+                      { icon: <PiGear />, label: "Quản lý tài khoản", href: "/dashboard" },
+                    ].map((menuItem, mi) => (
+                      <a key={mi} href={menuItem.href} style={{
+                        display: "flex", alignItems: "center", gap: 10,
+                        padding: "10px 16px", fontSize: "0.82rem", fontWeight: 500,
+                        color: "#374151", textDecoration: "none", transition: "background 0.15s",
+                      }}
+                        onMouseEnter={e => e.currentTarget.style.background = "#f9fafb"}
+                        onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                      >
+                        <span style={{ fontSize: "1rem", color: "#16a34a" }}>{menuItem.icon}</span>
+                        {menuItem.label}
+                      </a>
+                    ))}
+                    <div style={{ borderTop: "1px solid #f1f5f9", margin: "4px 0" }} />
+                    <button onClick={handleLogout} style={{
+                      display: "flex", alignItems: "center", gap: 10, width: "100%",
+                      padding: "10px 16px", fontSize: "0.82rem", fontWeight: 500,
+                      color: "#ef4444", border: "none", background: "transparent",
+                      cursor: "pointer", textAlign: "left", transition: "background 0.15s",
+                    }}
+                      onMouseEnter={e => e.currentTarget.style.background = "#fef2f2"}
+                      onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                    >
+                      <PiSignOut style={{ fontSize: "1rem" }} />
+                      Đăng xuất
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* Not Logged In: Login + Register */
+              <>
+                <a href="/login" style={{
+                  padding: "8px 20px", borderRadius: 24,
+                  fontSize: "0.82rem", fontWeight: 600,
+                  color: "#374151", transition: "color 0.2s",
+                  display: "flex", alignItems: "center", gap: 6,
+                }}
+                  onMouseEnter={e => e.currentTarget.style.color = "#16a34a"}
+                  onMouseLeave={e => e.currentTarget.style.color = "#374151"}
+                >
+                  <PiUser style={{ fontSize: "1rem" }} />
+                  Đăng nhập
+                </a>
+                <a href="/register" style={{
+                  padding: "10px 24px", borderRadius: 24,
+                  background: "linear-gradient(135deg, #16a34a, #15803d)",
+                  color: "#fff", fontSize: "0.82rem", fontWeight: 600,
+                  boxShadow: "0 4px 12px rgba(22,163,74,0.3)", transition: "all 0.2s",
+                  display: "flex", alignItems: "center", gap: 6,
+                }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 6px 20px rgba(22,163,74,0.4)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 12px rgba(22,163,74,0.3)"; }}
+                ><PiRocketLaunch style={{ fontSize: "1rem" }} /> Đăng ký</a>
+              </>
+            )}
           </div>
 
           {/* Search icon (mobile only) */}

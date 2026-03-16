@@ -67,6 +67,8 @@ export default function LoginPage() {
       // Save token
       localStorage.setItem("token", data.access_token);
       localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("username", data.user?.username || data.user?.email || "User");
+      localStorage.setItem("role", data.user?.role || "user");
 
       // Redirect to dashboard
       window.location.href = "/dashboard";
