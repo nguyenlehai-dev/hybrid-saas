@@ -28,6 +28,17 @@ export default function GeneratePublicPage() {
   const [viewMode, setViewMode] = useState<"list" | "grid">("grid");
   const [activeTab, setActiveTab] = useState<"create" | "history">("create");
 
+  const loadHistory = async (token: string) => {
+    try {
+      const res = await fetch(`${API_URL}/ai/history?per_page=50`, { headers: { Authorization: `Bearer ${token}` } });
+      if (res.ok) {
+        const data = await res.json();
+        setResults(data.tasks.map((t: any) => ({ task_id: t.id, status: t.status, output_image_url: t.output_image_url, prompt: t.input_params?.prompt })));
+        if (data.tasks.length > 0) setActiveTab("history");
+      }
+    } catch {}
+  };
+
   useEffect(() => {
     setMounted(true);
     const token = localStorage.getItem("token");
@@ -38,6 +49,8 @@ export default function GeneratePublicPage() {
       .then(r => r.json())
       .then(data => { if (data.credits_balance !== undefined) setCredits(data.credits_balance); })
       .catch(() => {});
+    // Load history
+    loadHistory(token);
   }, []);
 
   if (!mounted) return null;
@@ -55,7 +68,8 @@ export default function GeneratePublicPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail?.error || data.detail || "Đã xảy ra lỗi");
-      setResults(prev => [{ task_id: data.task_id, status: data.status, output_image_url: data.output_image_url }, ...prev]);
+      // Reload full history from API
+      await loadHistory(token);
       setActiveTab("history");
       const meRes = await fetch(`${API_URL}/auth/me`, { headers: { Authorization: `Bearer ${token}` } });
       const meData = await meRes.json();
@@ -347,12 +361,19 @@ export default function GeneratePublicPage() {
                       </div>
                     )}
                     <div style={{ padding: "10px 14px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-                      <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.3)" }}>ID: {r.task_id.slice(0, 12)}...</div>
-                      <div style={{
-                        fontSize: "0.72rem", fontWeight: 600, marginTop: 2,
-                        color: r.status === "completed" ? "#16a34a" : "#f59e0b",
-                      }}>
-                        {r.status === "completed" ? "✅ Hoàn thành" : "⏳ " + r.status}
+                      {(r as any).prompt && (
+                        <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.5)", marginBottom: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const }}>
+                          {(r as any).prompt}
+                        </div>
+                      )}
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <div style={{ fontSize: "0.68rem", color: "rgba(255,255,255,0.25)" }}>ID: {r.task_id.slice(0, 8)}</div>
+                        <div style={{
+                          fontSize: "0.68rem", fontWeight: 600,
+                          color: r.status === "completed" ? "#16a34a" : r.status === "failed" ? "#ef4444" : "#f59e0b",
+                        }}>
+                          {r.status === "completed" ? "✅" : r.status === "failed" ? "❌" : "⏳"} {r.status}
+                        </div>
                       </div>
                     </div>
                   </div>
