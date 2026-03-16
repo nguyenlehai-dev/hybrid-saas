@@ -73,8 +73,12 @@ export default function GeneratePublicPage() {
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ task_type: "text_to_image", prompt, negative_prompt: negPrompt, width, height, steps, cfg_scale: cfgScale, seed: -1, model: selectedModel }),
       });
+      const contentType = res.headers.get("content-type") || "";
+      if (!contentType.includes("application/json")) {
+        throw new Error(res.status === 504 || res.status === 502 ? "AI Engine đang xử lý quá lâu. Thử giảm kích thước hoặc steps." : `Server trả về lỗi (${res.status})`);
+      }
       const data = await res.json();
-      if (!res.ok) throw new Error(data.detail?.error || data.detail || "Đã xảy ra lỗi");
+      if (!res.ok) throw new Error(data.detail?.error || (typeof data.detail === "string" ? data.detail : JSON.stringify(data.detail)) || "Đã xảy ra lỗi");
       // Reload full history from API
       await loadHistory(token);
       setActiveTab("history");
