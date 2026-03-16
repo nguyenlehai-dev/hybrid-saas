@@ -1,21 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
-import { PiCaretRight, PiSparkle } from "react-icons/pi";
+import { PiCaretRight, PiSparkle, PiClockCounterClockwise, PiQuestion, PiListBullets, PiSquaresFour, PiImage, PiDownloadSimple, PiArrowsOut } from "react-icons/pi";
 import { TopBar, Navbar, MobileMenu, Footer, FloatingButtons } from "@/components/landing";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://vpspanel.io.vn/api";
-
-const TASK_TYPES = [
-  { value: "text_to_image", label: "✨ Text to Image", cost: 1.0, desc: "Tạo ảnh từ mô tả văn bản" },
-  { value: "image_to_image", label: "🔄 Image to Image", cost: 1.5, desc: "Chuyển đổi phong cách ảnh" },
-  { value: "review_product", label: "📸 Review Product", cost: 2.0, desc: "Ảnh review sản phẩm chuyên nghiệp" },
-  { value: "multishots", label: "🎭 Multishots", cost: 3.0, desc: "Tạo nhiều góc chụp sản phẩm" },
-  { value: "inpaint", label: "🖌️ Inpaint", cost: 1.5, desc: "Chỉnh sửa vùng chọn trên ảnh" },
-  { value: "skin_enhancer", label: "💄 Skin Enhancer", cost: 2.0, desc: "Làm đẹp da và retouching" },
-  { value: "upscale", label: "🔍 Upscale", cost: 0.5, desc: "Nâng cấp độ phân giải" },
-  { value: "crop", label: "✂️ Smart Crop", cost: 0.25, desc: "Cắt ảnh thông minh" },
-  { value: "video_generate", label: "🎬 Video Generate", cost: 5.0, desc: "Tạo video từ ảnh" },
-];
 
 interface GenerationResult {
   task_id: string;
@@ -25,10 +13,8 @@ interface GenerationResult {
 
 export default function GeneratePublicPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
   const [credits, setCredits] = useState(0);
-  const [selectedType, setSelectedType] = useState("text_to_image");
   const [prompt, setPrompt] = useState("");
   const [negPrompt, setNegPrompt] = useState("");
   const [width, setWidth] = useState(512);
@@ -36,21 +22,18 @@ export default function GeneratePublicPage() {
   const [steps, setSteps] = useState(30);
   const [cfgScale, setCfgScale] = useState(7.0);
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<GenerationResult | null>(null);
+  const [results, setResults] = useState<GenerationResult[]>([]);
   const [error, setError] = useState("");
   const [mounted, setMounted] = useState(false);
+  const [viewMode, setViewMode] = useState<"list" | "grid">("grid");
+  const [activeTab, setActiveTab] = useState<"create" | "history">("create");
 
   useEffect(() => {
     setMounted(true);
     const token = localStorage.getItem("token");
     const user = localStorage.getItem("username");
-    if (!token) {
-      window.location.href = "/login";
-      return;
-    }
-    setIsLoggedIn(true);
+    if (!token) { window.location.href = "/login"; return; }
     setUsername(user || "User");
-
     fetch(`${API_URL}/auth/me`, { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.json())
       .then(data => { if (data.credits_balance !== undefined) setCredits(data.credits_balance); })
@@ -59,28 +42,21 @@ export default function GeneratePublicPage() {
 
   if (!mounted) return null;
 
-  const currentTool = TASK_TYPES.find(t => t.value === selectedType)!;
-
   const handleGenerate = async () => {
     if (!prompt.trim()) { setError("Vui lòng nhập prompt mô tả ảnh"); return; }
-    setLoading(true); setError(""); setResult(null);
+    setLoading(true); setError("");
     try {
       const token = localStorage.getItem("token");
       if (!token) { window.location.href = "/login"; return; }
-
       const res = await fetch(`${API_URL}/ai/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({
-          task_type: selectedType, prompt, negative_prompt: negPrompt,
-          width, height, steps, cfg_scale: cfgScale, seed: -1,
-        }),
+        body: JSON.stringify({ task_type: "text_to_image", prompt, negative_prompt: negPrompt, width, height, steps, cfg_scale: cfgScale, seed: -1 }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail?.error || data.detail || "Đã xảy ra lỗi");
-      setResult({ task_id: data.task_id, status: data.status, output_image_url: data.output_image_url });
-
-      // Refresh credits
+      setResults(prev => [{ task_id: data.task_id, status: data.status, output_image_url: data.output_image_url }, ...prev]);
+      setActiveTab("history");
       const meRes = await fetch(`${API_URL}/auth/me`, { headers: { Authorization: `Bearer ${token}` } });
       const meData = await meRes.json();
       if (meData.credits_balance !== undefined) setCredits(meData.credits_balance);
@@ -88,8 +64,17 @@ export default function GeneratePublicPage() {
     finally { setLoading(false); }
   };
 
+  const SIZES = [
+    { label: "1:1", w: 512, h: 512 },
+    { label: "4:3", w: 768, h: 576 },
+    { label: "16:9", w: 1024, h: 576 },
+    { label: "9:16", w: 576, h: 1024 },
+    { label: "3:4", w: 576, h: 768 },
+  ];
+  const currentSize = SIZES.find(s => s.w === width && s.h === height) || SIZES[0];
+
   return (
-    <div style={{ overflow: "hidden" }}>
+    <div style={{ overflow: "hidden", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       {/* Header */}
       <div style={{ background: "#fafbfc", position: "relative", display: "flex", flexDirection: "column" as const }}>
         <TopBar />
@@ -97,230 +82,295 @@ export default function GeneratePublicPage() {
       </div>
       <MobileMenu isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
 
-      {/* ══════ HERO BREADCRUMB ══════ */}
-      <section style={{
-        background: "linear-gradient(135deg, #064e3b 0%, #15803d 50%, #16a34a 100%)",
-        padding: "60px 0 70px", position: "relative", overflow: "hidden",
-      }}>
-        <div style={{ position: "absolute", width: 300, height: 300, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.08)", top: -100, right: -50 }} />
-        <div style={{ position: "absolute", width: 200, height: 200, borderRadius: "50%", border: "1px solid rgba(255,255,255,0.06)", bottom: -80, left: "20%" }} />
+      {/* ══════ MAIN WORKSPACE ══════ */}
+      <div className="gen-workspace" style={{ flex: 1, display: "flex", background: "#0f1117" }}>
 
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px", position: "relative", zIndex: 2 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, fontSize: "0.85rem" }}>
-            <a href="/" style={{ color: "rgba(255,255,255,0.6)", transition: "color 0.2s" }}
-              onMouseEnter={e => e.currentTarget.style.color = "#fff"}
-              onMouseLeave={e => e.currentTarget.style.color = "rgba(255,255,255,0.6)"}
-            >Trang chủ</a>
-            <PiCaretRight style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.7rem" }} />
-            <span style={{ color: "#fff", fontWeight: 600 }}>Tạo ảnh AI</span>
+        {/* ── LEFT SIDEBAR ── */}
+        <div className="gen-sidebar" style={{
+          width: 340, flexShrink: 0, background: "#161822",
+          borderRight: "1px solid rgba(255,255,255,0.06)",
+          display: "flex", flexDirection: "column", overflow: "hidden",
+        }}>
+          {/* Tool Tab */}
+          <div style={{ padding: "14px 16px 0", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+            <div style={{ display: "flex", gap: 4, marginBottom: 14 }}>
+              <button style={{
+                padding: "8px 16px", borderRadius: 8, border: "none", cursor: "pointer",
+                background: "linear-gradient(135deg, #16a34a, #15803d)", color: "#fff",
+                fontSize: "0.8rem", fontWeight: 600,
+              }}>✨ Text to Image</button>
+            </div>
           </div>
 
-          <h1 style={{ fontSize: "clamp(1.8rem, 4vw, 2.8rem)", fontWeight: 800, color: "#fff", lineHeight: 1.3, marginBottom: 12 }}>
-            🎨 Thiết kế hình ảnh bằng AI
-          </h1>
-          <p style={{ color: "rgba(255,255,255,0.7)", fontSize: "0.95rem", maxWidth: 520, lineHeight: 1.7 }}>
-            Chọn công cụ và nhập prompt để tạo ảnh chuyên nghiệp chỉ trong vài giây
-          </p>
+          {/* Scrollable Form */}
+          <div style={{ flex: 1, overflowY: "auto", padding: "16px" }}>
 
-          {/* Credits Badge */}
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, marginTop: 20, padding: "8px 20px", borderRadius: 24, background: "rgba(255,255,255,0.15)", backdropFilter: "blur(10px)" }}>
-            <PiSparkle style={{ color: "#fbbf24" }} />
-            <span style={{ color: "#fff", fontSize: "0.85rem", fontWeight: 600 }}>
-              {username} • <span style={{ color: "#fbbf24" }}>{credits.toFixed(0)} credits</span>
-            </span>
+            {/* Prompt */}
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ fontSize: "0.78rem", fontWeight: 600, color: "rgba(255,255,255,0.6)", marginBottom: 8, display: "block" }}>Mô tả hình ảnh</label>
+              <textarea value={prompt} onChange={e => setPrompt(e.target.value)}
+                placeholder="Mô tả chi tiết hình ảnh bạn muốn tạo..."
+                style={{
+                  width: "100%", minHeight: 120, padding: "12px 14px", borderRadius: 10,
+                  background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
+                  color: "#fff", fontSize: "0.85rem", resize: "vertical", outline: "none",
+                  fontFamily: "inherit", lineHeight: 1.6, transition: "border-color 0.2s",
+                }}
+                onFocus={e => e.currentTarget.style.borderColor = "#16a34a"}
+                onBlur={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"}
+              />
+            </div>
+
+            {/* Negative Prompt */}
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ fontSize: "0.78rem", fontWeight: 600, color: "rgba(255,255,255,0.6)", marginBottom: 8, display: "block" }}>Negative Prompt <span style={{ fontWeight: 400, opacity: 0.5 }}>(tùy chọn)</span></label>
+              <textarea value={negPrompt} onChange={e => setNegPrompt(e.target.value)}
+                placeholder="blurry, low quality, watermark..."
+                style={{
+                  width: "100%", minHeight: 60, padding: "10px 14px", borderRadius: 10,
+                  background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
+                  color: "#fff", fontSize: "0.82rem", resize: "vertical", outline: "none",
+                  fontFamily: "inherit", lineHeight: 1.5, transition: "border-color 0.2s",
+                }}
+                onFocus={e => e.currentTarget.style.borderColor = "#16a34a"}
+                onBlur={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"}
+              />
+            </div>
+
+            {/* Divider */}
+            <div style={{ height: 1, background: "rgba(255,255,255,0.06)", marginBottom: 16 }} />
+
+            {/* Ratio / Size */}
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                <label style={{ fontSize: "0.78rem", fontWeight: 600, color: "rgba(255,255,255,0.6)" }}>Tỷ lệ</label>
+                <span style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.35)" }}>{width}×{height}</span>
+              </div>
+              <div style={{ display: "flex", gap: 6 }}>
+                {SIZES.map(s => (
+                  <button key={s.label} onClick={() => { setWidth(s.w); setHeight(s.h); }} style={{
+                    flex: 1, padding: "8px 0", borderRadius: 8, border: "none", cursor: "pointer",
+                    background: currentSize.label === s.label ? "rgba(22,163,74,0.2)" : "rgba(255,255,255,0.05)",
+                    color: currentSize.label === s.label ? "#16a34a" : "rgba(255,255,255,0.5)",
+                    fontSize: "0.75rem", fontWeight: 600, transition: "all 0.15s",
+                    outline: currentSize.label === s.label ? "1px solid rgba(22,163,74,0.4)" : "none",
+                  }}>{s.label}</button>
+                ))}
+              </div>
+            </div>
+
+            {/* Steps */}
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                <label style={{ fontSize: "0.78rem", fontWeight: 600, color: "rgba(255,255,255,0.6)" }}>Steps</label>
+                <span style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.4)", background: "rgba(255,255,255,0.05)", padding: "2px 10px", borderRadius: 6 }}>{steps}</span>
+              </div>
+              <input type="range" min={10} max={60} value={steps} onChange={e => setSteps(Number(e.target.value))}
+                style={{ width: "100%", accentColor: "#16a34a" }} />
+            </div>
+
+            {/* CFG Scale */}
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                <label style={{ fontSize: "0.78rem", fontWeight: 600, color: "rgba(255,255,255,0.6)" }}>CFG Scale</label>
+                <span style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.4)", background: "rgba(255,255,255,0.05)", padding: "2px 10px", borderRadius: 6 }}>{cfgScale}</span>
+              </div>
+              <input type="range" min={1} max={20} step={0.5} value={cfgScale} onChange={e => setCfgScale(Number(e.target.value))}
+                style={{ width: "100%", accentColor: "#16a34a" }} />
+            </div>
+          </div>
+
+          {/* Bottom: Error + Generate Button */}
+          <div style={{ padding: "12px 16px 16px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+            {error && (
+              <div style={{ padding: "8px 12px", borderRadius: 8, marginBottom: 10, background: "rgba(239,68,68,0.15)", color: "#f87171", fontSize: "0.78rem" }}>
+                ⚠️ {error}
+              </div>
+            )}
+            <button onClick={handleGenerate} disabled={loading} style={{
+              width: "100%", padding: "14px 0", borderRadius: 10, border: "none",
+              cursor: loading ? "wait" : "pointer",
+              background: loading ? "rgba(255,255,255,0.1)" : "linear-gradient(135deg, #16a34a, #15803d)",
+              color: "#fff", fontSize: "0.88rem", fontWeight: 700,
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+              transition: "all 0.2s",
+              boxShadow: loading ? "none" : "0 4px 15px rgba(22,163,74,0.25)",
+            }}>
+              {loading ? (
+                <><span style={{ animation: "spin 1s linear infinite", display: "inline-block" }}>⏳</span> Đang xử lý...</>
+              ) : (
+                <>Tạo ảnh <PiSparkle /> 1 credit</>
+              )}
+            </button>
+
+            {/* Credits Info */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 10, fontSize: "0.75rem", color: "rgba(255,255,255,0.35)" }}>
+              <span>{username}</span>
+              <span style={{ color: "#16a34a", fontWeight: 600 }}>{credits.toFixed(0)} credits còn lại</span>
+            </div>
           </div>
         </div>
-      </section>
 
-      {/* ══════ MAIN CONTENT ══════ */}
-      <section style={{ padding: "50px 0 80px", background: "#f9fafb" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px" }}>
-          <div className="generate-layout" style={{ display: "grid", gridTemplateColumns: "1fr 380px", gap: 28 }}>
+        {/* ── RIGHT CONTENT AREA ── */}
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
 
-            {/* Left: Form */}
-            <div>
-              {/* Tool Selection */}
-              <div style={{ background: "#fff", borderRadius: 16, padding: 24, marginBottom: 20, boxShadow: "0 2px 12px rgba(0,0,0,0.04)" }}>
-                <h3 style={{ fontSize: "1rem", fontWeight: 700, marginBottom: 16, color: "#111827" }}>Chọn công cụ AI</h3>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(155px, 1fr))", gap: 10 }}>
-                  {TASK_TYPES.map(tool => (
-                    <button key={tool.value} onClick={() => setSelectedType(tool.value)} style={{
-                      padding: "14px 12px", borderRadius: 12, border: "none", cursor: "pointer", textAlign: "left",
-                      background: selectedType === tool.value ? "linear-gradient(135deg, #16a34a, #15803d)" : "#f9fafb",
-                      color: selectedType === tool.value ? "#fff" : "#374151",
-                      boxShadow: selectedType === tool.value ? "0 4px 12px rgba(22,163,74,0.3)" : "0 1px 3px rgba(0,0,0,0.04)",
-                      transition: "all 0.2s",
-                    }}
-                      onMouseEnter={e => { if (selectedType !== tool.value) e.currentTarget.style.background = "#f3f4f6"; }}
-                      onMouseLeave={e => { if (selectedType !== tool.value) e.currentTarget.style.background = "#f9fafb"; }}
-                    >
-                      <div style={{ fontSize: "0.85rem", fontWeight: 600 }}>{tool.label}</div>
-                      <div style={{ fontSize: "0.72rem", marginTop: 4, opacity: 0.7 }}>{tool.desc}</div>
-                      <div style={{ fontSize: "0.7rem", marginTop: 6, fontWeight: 700, opacity: 0.8 }}>{tool.cost} credits</div>
-                    </button>
+          {/* Top Bar */}
+          <div style={{
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            padding: "10px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)",
+            background: "rgba(255,255,255,0.02)",
+          }}>
+            {/* Left: Tabs */}
+            <div style={{ display: "flex", gap: 4 }}>
+              <button onClick={() => setActiveTab("history")} style={{
+                display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", borderRadius: 8,
+                border: "none", cursor: "pointer", fontSize: "0.8rem", fontWeight: 600,
+                background: activeTab === "history" ? "rgba(255,255,255,0.08)" : "transparent",
+                color: activeTab === "history" ? "#fff" : "rgba(255,255,255,0.45)", transition: "all 0.15s",
+              }}><PiClockCounterClockwise /> Lịch sử</button>
+              <button onClick={() => setActiveTab("create")} style={{
+                display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", borderRadius: 8,
+                border: "none", cursor: "pointer", fontSize: "0.8rem", fontWeight: 600,
+                background: activeTab === "create" ? "rgba(255,255,255,0.08)" : "transparent",
+                color: activeTab === "create" ? "#fff" : "rgba(255,255,255,0.45)", transition: "all 0.15s",
+              }}><PiQuestion /> Hướng dẫn sử dụng</button>
+            </div>
+
+            {/* Right: View mode */}
+            <div style={{ display: "flex", gap: 4 }}>
+              <button onClick={() => setViewMode("list")} style={{
+                display: "flex", alignItems: "center", gap: 5, padding: "7px 14px", borderRadius: 8,
+                border: "none", cursor: "pointer", fontSize: "0.78rem", fontWeight: 600,
+                background: viewMode === "list" ? "rgba(255,255,255,0.08)" : "transparent",
+                color: viewMode === "list" ? "#fff" : "rgba(255,255,255,0.4)", transition: "all 0.15s",
+              }}><PiListBullets /> Danh sách</button>
+              <button onClick={() => setViewMode("grid")} style={{
+                display: "flex", alignItems: "center", gap: 5, padding: "7px 14px", borderRadius: 8,
+                border: "none", cursor: "pointer", fontSize: "0.78rem", fontWeight: 600,
+                background: viewMode === "grid" ? "rgba(255,255,255,0.08)" : "transparent",
+                color: viewMode === "grid" ? "#fff" : "rgba(255,255,255,0.4)", transition: "all 0.15s",
+              }}><PiSquaresFour /> Lưới</button>
+            </div>
+          </div>
+
+          {/* Content Area */}
+          <div style={{ flex: 1, padding: 20, overflowY: "auto" }}>
+            {activeTab === "create" && (
+              <div style={{ maxWidth: 700, margin: "0 auto", padding: "40px 20px" }}>
+                <h2 style={{ color: "#fff", fontSize: "1.3rem", fontWeight: 700, marginBottom: 20 }}>📖 Hướng dẫn sử dụng</h2>
+                <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                  {[
+                    { step: "1", title: "Nhập mô tả hình ảnh", desc: "Mô tả chi tiết hình ảnh bạn muốn tạo bằng tiếng Anh hoặc tiếng Việt. Ví dụ: 'Professional product photo of a modern smartwatch on white marble, studio lighting, 4K quality'" },
+                    { step: "2", title: "Chọn tỷ lệ và cài đặt", desc: "Chọn tỷ lệ ảnh phù hợp (1:1 cho avatar, 16:9 cho banner, 9:16 cho story). Điều chỉnh Steps (chất lượng) và CFG Scale (độ sáng tạo)" },
+                    { step: "3", title: "Nhấn 'Tạo ảnh'", desc: "Mỗi ảnh tốn 1 credit. Kết quả thường mất 10-30 giây. Ảnh sẽ hiện trong tab 'Lịch sử'" },
+                  ].map(item => (
+                    <div key={item.step} style={{
+                      display: "flex", gap: 14, padding: "16px 18px", borderRadius: 12,
+                      background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)",
+                    }}>
+                      <div style={{
+                        width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+                        background: "linear-gradient(135deg, #16a34a, #15803d)",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        color: "#fff", fontSize: "0.85rem", fontWeight: 700,
+                      }}>{item.step}</div>
+                      <div>
+                        <div style={{ color: "#fff", fontSize: "0.88rem", fontWeight: 600, marginBottom: 4 }}>{item.title}</div>
+                        <div style={{ color: "rgba(255,255,255,0.45)", fontSize: "0.8rem", lineHeight: 1.6 }}>{item.desc}</div>
+                      </div>
+                    </div>
                   ))}
                 </div>
               </div>
+            )}
 
-              {/* Prompt */}
-              <div style={{ background: "#fff", borderRadius: 16, padding: 24, marginBottom: 20, boxShadow: "0 2px 12px rgba(0,0,0,0.04)" }}>
-                <h3 style={{ fontSize: "1rem", fontWeight: 700, marginBottom: 16, color: "#111827" }}>Mô tả ảnh</h3>
-                <div style={{ marginBottom: 16 }}>
-                  <label style={{ fontSize: "0.85rem", fontWeight: 600, color: "#374151", marginBottom: 8, display: "block" }}>Prompt</label>
-                  <textarea value={prompt} onChange={e => setPrompt(e.target.value)} placeholder="Mô tả ảnh bạn muốn tạo... Ví dụ: Professional product photo of a modern smartwatch on white marble, studio lighting, 4K quality"
-                    style={{
-                      width: "100%", minHeight: 120, padding: "14px 16px", borderRadius: 12,
-                      border: "2px solid #e5e7eb", fontSize: "0.9rem", resize: "vertical",
-                      outline: "none", transition: "border-color 0.2s", fontFamily: "inherit", lineHeight: 1.6,
-                    }}
-                    onFocus={e => e.currentTarget.style.borderColor = "#16a34a"}
-                    onBlur={e => e.currentTarget.style.borderColor = "#e5e7eb"}
-                  />
-                </div>
-                <div>
-                  <label style={{ fontSize: "0.85rem", fontWeight: 600, color: "#374151", marginBottom: 8, display: "block" }}>Negative Prompt (tùy chọn)</label>
-                  <textarea value={negPrompt} onChange={e => setNegPrompt(e.target.value)} placeholder="Những gì KHÔNG muốn trong ảnh... Ví dụ: blurry, low quality, watermark"
-                    style={{
-                      width: "100%", minHeight: 80, padding: "14px 16px", borderRadius: 12,
-                      border: "2px solid #e5e7eb", fontSize: "0.9rem", resize: "vertical",
-                      outline: "none", transition: "border-color 0.2s", fontFamily: "inherit", lineHeight: 1.6,
-                    }}
-                    onFocus={e => e.currentTarget.style.borderColor = "#16a34a"}
-                    onBlur={e => e.currentTarget.style.borderColor = "#e5e7eb"}
-                  />
-                </div>
+            {activeTab === "history" && results.length === 0 && (
+              <div style={{
+                display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                height: "100%", minHeight: 400, gap: 16,
+              }}>
+                <PiSparkle style={{ fontSize: "3rem", color: "rgba(255,255,255,0.15)" }} />
+                <div style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.95rem", fontWeight: 600 }}>Chưa có ảnh nào</div>
+                <div style={{ color: "rgba(255,255,255,0.25)", fontSize: "0.82rem" }}>Các ảnh đã tạo sẽ hiển thị tại đây</div>
               </div>
+            )}
 
-              {/* Advanced Settings */}
-              <div style={{ background: "#fff", borderRadius: 16, padding: 24, marginBottom: 20, boxShadow: "0 2px 12px rgba(0,0,0,0.04)" }}>
-                <h3 style={{ fontSize: "1rem", fontWeight: 700, marginBottom: 16, color: "#111827" }}>Cài đặt nâng cao</h3>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-                  <div>
-                    <label style={{ fontSize: "0.82rem", fontWeight: 600, color: "#374151", marginBottom: 6, display: "block" }}>Width (px)</label>
-                    <select value={width} onChange={e => setWidth(Number(e.target.value))} style={{
-                      width: "100%", padding: "10px 12px", borderRadius: 10, border: "2px solid #e5e7eb", fontSize: "0.85rem", outline: "none",
-                    }}>
-                      {[512, 768, 1024, 2048].map(v => <option key={v} value={v}>{v}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label style={{ fontSize: "0.82rem", fontWeight: 600, color: "#374151", marginBottom: 6, display: "block" }}>Height (px)</label>
-                    <select value={height} onChange={e => setHeight(Number(e.target.value))} style={{
-                      width: "100%", padding: "10px 12px", borderRadius: 10, border: "2px solid #e5e7eb", fontSize: "0.85rem", outline: "none",
-                    }}>
-                      {[512, 768, 1024, 2048].map(v => <option key={v} value={v}>{v}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label style={{ fontSize: "0.82rem", fontWeight: 600, color: "#374151", marginBottom: 6, display: "block" }}>Steps: {steps}</label>
-                    <input type="range" min={10} max={60} value={steps} onChange={e => setSteps(Number(e.target.value))}
-                      style={{ width: "100%", accentColor: "#16a34a" }} />
-                  </div>
-                  <div>
-                    <label style={{ fontSize: "0.82rem", fontWeight: 600, color: "#374151", marginBottom: 6, display: "block" }}>CFG Scale: {cfgScale}</label>
-                    <input type="range" min={1} max={20} step={0.5} value={cfgScale} onChange={e => setCfgScale(Number(e.target.value))}
-                      style={{ width: "100%", accentColor: "#16a34a" }} />
-                  </div>
-                </div>
-              </div>
-
-              {/* Error */}
-              {error && (
-                <div style={{ padding: "12px 18px", borderRadius: 12, marginBottom: 16, background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", color: "#ef4444", fontSize: "0.85rem" }}>
-                  ⚠️ {error}
-                </div>
-              )}
-
-              {/* Generate Button */}
-              <button onClick={handleGenerate} disabled={loading} style={{
-                width: "100%", padding: "16px 32px", borderRadius: 14, border: "none", cursor: loading ? "wait" : "pointer",
-                background: loading ? "#9ca3af" : "linear-gradient(135deg, #16a34a, #15803d)",
-                color: "#fff", fontSize: "1rem", fontWeight: 700,
-                boxShadow: loading ? "none" : "0 4px 15px rgba(22,163,74,0.3)", transition: "all 0.2s",
-              }}
-                onMouseEnter={e => { if (!loading) { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 6px 20px rgba(22,163,74,0.4)"; } }}
-                onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = loading ? "none" : "0 4px 15px rgba(22,163,74,0.3)"; }}
-              >
-                {loading ? "⏳ Đang gửi yêu cầu..." : `🎨 Tạo ảnh — ${currentTool.cost} credits`}
-              </button>
-            </div>
-
-            {/* Right: Preview / Result */}
-            <div>
-              <div style={{ background: "#fff", borderRadius: 16, padding: 24, boxShadow: "0 2px 12px rgba(0,0,0,0.04)", position: "sticky", top: 100 }}>
-                <h3 style={{ fontSize: "1rem", fontWeight: 700, marginBottom: 16, color: "#111827" }}>Kết quả</h3>
-
-                {result ? (
-                  <div>
-                    <div style={{ padding: "14px", background: "#f0fdf4", borderRadius: 12, marginBottom: 16 }}>
-                      <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "#16a34a" }}>✅ Task đã được tạo</div>
-                      <div style={{ fontSize: "0.8rem", color: "#6b7280", marginTop: 4 }}>ID: {result.task_id}</div>
-                      <div style={{ fontSize: "0.8rem", color: "#6b7280" }}>
-                        Status: <span style={{ fontWeight: 600, color: result.status === "completed" ? "#16a34a" : "#f59e0b" }}>{result.status}</span>
+            {activeTab === "history" && results.length > 0 && (
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: viewMode === "grid" ? "repeat(auto-fill, minmax(240px, 1fr))" : "1fr",
+                gap: 16,
+              }}>
+                {results.map((r, i) => (
+                  <div key={i} style={{
+                    background: "rgba(255,255,255,0.03)", borderRadius: 14,
+                    border: "1px solid rgba(255,255,255,0.06)", overflow: "hidden",
+                    transition: "border-color 0.2s",
+                  }}
+                    onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(22,163,74,0.3)"}
+                    onMouseLeave={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.06)"}
+                  >
+                    {r.output_image_url ? (
+                      <div style={{ position: "relative", aspectRatio: viewMode === "grid" ? "1" : "auto" }}>
+                        <img src={r.output_image_url} alt="Generated" style={{
+                          width: "100%", height: viewMode === "grid" ? "100%" : "auto",
+                          objectFit: "cover", display: "block",
+                        }} />
+                        {/* Hover overlay */}
+                        <div style={{
+                          position: "absolute", inset: 0, background: "rgba(0,0,0,0.5)",
+                          display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+                          opacity: 0, transition: "opacity 0.2s",
+                        }}
+                          onMouseEnter={e => e.currentTarget.style.opacity = "1"}
+                          onMouseLeave={e => e.currentTarget.style.opacity = "0"}
+                        >
+                          <a href={r.output_image_url} download style={{
+                            width: 40, height: 40, borderRadius: 10, background: "rgba(255,255,255,0.15)",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            color: "#fff", fontSize: "1.1rem", backdropFilter: "blur(4px)",
+                          }}><PiDownloadSimple /></a>
+                          <a href={r.output_image_url} target="_blank" rel="noopener noreferrer" style={{
+                            width: 40, height: 40, borderRadius: 10, background: "rgba(255,255,255,0.15)",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            color: "#fff", fontSize: "1.1rem", backdropFilter: "blur(4px)",
+                          }}><PiArrowsOut /></a>
+                        </div>
                       </div>
-                    </div>
-
-                    {result.output_image_url ? (
-                      <>
-                        <div style={{ borderRadius: 12, overflow: "hidden", border: "1px solid #e5e7eb" }}>
-                          <img src={result.output_image_url} alt="Generated" style={{ width: "100%", display: "block" }} />
-                        </div>
-                        <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
-                          <a href={result.output_image_url} download style={{
-                            flex: 1, padding: "10px", borderRadius: 10, textAlign: "center",
-                            background: "#16a34a", color: "#fff", fontSize: "0.8rem", fontWeight: 600, textDecoration: "none",
-                          }}>📥 Tải về</a>
-                          <a href={result.output_image_url} target="_blank" rel="noopener noreferrer" style={{
-                            flex: 1, padding: "10px", borderRadius: 10, textAlign: "center",
-                            border: "1px solid #e5e7eb", color: "#374151", fontSize: "0.8rem", fontWeight: 600, textDecoration: "none",
-                          }}>🔍 Xem full</a>
-                        </div>
-                      </>
                     ) : (
                       <div style={{
-                        aspectRatio: "1", background: "#f9fafb", borderRadius: 12,
-                        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12,
+                        aspectRatio: "1", display: "flex", flexDirection: "column",
+                        alignItems: "center", justifyContent: "center", gap: 8,
                       }}>
-                        <div style={{ fontSize: "2rem", animation: "pulse 2s infinite" }}>⏳</div>
-                        <div style={{ fontSize: "0.85rem", color: "#6b7280" }}>Đang xử lý trên AI Engine...</div>
-                        <div style={{ fontSize: "0.8rem", color: "#9ca3af" }}>Thường mất 10-30 giây</div>
+                        <div style={{ fontSize: "1.5rem", animation: "pulse 2s infinite" }}>⏳</div>
+                        <div style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.78rem" }}>Đang xử lý...</div>
                       </div>
                     )}
-                  </div>
-                ) : (
-                  <div style={{
-                    aspectRatio: "1", background: "#f9fafb", borderRadius: 12,
-                    display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-                    gap: 12, border: "2px dashed #e5e7eb",
-                  }}>
-                    <div style={{ fontSize: "3rem" }}>🎨</div>
-                    <div style={{ fontSize: "0.9rem", fontWeight: 600, color: "#374151" }}>Ảnh sẽ hiện ở đây</div>
-                    <div style={{ fontSize: "0.8rem", color: "#9ca3af", textAlign: "center", padding: "0 20px" }}>
-                      Nhập prompt và nhấn &quot;Tạo ảnh&quot; để bắt đầu
+                    <div style={{ padding: "10px 14px", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+                      <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.3)" }}>ID: {r.task_id.slice(0, 12)}...</div>
+                      <div style={{
+                        fontSize: "0.72rem", fontWeight: 600, marginTop: 2,
+                        color: r.status === "completed" ? "#16a34a" : "#f59e0b",
+                      }}>
+                        {r.status === "completed" ? "✅ Hoàn thành" : "⏳ " + r.status}
+                      </div>
                     </div>
                   </div>
-                )}
-
-                {/* Tool Info */}
-                <div style={{ marginTop: 20, padding: 16, background: "#f9fafb", borderRadius: 12 }}>
-                  <div style={{ fontSize: "0.85rem", fontWeight: 700, marginBottom: 6, color: "#111827" }}>{currentTool.label}</div>
-                  <div style={{ fontSize: "0.8rem", color: "#6b7280", marginBottom: 8 }}>{currentTool.desc}</div>
-                  <div style={{ fontSize: "0.8rem" }}>
-                    Chi phí: <span style={{ color: "#16a34a", fontWeight: 700 }}>{currentTool.cost} credits</span>
-                  </div>
-                </div>
+                ))}
               </div>
-            </div>
+            )}
           </div>
         </div>
-      </section>
-
-      <Footer />
-      <FloatingButtons />
+      </div>
 
       <style>{`
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .gen-sidebar::-webkit-scrollbar { width: 4px; }
+        .gen-sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
         @media (max-width: 768px) {
-          .generate-layout { grid-template-columns: 1fr !important; }
+          .gen-workspace { flex-direction: column !important; }
+          .gen-sidebar { width: 100% !important; max-height: 60vh; }
         }
       `}</style>
     </div>
