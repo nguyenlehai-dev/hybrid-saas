@@ -11,9 +11,12 @@ const AI_MODELS = [
 ];
 
 const SAMPLERS = [
-  "DPM++ 2M", "DPM++ SDE", "DPM++ 2M SDE", "DPM++ 2M SDE Heun", "DPM++ 2S a",
-  "DPM++ 3M SDE", "Euler a", "Euler", "LMS", "Heun",
-  "DPM2", "DPM2 a", "DPM fast", "DPM adaptive", "DDIM", "PLMS", "UniPC",
+  "DPM++ 2M Karras", "DPM++ SDE Karras", "DPM++ 2M SDE Karras",
+  "DPM++ 2M", "DPM++ SDE", "DPM++ 2M SDE", "DPM++ 2M SDE Heun",
+  "DPM++ 2S a Karras", "DPM++ 2S a", "DPM++ 3M SDE Karras", "DPM++ 3M SDE",
+  "Euler a", "Euler", "LMS", "Heun",
+  "DPM2 Karras", "DPM2 a Karras", "DPM2", "DPM2 a",
+  "DDIM", "PLMS", "UniPC",
 ];
 
 interface GenerationResult {
@@ -32,7 +35,7 @@ export default function GeneratePublicPage() {
   const [height, setHeight] = useState(512);
   const [steps, setSteps] = useState(30);
   const [cfgScale, setCfgScale] = useState(7.0);
-  const [sampler, setSampler] = useState("DPM++ 2M");
+  const [sampler, setSampler] = useState("DPM++ 2M Karras");
   const [batchCount, setBatchCount] = useState(1);
   const [seed, setSeed] = useState(-1);
   const [restoreFaces, setRestoreFaces] = useState(false);
