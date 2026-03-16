@@ -10,6 +10,12 @@ const AI_MODELS = [
   { id: "v1-5-pruned-emaonly", name: "Stable Diffusion 1.5", icon: "⚡", tag: "" },
 ];
 
+const SAMPLERS = [
+  "DPM++ 2M", "DPM++ SDE", "DPM++ 2M SDE", "DPM++ 2M SDE Heun", "DPM++ 2S a",
+  "DPM++ 3M SDE", "Euler a", "Euler", "LMS", "Heun",
+  "DPM2", "DPM2 a", "DPM fast", "DPM adaptive", "DDIM", "PLMS", "UniPC",
+];
+
 interface GenerationResult {
   task_id: string;
   status: string;
@@ -26,6 +32,14 @@ export default function GeneratePublicPage() {
   const [height, setHeight] = useState(512);
   const [steps, setSteps] = useState(30);
   const [cfgScale, setCfgScale] = useState(7.0);
+  const [sampler, setSampler] = useState("DPM++ 2M");
+  const [batchCount, setBatchCount] = useState(1);
+  const [seed, setSeed] = useState(-1);
+  const [restoreFaces, setRestoreFaces] = useState(false);
+  const [hiresFixEnabled, setHiresFixEnabled] = useState(false);
+  const [hiresScale, setHiresScale] = useState(2);
+  const [hiresSteps, setHiresSteps] = useState(0);
+  const [denoising, setDenoising] = useState(0.35);
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<GenerationResult[]>([]);
   const [error, setError] = useState("");
@@ -71,7 +85,17 @@ export default function GeneratePublicPage() {
       const res = await fetch(`${API_URL}/ai/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ task_type: "text_to_image", prompt, negative_prompt: negPrompt, width, height, steps, cfg_scale: cfgScale, seed: -1, model: selectedModel }),
+        body: JSON.stringify({
+          task_type: "text_to_image", prompt, negative_prompt: negPrompt,
+          width, height, steps, cfg_scale: cfgScale, seed,
+          model: selectedModel,
+          extra_params: {
+            sampler_name: sampler, n_iter: batchCount,
+            restore_faces: restoreFaces,
+            enable_hr: hiresFixEnabled, hr_scale: hiresScale,
+            hr_second_pass_steps: hiresSteps, denoising_strength: denoising,
+          },
+        }),
       });
       const contentType = res.headers.get("content-type") || "";
       if (!contentType.includes("application/json")) {
@@ -246,25 +270,97 @@ export default function GeneratePublicPage() {
               </div>
             </div>
 
-            {/* Steps */}
+            {/* Sampler */}
             <div style={{ marginBottom: 16 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                <label style={{ fontSize: "0.78rem", fontWeight: 600, color: "rgba(255,255,255,0.6)" }}>Steps</label>
-                <span style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.4)", background: "rgba(255,255,255,0.05)", padding: "2px 10px", borderRadius: 6 }}>{steps}</span>
-              </div>
-              <input type="range" min={10} max={60} value={steps} onChange={e => setSteps(Number(e.target.value))}
-                style={{ width: "100%", accentColor: "#16a34a" }} />
+              <label style={{ fontSize: "0.78rem", fontWeight: 600, color: "rgba(255,255,255,0.6)", marginBottom: 8, display: "block" }}>Sampling method</label>
+              <select value={sampler} onChange={e => setSampler(e.target.value)} style={{
+                width: "100%", padding: "10px 12px", borderRadius: 10,
+                background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
+                color: "#fff", fontSize: "0.82rem", outline: "none", cursor: "pointer",
+                appearance: "none" as any,
+              }}>
+                {SAMPLERS.map(s => <option key={s} value={s} style={{ background: "#1e293b" }}>{s}</option>)}
+              </select>
             </div>
 
-            {/* CFG Scale */}
-            <div style={{ marginBottom: 16 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                <label style={{ fontSize: "0.78rem", fontWeight: 600, color: "rgba(255,255,255,0.6)" }}>CFG Scale</label>
-                <span style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.4)", background: "rgba(255,255,255,0.05)", padding: "2px 10px", borderRadius: 6 }}>{cfgScale}</span>
+            {/* Steps + CFG in row */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                  <label style={{ fontSize: "0.78rem", fontWeight: 600, color: "rgba(255,255,255,0.6)" }}>Steps</label>
+                  <span style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.4)", background: "rgba(255,255,255,0.05)", padding: "2px 8px", borderRadius: 5 }}>{steps}</span>
+                </div>
+                <input type="range" min={10} max={60} value={steps} onChange={e => setSteps(Number(e.target.value))} style={{ width: "100%", accentColor: "#16a34a" }} />
               </div>
-              <input type="range" min={1} max={20} step={0.5} value={cfgScale} onChange={e => setCfgScale(Number(e.target.value))}
-                style={{ width: "100%", accentColor: "#16a34a" }} />
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                  <label style={{ fontSize: "0.78rem", fontWeight: 600, color: "rgba(255,255,255,0.6)" }}>CFG Scale</label>
+                  <span style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.4)", background: "rgba(255,255,255,0.05)", padding: "2px 8px", borderRadius: 5 }}>{cfgScale}</span>
+                </div>
+                <input type="range" min={1} max={20} step={0.5} value={cfgScale} onChange={e => setCfgScale(Number(e.target.value))} style={{ width: "100%", accentColor: "#16a34a" }} />
+              </div>
             </div>
+
+            {/* Batch + Seed */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+              <div>
+                <label style={{ fontSize: "0.78rem", fontWeight: 600, color: "rgba(255,255,255,0.6)", marginBottom: 6, display: "block" }}>Batch count</label>
+                <input type="number" min={1} max={8} value={batchCount} onChange={e => setBatchCount(Number(e.target.value))} style={{
+                  width: "100%", padding: "8px 12px", borderRadius: 8,
+                  background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
+                  color: "#fff", fontSize: "0.82rem", outline: "none",
+                }} />
+              </div>
+              <div>
+                <label style={{ fontSize: "0.78rem", fontWeight: 600, color: "rgba(255,255,255,0.6)", marginBottom: 6, display: "block" }}>Seed</label>
+                <input type="number" value={seed} onChange={e => setSeed(Number(e.target.value))} placeholder="-1 = random" style={{
+                  width: "100%", padding: "8px 12px", borderRadius: 8,
+                  background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
+                  color: "#fff", fontSize: "0.82rem", outline: "none",
+                }} />
+              </div>
+            </div>
+
+            {/* Toggles */}
+            <div style={{ display: "flex", gap: 16, marginBottom: 16, flexWrap: "wrap" as const }}>
+              <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: "0.78rem", color: "rgba(255,255,255,0.6)" }}>
+                <input type="checkbox" checked={restoreFaces} onChange={e => setRestoreFaces(e.target.checked)} style={{ accentColor: "#16a34a" }} />
+                Restore faces
+              </label>
+              <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: "0.78rem", color: "rgba(255,255,255,0.6)" }}>
+                <input type="checkbox" checked={hiresFixEnabled} onChange={e => setHiresFixEnabled(e.target.checked)} style={{ accentColor: "#16a34a" }} />
+                Hires. fix
+              </label>
+            </div>
+
+            {/* Hires settings (conditional) */}
+            {hiresFixEnabled && (
+              <div style={{ padding: 12, borderRadius: 10, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", marginBottom: 16 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                  <div>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                      <label style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.5)" }}>Upscale by</label>
+                      <span style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.35)" }}>{hiresScale}x</span>
+                    </div>
+                    <input type="range" min={1.5} max={4} step={0.5} value={hiresScale} onChange={e => setHiresScale(Number(e.target.value))} style={{ width: "100%", accentColor: "#16a34a" }} />
+                  </div>
+                  <div>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                      <label style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.5)" }}>Denoising</label>
+                      <span style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.35)" }}>{denoising}</span>
+                    </div>
+                    <input type="range" min={0} max={1} step={0.05} value={denoising} onChange={e => setDenoising(Number(e.target.value))} style={{ width: "100%", accentColor: "#16a34a" }} />
+                  </div>
+                </div>
+                <div style={{ marginTop: 8 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                    <label style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.5)" }}>Hires steps</label>
+                    <span style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.35)" }}>{hiresSteps || "auto"}</span>
+                  </div>
+                  <input type="range" min={0} max={60} value={hiresSteps} onChange={e => setHiresSteps(Number(e.target.value))} style={{ width: "100%", accentColor: "#16a34a" }} />
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Bottom: Error + Generate Button */}

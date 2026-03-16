@@ -111,6 +111,13 @@ class AIDispatcher:
             "steps": params.get("steps", 30),
             "cfg_scale": params.get("cfg_scale", 7.0),
             "seed": params.get("seed", -1),
+            "sampler_name": params.get("sampler_name", "DPM++ 2M"),
+            "n_iter": params.get("n_iter", 1),
+            "restore_faces": params.get("restore_faces", False),
+            "enable_hr": params.get("enable_hr", False),
+            "hr_scale": params.get("hr_scale", 2),
+            "hr_second_pass_steps": params.get("hr_second_pass_steps", 0),
+            "denoising_strength": params.get("denoising_strength", 0.35),
         }
 
         # Apply model selection
